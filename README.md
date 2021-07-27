@@ -8,7 +8,7 @@ This is an online course where you can learn to find and fix low-level performan
 
 Each lab assignment focuses on a specific performance problem and can take anywhere from 30 mins up to 4 hours depending on your background and the complexity of the lab assignment itself. Once you're done improving the code, you can submit your solution to Github for automated benchmarking and verification.
 
-Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
+Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ). Join our [discord channel](https://discord.gg/8h6gEzgMDY) to collaborate with others.
 
 ## Lab assignments
 
