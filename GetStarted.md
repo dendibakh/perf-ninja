@@ -38,6 +38,8 @@ You are free to work on whatever platform you have at your disposal. However, th
 
 ## Submission guidelines:
 
+**IMPORTANT:** Send a request to be added as a collaborator to this Github repo. Otherwise, you won't be able to push your private branch[es]. Send your github handle to dendibakh@gmail.com with the topic "[PerfNinjaAccessRequest]". Do not fork the repo and submit a pull request with your solution, the CI job won't be triggered.
+
 Push your submissions into your own branch[es]. CI job will be triggered every time you push changes to your remote Github branch. For now, we use a self-hosted runner, which is configured specifically for benchmarking purposes.
 
 By default, CI will detect which lab was modified in the last commit and will only benchmark affected asignment. If you make changes to more than one lab, CI job will benchmark all the labs. You can also force benchmarking all the labs if you add `[CheckAll]` in the commit message.
