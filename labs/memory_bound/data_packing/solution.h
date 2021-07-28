@@ -14,7 +14,7 @@ struct S {
   double d;
   bool b;
 
-  bool operator<(const S &s) { return this->i < s.i; }
+  bool operator<(const S &s) const { return this->i < s.i; }
 };
 
 void init(std::array<S, N> &arr);
