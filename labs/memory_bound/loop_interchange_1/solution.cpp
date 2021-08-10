@@ -1,6 +1,35 @@
 
 #include "solution.h"
-#include <memory>
+#include <cstdint>
+
+class MatrixView{
+public:
+  // NOLINTNEXTLINE: implicit conversion is desired
+  MatrixView(Matrix& m): m{&m}{}
+
+  const Matrix::value_type& operator[](const std::size_t index) const
+  {
+    return (*m)[index];
+  }
+
+  Matrix::value_type& operator[](const std::size_t index)
+  {
+    return (*m)[index];
+  }
+
+  Matrix& raw()
+  {
+    return *m;
+  }
+
+  friend void swap(MatrixView& lhs, MatrixView& rhs)
+  {
+    std::swap(lhs.m, rhs.m);
+  }
+
+private:
+  Matrix* m{};
+};
 
 // Make zero matrix
 void zero(Matrix &result) {
@@ -42,44 +71,52 @@ constexpr Matrix identity() {
   return result;
 }
 
-Matrix multiply(const Matrix &a, const Matrix &b) {
-  Matrix result{};
+void multiply2(const MatrixView a, const MatrixView b, MatrixView out) {
+  out.raw() = {};
   for (int i = 0; i < N; i++) {
     for (int k = 0; k < N; k++) {
       for (int j = 0; j < N; j++) {
-        result[i][j] += a[i][k] * b[k][j];
+        out[i][j] += a[i][k] * b[k][j];
       }
     }
   }
-
-  return result;
 }
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
-  // Temporary products
+  // if(k == 1) [[unlikely]]{
+  //   return input;
+  // }
+  // store everything on stack, no dynamic allocations
+  // products
   auto productCurrent = identity();
+  Matrix productTmp;
+  MatrixView productCurrentView{productCurrent};
+  MatrixView productTmpView{productTmp};
 
-  // Temporary elements = a^(2^integer)
+  // elements
   auto elementCurrent = input;
+  Matrix elementTmp;
+  MatrixView elementCurrentView{elementCurrent};
+  MatrixView elementTmpView{elementTmp};
 
-  // Use binary representation of k to be O(log(k))
-  for (auto i = k; i > 0; i /= 2) {
-    // k is always 2021, it has only 2 zero bits, we can add [[likely]]?
-    if (i % 2 != 0) {
-      // Multiply the product by element
-      productCurrent = multiply(productCurrent, elementCurrent);
-
-      // Exit early to skip next squaring
-      if (i == 1)
-      {
-        break;
-      }
+  for (auto i = k; i != 1; i >>= 2) {
+    // `k` is `2021`, it has only 2 zero bits, thus, we can use `likely`
+    const auto isEven = (i & 1);
+    if (isEven) [[likely]] {
+      multiply2(productCurrentView, elementCurrentView, productTmpView);
+      // using views allows us to efficiently swap matrices
+      swap(productTmpView, productCurrentView);
     }
 
-    // Square an element
-    elementCurrent = multiply(elementCurrent, elementCurrent);
+    multiply2(elementCurrentView, elementCurrentView, elementTmpView);
+    swap(elementTmpView, elementCurrentView);
   }
+
+  // for the case when `k == 1` we can omit this multiplication using the
+  // condition at the beginning of this function
+  multiply2(productCurrentView, elementCurrentView, productTmpView);
+  swap(productTmpView, productCurrentView);
 
   return productCurrent;
 }
