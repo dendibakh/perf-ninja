@@ -1,6 +1,7 @@
 
 #include "solution.h"
 #include <cstdint>
+#include <iostream>
 
 class MatrixView{
 public:
@@ -84,6 +85,9 @@ void multiply2(const MatrixView a, const MatrixView b, MatrixView out) {
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
+  std::cout << "K: " << k << std::endl;
+  return {};
+
   if(k == 0) [[unlikely]]{
     return identity();
   }
