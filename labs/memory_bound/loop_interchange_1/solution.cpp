@@ -84,10 +84,13 @@ void multiply2(const MatrixView a, const MatrixView b, MatrixView out) {
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
-  return {};
-  // if(k == 1) [[unlikely]]{
-  //   return input;
-  // }
+  if(k == 0) [[unlikely]]{
+    return identity();
+  }
+
+  if(k == 1) [[unlikely]]{
+    return input;
+  }
   // store everything on stack, no dynamic allocations
   // products
   auto productCurrent = identity();
@@ -114,8 +117,6 @@ Matrix power(const Matrix &input, const uint32_t k) {
     swap(elementTmpView, elementCurrentView);
   }
 
-  // for the case when `k == 1` we can omit this multiplication using the
-  // condition at the beginning of this function
   multiply2(productCurrentView, elementCurrentView, productTmpView);
   swap(productTmpView, productCurrentView);
 
