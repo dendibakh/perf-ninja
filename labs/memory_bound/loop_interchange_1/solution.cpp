@@ -84,6 +84,7 @@ void multiply2(const MatrixView a, const MatrixView b, MatrixView out) {
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
+  return {};
   // if(k == 1) [[unlikely]]{
   //   return input;
   // }
