@@ -48,6 +48,14 @@ int main() {
       return 1;
     }
   }
+  {
+    multiply(*b, *a, *a);
+    *c = power(*a, 2);
+    if (!equals(*b, *c)) {
+      std::cerr << "Validation Failed. a^2" << std::endl;
+      return 1;
+    }
+  }
   *b = power(*a, k);
   *c = power(*a, k1);
   *d = power(*a, k - k1);
