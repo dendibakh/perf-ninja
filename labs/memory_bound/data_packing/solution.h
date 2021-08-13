@@ -8,12 +8,22 @@ constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
-struct S {
+struct S_Old {
   double d;                     // 0-1
-  short l;                      // (0-100)*(0-100) = 0-10000
-  signed char i;                // 0-100
-  signed char s;                // 0-100
-  bool b;                       // true/false
+  short l;                      // (0-100)*(0-100) = 0-10000 -- 14
+  signed char i;                // 0-100 -- 7
+  signed char s;                // 0-100 -- 7
+  bool b;                       // true/false -- 1
+
+  bool operator<(const S_Old &s) const { return this->i < s.i; }
+};
+
+struct S {
+  float d;                      // 0-1
+  unsigned l : 14;              // (0-100)*(0-100) = 0-10000 -- 14
+  unsigned i : 7;               // 0-100 -- 7
+  unsigned s : 7;               // 0-100 -- 7
+  unsigned b : 1;               // true/false -- 1
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
