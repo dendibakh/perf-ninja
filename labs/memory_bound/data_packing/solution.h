@@ -17,18 +17,19 @@ struct S_Old {
 
   bool operator<(const S_Old &s) const { return this->i < s.i; }
 };
+static_assert( std::numeric_limits<short>::max() >= 10000);
+static_assert( std::numeric_limits<signed char>::max() >= 100);
 
-struct S {
+struct S_bitpacked {
   float d;                      // 0-1
   unsigned l : 14;              // (0-100)*(0-100) = 0-10000 -- 14
   unsigned i : 7;               // 0-100 -- 7
   unsigned s : 7;               // 0-100 -- 7
   unsigned b : 1;               // true/false -- 1
 
-  bool operator<(const S &s) const { return this->i < s.i; }
+  bool operator<(const S_bitpacked &s) const { return this->i < s.i; }
 };
-static_assert( std::numeric_limits<short>::max() >= 10000);
-static_assert( std::numeric_limits<signed char>::max() >= 100);
+using S = S_Old;
 
 void init(std::array<S, N> &arr);
 void solution(std::array<S, N> &arr);
