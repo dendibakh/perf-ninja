@@ -10,10 +10,9 @@ void init(std::array<S, N> &arr) {
     int random_int1 = distribution(generator);
     int random_int2 = distribution(generator);
 
-    arr[i].i = random_int1;
-    arr[i].s = static_cast<short>(random_int2);
-    arr[i].l = static_cast<long long>(random_int1) * random_int2;
-    arr[i].d = static_cast<double>(random_int1) / maxRandom;
-    arr[i].b = random_int1 < random_int2;
+    // casting to char is fine, since we are allowed to assume that maxRandom
+    // never exceeds 100
+    arr[i].i = static_cast<char>(random_int1);
+    arr[i].s = static_cast<char>(random_int2);
   }
 }
