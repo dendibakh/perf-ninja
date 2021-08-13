@@ -24,15 +24,32 @@ void identity(Matrix &result) {
 
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
-  zero(result);
-
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
-      }
+#if 0
+    // No zeroing out, sequential writes, about 5x slower
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            float tmp = 0.0;
+            for (int k = 0; k < N; k++) {
+                tmp += a[i][k] * b[k][j];
+            }
+            result[i][j] = tmp;
+        }
     }
-  }
+
+#else
+
+    zero(result);
+    for (int i = 0; i < N; i++) {
+        for (int k = 0; k < N; k++) {
+            float const tmp = a[i][k];
+            for (int j = 0; j < N; j++) {
+                result[i][j] += tmp * b[k][j];
+            }
+        }
+    }
+
+#endif
+
 }
 
 // Compute integer power of a given square matrix
