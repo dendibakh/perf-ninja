@@ -27,19 +27,19 @@ bool check_entry(int first_value, int second_value) {
 
   const auto expected_l = static_cast<short>(first_value * second_value);
   if (entry.get_l() != expected_l) {
-    report_failure("l", entry.l, expected_l, first_value, second_value);
+    report_failure("l", entry.get_l(), expected_l, first_value, second_value);
     return false;
   }
 
   const auto expected_d = static_cast<double>(first_value) / maxRandom;
   if (entry.get_d() != expected_d) {
-    report_failure("d", entry.d, expected_d, first_value, second_value);
+    report_failure("d", entry.get_d(), expected_d, first_value, second_value);
     return false;
   }
 
   const auto expected_b = (first_value < second_value);
   if (entry.get_b() != expected_b) {
-    report_failure("b", entry.b, expected_b, first_value, second_value);
+    report_failure("b", entry.get_b(), expected_b, first_value, second_value);
     return false;
   }
 
