@@ -4,46 +4,35 @@
 #include <iostream>
 
 template <typename Received_t, typename Expected_t>
-static void report_failure(const char *var_name, Received_t received,
-                           Expected_t expected, int first_value,
-                           int second_value) {
+static bool validate(const char *var_name, Received_t received,
+                     Expected_t expected, int first_value, int second_value) {
+  if (received == expected)
+    return true;
+
   std::cerr << "Validation Failed. Value " << var_name << " is " << received
             << ". Expected is " << expected << " for intialization values "
             << first_value << " and " << second_value << std::endl;
+  return false;
 }
 
-bool check_entry(int first_value, int second_value) {
-  S entry = create_entry(first_value, second_value);
+bool check_entry(int first, int second) {
+  S entry = create_entry(first, second);
 
-  if (entry.i != first_value) {
-    report_failure("i", entry.i, first_value, first_value, second_value);
-    return false;
-  }
+  bool result = validate("i", entry.i, first, first, second);
 
-  if (entry.s != second_value) {
-    report_failure("s", entry.s, second_value, first_value, second_value);
-    return false;
-  }
+  // check result of validate_value first to ensure all failures are printed
+  result = validate("s", entry.s, second, first, second) && result;
 
-  const auto expected_l = static_cast<short>(first_value * second_value);
-  if (entry.get_l() != expected_l) {
-    report_failure("l", entry.get_l(), expected_l, first_value, second_value);
-    return false;
-  }
+  const auto expected_l = static_cast<short>(first * second);
+  result = validate("l", entry.get_l(), expected_l, first, second) && result;
 
-  const auto expected_d = static_cast<double>(first_value) / maxRandom;
-  if (entry.get_d() != expected_d) {
-    report_failure("d", entry.get_d(), expected_d, first_value, second_value);
-    return false;
-  }
+  const auto expected_d = static_cast<double>(first) / maxRandom;
+  result = validate("d", entry.get_d(), expected_d, first, second) && result;
 
-  const auto expected_b = (first_value < second_value);
-  if (entry.get_b() != expected_b) {
-    report_failure("b", entry.get_b(), expected_b, first_value, second_value);
-    return false;
-  }
+  const auto expected_b = (first < second);
+  result = validate("b", entry.get_b(), expected_b, first, second) && result;
 
-  return true;
+  return result;
 }
 
 int main() {
