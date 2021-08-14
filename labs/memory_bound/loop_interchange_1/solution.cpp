@@ -23,29 +23,42 @@ void identity(Matrix &result) {
   }
 }
 
+static Row get_column(const Matrix &m, int column_index) {
+  // convert entries stored column-wise into a
+  // contiguous array of values to
+  // allow vectorization
+  Row column_values;
+  for (int k = 0; k < N; k++) {
+    column_values[k] = m[k][column_index];
+  }
+
+  return column_values;
+}
+
+static float calc_scalar(const Row &a, const Row &b) {
+  float value = 0.f;
+
+  for (int k = 0; k < N; k++) {
+    value += a[k] * b[k];
+  }
+
+  return value;
+}
+
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   // omit zeroing target matrix as it will be overwritten with the final value
   // zero(result);
-  Row column_values;
 
   for (int j = 0; j < N; j++) {
-    // convert entries stored column-wise into a contiguous array of values to
-    // allow vectorization
-    for (int k = 0; k < N; k++) {
-      column_values[k] = b[k][j];
-    }
+    const Row column_values = get_column(b, j);
 
     for (int i = 0; i < N; i++) {
       // prevent store to memory on every iteration, this potentially allows a
       // more efficient calculation
 
       const Row &row_values = a[i];
-      float value = 0.f;
-      for (int k = 0; k < N; k++) {
-        value += row_values[k] * column_values[k];
-      }
-      result[i][j] = value;
+      result[i][j] = calc_scalar(row_values, column_values);
     }
   }
 }
@@ -64,18 +77,18 @@ Matrix power(const Matrix &input, const uint32_t k) {
   identity(*productCurrent);
   *elementCurrent = input;
 
+  if (k % 2 != 0) {
+    // Multiply the product by element
+    multiply(*productNext, *productCurrent, *elementCurrent);
+    std::swap(productNext, productCurrent);
+
+    // Exit early to skip next squaring
+    if (k == 1)
+      return *productCurrent;
+  }
+
   // Use binary representation of k to be O(log(k))
-  for (auto i = k; i > 0; i /= 2) {
-    if (i % 2 != 0) {
-      // Multiply the product by element
-      multiply(*productNext, *productCurrent, *elementCurrent);
-      std::swap(productNext, productCurrent);
-
-      // Exit early to skip next squaring
-      if (i == 1)
-        break;
-    }
-
+  for (auto i = k & ~1u; i > 0; i /= 2) {
     // Square an element
     multiply(*elementNext, *elementCurrent, *elementCurrent);
     std::swap(elementNext, elementCurrent);
