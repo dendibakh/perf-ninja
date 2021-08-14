@@ -1,5 +1,6 @@
 
 #include "solution.h"
+#include <cstring>
 #include <memory>
 #include <string_view>
 
@@ -26,15 +27,23 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   // omit zeroing target matrix as it will be overwritten with the final value
   // zero(result);
+  Row column_values;
 
-  // prefer iteration over adjacent values
   for (int j = 0; j < N; j++) {
+    // convert entries stored column-wise into a contiguous array of values to
+    // allow vectorization
+    for (int k = 0; k < N; k++) {
+      column_values[k] = b[k][j];
+    }
+
     for (int i = 0; i < N; i++) {
       // prevent store to memory on every iteration, this potentially allows a
       // more efficient calculation
+
+      const Row &row_values = a[i];
       float value = 0.f;
       for (int k = 0; k < N; k++) {
-        value += a[i][k] * b[k][j];
+        value += row_values[k] * column_values[k];
       }
       result[i][j] = value;
     }

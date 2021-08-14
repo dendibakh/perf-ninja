@@ -6,7 +6,8 @@
 constexpr int N = 400;
 
 // Square matrix 400 x 400
-using Matrix = std::array<std::array<float, N>, N>;
+using Row = std::array<float, N>;
+using Matrix = std::array<Row, N>;
 
 void zero(Matrix &result);
 void identity(Matrix &result);
