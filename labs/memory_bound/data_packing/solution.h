@@ -10,8 +10,8 @@ constexpr int maxRandom = 100;
 struct S {
   // prefer use of byte sized types instead of 7 bit bitfield for ~5% better
   // performance at no increase of overall structure size
-  char i;
-  char s;
+  short i;
+  short s;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 
