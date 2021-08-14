@@ -24,13 +24,19 @@ void identity(Matrix &result) {
 
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
-  zero(result);
+  // omit zeroing target matrix as it will be overwritten with the final value
+  // zero(result);
 
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
+  // prefer iteration over adjacent values
+  for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+      // prevent store to memory on every iteration, this potentially allows a
+      // more efficient calculation
+      float value = 0.f;
       for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+        value += a[i][k] * b[k][j];
       }
+      result[i][j] = value;
     }
   }
 }
@@ -66,5 +72,7 @@ Matrix power(const Matrix &input, const uint32_t k) {
     std::swap(elementNext, elementCurrent);
   }
 
-  return std::move(*productCurrent);
+  // remove std::move to allow for copy elision (even though this is more of a
+  // rounding error)
+  return *productCurrent;
 }
