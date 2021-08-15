@@ -8,11 +8,10 @@ constexpr int maxRandom = 100;
 
 struct S {
   float d;
-  short l : 14;
-  bool b : 1;
-  char : 0;
-  char i : 7;
+  long long l : 16;
+  char i : 8;
   char s : 7;
+  bool b : 1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
