@@ -12,7 +12,7 @@ int main() {
   int result = solution(arr, N);
   if (result != (N * (N + 1)) / 2) {
     std::cerr << "Validation Failed. Result = " << result
-              << ". Expected = " << N * (N + 1)) / 2 << std::endl;
+              << ". Expected = " << (N * (N + 1)) / 2 << std::endl;
     return 1;
   }
 
