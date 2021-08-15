@@ -7,11 +7,12 @@ constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
 struct S {
-  double d;
-  short l;
-  char i;
-  char s;
-  bool b;
+  float d;
+  short l : 14;
+  bool b : 1;
+  char : 0;
+  char i : 7;
+  char s : 7;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
