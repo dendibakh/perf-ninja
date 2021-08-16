@@ -26,8 +26,8 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int k = 0; k < N; k++) {
-    for (int i = 0; i < N; i++) {
+  for (int i = 0; i < N; i++) {
+    for (int k = 0; k < N; k++) {
       for (int j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
       }
