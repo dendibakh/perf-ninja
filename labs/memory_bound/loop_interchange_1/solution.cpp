@@ -85,16 +85,16 @@ void multiply2(const MatrixView a, const MatrixView b, MatrixView out) {
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
-  std::cout << "K: " << k << std::endl;
-  return {};
+  // std::cout << "K: " << k << std::endl;
+  // return {};
 
-  if(k == 0) [[unlikely]]{
-    return identity();
-  }
+  // if(k == 0) [[unlikely]]{
+  //   return identity();
+  // }
 
-  if(k == 1) [[unlikely]]{
-    return input;
-  }
+  // if(k == 1) [[unlikely]]{
+  //   return input;
+  // }
   // store everything on stack, no dynamic allocations
   // products
   auto productCurrent = identity();
@@ -108,7 +108,7 @@ Matrix power(const Matrix &input, const uint32_t k) {
   MatrixView elementCurrentView{elementCurrent};
   MatrixView elementTmpView{elementTmp};
 
-  for (auto i = k; i != 1; i >>= 2) {
+  for (auto i = k; i != 0; i >>= 2) {
     // `k` is `2021`, it has only 2 zero bits, thus, we can use `likely`
     const auto isEven = (i & 1);
     if (isEven) [[likely]] {
@@ -117,12 +117,15 @@ Matrix power(const Matrix &input, const uint32_t k) {
       swap(productTmpView, productCurrentView);
     }
 
+    if(i == 1){
+      break;
+    }
     multiply2(elementCurrentView, elementCurrentView, elementTmpView);
     swap(elementTmpView, elementCurrentView);
   }
 
-  multiply2(productCurrentView, elementCurrentView, productTmpView);
-  swap(productTmpView, productCurrentView);
+  // multiply2(productCurrentView, elementCurrentView, productTmpView);
+  // swap(productTmpView, productCurrentView);
 
   return productCurrent;
 }
