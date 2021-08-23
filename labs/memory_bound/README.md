@@ -1,6 +1,6 @@
 # Memory Bound
 
-[<img src="https://img.youtube.com/vi/jxK6GAyp8XE/maxresdefault.jpg" width="50%">](https://youtu.be/jxK6GAyp8XE)
+[<img src="https://drive.google.com/uc?export=view&id=1gOFPTbLlLLXQrWccnLRAWd_uUZcFlosk" width="50%">](https://youtu.be/jxK6GAyp8XE)
 
 This is a collection of labs with performance bound by memory accesses. Here are some of the topics we plan to cover:
 

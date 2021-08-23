@@ -2,7 +2,7 @@
 
 Watch the warmup video:
 
-[<img src="https://img.youtube.com/vi/jFRwAcIoLgQ/maxresdefault.jpg" width="50%">](https://youtu.be/jFRwAcIoLgQ)
+[<img src="https://drive.google.com/uc?export=view&id=17PvMuyuH7W6Dx-jXV1xuMLqo6gIudGmE" width="50%">](https://youtu.be/jFRwAcIoLgQ)
 
 Every lab assignment has the following:
 * Video that introduces a particular transformation.
