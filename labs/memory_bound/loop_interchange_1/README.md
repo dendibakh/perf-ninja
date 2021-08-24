@@ -1,5 +1,3 @@
-**TODO**: add an introductory and a summary videos.
-
 This is a lab about [loop interchange](https://en.wikipedia.org/wiki/Loop_interchange).
 
 [<img src="https://drive.google.com/uc?export=view&id=19g9RQifLdObp2mUHcaCHXwk6WCXmupZV" width="50%">](https://www.youtube.com/watch?v=TLDR_nO9XVc&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
