@@ -54,7 +54,7 @@ Labs["frontend_bound"] = dict()
 Labs["data_driven"] = dict()
 Labs["misc"] = dict()
 
-Labs["memory_bound"]["data_packing"] = LabParams(threshold=15.0)
+Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
 Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
 Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
 Labs["misc"]["warmup"] = LabParams(threshold=50.0)
