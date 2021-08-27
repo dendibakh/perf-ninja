@@ -22,6 +22,16 @@ cmake --build . --target benchmarkLab
 ```
 When you push changes to your private branch, it will automatically trigger CI benchmarking job. More details about it at the bottom of the page.
 
+## Profiling
+
+Lab assignments are build on top of Google Benchmark library, which by default performs a variable number of benchmark iterations. That makes it hard to compare performance profiles of two runs since they will not do the same amount of work. You can see the same wall time even though the number of iterations is different. To fix the number of iterations, you can do the following change:
+
+```
+  BENCHMARK(bench1)->Iterations(10);
+```
+
+This will instruct the Google Benchmark framework to execute exactly 10 iterations of the benchmark. Now when you improve your code you can also compare performance profiles since the wall time will be different.
+
 ## Project dependencies
 
 To build labs in this video course you need to install the following dependencies:
