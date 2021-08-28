@@ -6,7 +6,7 @@
 template <typename Received_t, typename Expected_t>
 static bool validate(const char *var_name, Received_t received,
                      Expected_t expected, int first_value, int second_value) {
-  if (std::abs(float(received - expected)) < 0.001)
+  if (std::abs(Received_t(received - expected)) < 0.001)
     return true;
 
   std::cerr << "Validation Failed. Value " << var_name << " is " << received
