@@ -12,7 +12,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
 
 ## Lab assignments
 
-* Memory Bound:
+* [Memory Bound](labs/memory_bound):
   * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
