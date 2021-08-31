@@ -21,6 +21,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Function Inlining 1](labs/core_bound/function_inlining_1)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
 * Bad Speculation:
+  * [Conditional Store 1](labs/bad_speculation/conditional_store_1)
 * CPU Frontend Bound:
 * Data-Driven optimizations:
 * Misc:

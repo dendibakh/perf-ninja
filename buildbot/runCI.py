@@ -61,6 +61,7 @@ Labs["misc"]["warmup"] = LabParams(threshold=50.0)
 Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=35.0)
 Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
 Labs["core_bound"]["vectorization_1"] = LabParams(threshold=90.0)
+Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
 
 def getLabCurrentStatus(labPath):
   return Labs[labPath.category][labPath.name].result
