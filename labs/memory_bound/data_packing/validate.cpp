@@ -4,35 +4,47 @@
 #include <iostream>
 
 template <typename Received_t, typename Expected_t>
-static bool validate(const char *var_name, Received_t received,
+static void reportError(const char *var_name, Received_t received,
                      Expected_t expected, int first_value, int second_value) {
-  if (std::abs(Received_t(received - expected)) < 0.001)
-    return true;
-
   std::cerr << "Validation Failed. Value " << var_name << " is " << received
             << ". Expected is " << expected << " for intialization values "
             << first_value << " and " << second_value << std::endl;
-  return false;
 }
 
 bool check_entry(int first, int second) {
   S entry = create_entry(first, second);
 
-  bool result = validate("i", entry.i, first, first, second);
+  bool isValid = true;
 
-  // check result of validate_value first to ensure all failures are printed
-  result = validate("s", entry.s, second, first, second) && result;
+  if (entry.i != first) {
+    reportError("i", entry.i, first, first, second);
+    isValid = false;
+  }
+
+  if (entry.s != second) {
+    reportError("s", entry.s, second, first, second);
+    isValid = false;
+  }
 
   const auto expected_l = static_cast<short>(first * second);
-  result = validate("l", entry.l, expected_l, first, second) && result;
-
+  if (entry.l != expected_l) {
+    reportError("l", entry.l, expected_l, first, second);
+    isValid = false;
+  }
+  
   const auto expected_d = static_cast<double>(first) / maxRandom;
-  result = validate("d", entry.d, expected_d, first, second) && result;
+  if (std::abs(float(entry.d - expected_d)) > 0.001) {
+    reportError("d", entry.d, expected_d, first, second);
+    isValid = false;
+  }
 
   const auto expected_b = (first < second);
-  result = validate("b", entry.b, expected_b, first, second) && result;
+  if (entry.b != expected_b) {
+    reportError("b", entry.b, expected_b, first, second);
+    isValid = false;
+  }
 
-  return result;
+  return isValid;
 }
 
 int main() {
