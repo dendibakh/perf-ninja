@@ -24,13 +24,13 @@ bool check_entry(int first, int second) {
   result = validate("s", entry.s, second, first, second) && result;
 
   const auto expected_l = static_cast<short>(first * second);
-  result = validate("l", entry.l, expected_l, first, second) && result;
+  result = validate("l", entry.l(), expected_l, first, second) && result;
 
   const auto expected_d = static_cast<double>(first) / maxRandom;
-  result = validate("d", entry.d, expected_d, first, second) && result;
+  result = validate("d", entry.d(), expected_d, first, second) && result;
 
   const auto expected_b = (first < second);
-  result = validate("b", entry.b, expected_b, first, second) && result;
+  result = validate("b", entry.b(), expected_b, first, second) && result;
 
   return result;
 }
