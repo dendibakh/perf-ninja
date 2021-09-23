@@ -1,9 +1,9 @@
-
 #include "solution.h"
 #include <algorithm>
 #include <stdlib.h>
 
-static int compare(const void *lhs, const void *rhs) {
+
+inline int compare(const void *lhs, const void *rhs) __attribute__((alwaysinline)){
   auto &a = *reinterpret_cast<const S *>(lhs);
   auto &b = *reinterpret_cast<const S *>(rhs);
 
