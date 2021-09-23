@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdlib.h>
 
-inline static int compare(const void *lhs, const void *rhs) {
+ int compare(const void *lhs, const void *rhs) {
   auto &a = *reinterpret_cast<const S *>(lhs);
   auto &b = *reinterpret_cast<const S *>(rhs);
 
@@ -22,6 +22,6 @@ inline static int compare(const void *lhs, const void *rhs) {
   return 0;
 }
 
-void solution(std::array<S, N> &arr) {
+/*void solution(std::array<S, N> &arr) {
   qsort(arr.data(), arr.size(), sizeof(S), compare);
-}
+}*/
