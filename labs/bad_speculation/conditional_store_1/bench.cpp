@@ -1,6 +1,7 @@
 
 #include "benchmark/benchmark.h"
 #include "solution.h"
+#include <limits>
 
 static void bench1(benchmark::State &state) {
   std::array<S, N> arr;
