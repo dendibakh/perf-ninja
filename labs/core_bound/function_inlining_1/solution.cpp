@@ -3,25 +3,15 @@
 #include <algorithm>
 #include <stdlib.h>
 
-static int compare(const void *lhs, const void *rhs) {
-  auto &a = *reinterpret_cast<const S *>(lhs);
-  auto &b = *reinterpret_cast<const S *>(rhs);
+#define LIKELY(cond) (__builtin_expect(!!(cond), 1))
+#define UNLIKELY(cond) (__builtin_expect(!!(cond), 0))
 
-  if (a.key1 < b.key1)
-    return -1;
-
-  if (a.key1 > b.key1)
-    return 1;
-
-  if (a.key2 < b.key2)
-    return -1;
-
-  if (a.key2 > b.key2)
-    return 1;
-
-  return 0;
-}
+struct compare {
+  inline bool operator() (const S& a, const S& b) {
+    return a.key1 < b.key1;
+  }
+};
 
 void solution(std::array<S, N> &arr) {
-  qsort(arr.data(), arr.size(), sizeof(S), compare);
+  std::sort(arr.begin(), arr.end(), compare());
 }
