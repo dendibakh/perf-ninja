@@ -4,8 +4,8 @@
 #include <utility> // std::pair
 #include <vector>  // std::vector
 
-inline constexpr size_t sequence_size_v = 200; // The length of the generated sequences.
-inline constexpr size_t sequence_count_v = 16; // The number of sequences to generate for both sequence collections.
+inline constexpr size_t sequence_size_v = 16; // The length of the generated sequences.
+inline constexpr size_t sequence_count_v = 200 ; // The number of sequences to generate for both sequence collections.
 
 using sequence_t = std::array<uint8_t, sequence_size_v>;
 using result_t = std::array<int16_t, sequence_count_v>;
