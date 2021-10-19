@@ -1,6 +1,6 @@
 # Bad Speculation
 
-[<img src="https://drive.google.com/uc?export=view&id=1seCqxloOfy5kx5-Hw6j-y1JEjEv0QdjA" width="50%">](https://www.youtube.com/watch?v=B8AsUSN3Xa4&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+[<img src="https://drive.google.com/uc?export=view&id=1seCqxloOfy5kx5-Hw6j-y1JEjEv0QdjA" width="30%">](https://www.youtube.com/watch?v=B8AsUSN3Xa4&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 This is a collection of labs, which experience large amount of branch mispredictions. We will be covering branchless algorithms. Here are some of the topics we plan to cover:
 
