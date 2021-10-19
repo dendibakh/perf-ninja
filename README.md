@@ -33,6 +33,7 @@ Performance Ninja is in a very much work-in-progress state. We will be adding ne
 
 Current sponsors:
 * Pavel Davydov
+* Maya Lekova (@MayaLekova)
 
 ## Contributing
 
