@@ -37,9 +37,7 @@ Current sponsors:
 
 ## Contributing
 
-We warmly welcome contributions! Here is how you can help the project:
-* Propose/Implement new lab assignment.
-* Donate your idle machine to run CI jobs. We are looking to increase diversity of the platforms on which we test your submissions.
+We warmly welcome contributions! See [Contributing.md](Contributing.md) for the details.
 
 Please write to dendibakh@gmail.com with suggestions.
 
