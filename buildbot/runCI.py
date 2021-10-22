@@ -87,7 +87,10 @@ def buildAndValidate(labBuildDir):
   os.chdir(labBuildDir)
 
   try:
-    subprocess.check_call("cmake -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
+    if sys.platform != 'win32':
+      subprocess.check_call("cmake -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
+    else:
+      subprocess.check_call("cmake -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
     print("CMake - OK")
   except:
     print(bcolors.FAIL + "CMake - Failed" + bcolors.ENDC)
