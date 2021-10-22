@@ -1,6 +1,6 @@
 **TODO**: add an introductory and a summary videos.
 
-This is a lab about [SoA to AoS transformation](https://en.wikipedia.org/wiki/AoS_and_SoA).
+[<img src="https://drive.google.com/uc?export=view&id=1RMJ4F9sqnetaB4qjkx8DiCuii5MxuRao" width="30%">](https://www.youtube.com/watch?v=osfIC5uO0G8&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d&index=12)
 
 [Sequence alignment](https://en.wikipedia.org/wiki/Sequence_alignment) is an important algorithm in many bioinformatics applications and pipelines. The goal of the alignment is to gain insights about their biological  relation. In particular, one is interested how the sequences diverged from a common ancestor by evolutionary events like point mutations or insertions and deletions in the respective sequences.
 This problem, however, has quadratic complexity and optimizing it can have a great benefit in many applications.
