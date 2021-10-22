@@ -31,7 +31,7 @@ bool check_entry(int first, int second) {
     reportError("l", entry.l, expected_l, first, second);
     isValid = false;
   }
-  
+
   const auto expected_d = static_cast<double>(first) / maxRandom;
   if (std::abs(float(entry.d - expected_d)) > 0.001) {
     reportError("d", entry.d, expected_d, first, second);
