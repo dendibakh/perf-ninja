@@ -6,7 +6,7 @@
 std::pair<std::vector<sequence_t>, std::vector<sequence_t>> init() {
   std::mt19937_64 random_engine{};
   // Simulate DNA alphabet with 4 symbols.
-  std::uniform_int_distribution<uint8_t> symbol_distribution(0u, 4u);
+  std::uniform_int_distribution<uint16_t> symbol_distribution(0u, 4u);
 
   auto generate_sequences = [&]() -> std::vector<sequence_t> {
     std::vector<sequence_t> sequences{};
@@ -14,7 +14,8 @@ std::pair<std::vector<sequence_t>, std::vector<sequence_t>> init() {
 
     for (sequence_t &sequence : sequences) {
       std::generate(sequence.begin(), sequence.end(),
-                    [&]() { return symbol_distribution(random_engine); });
+                    [&]()
+                    { return static_cast<uint8_t>(symbol_distribution(random_engine)); });
     }
     return sequences;
   };
