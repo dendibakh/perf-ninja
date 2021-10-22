@@ -29,8 +29,13 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
+if (NOT WIN32)
+  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
+  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
+else()
+  set(BENCHMARK_FOLDER "C:/Program Files (x86)/benchmark")
+  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}" REQUIRED)
+endif()
 
 # Find source files
 file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
@@ -92,8 +97,13 @@ endif()
 
 # Other settings
 if(NOT MSVC)
-  target_link_libraries(lab ${BENCHMARK_LIBRARY} pthread m)
-  target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
+  if (WIN32)
+    target_link_libraries(lab ${BENCHMARK_LIBRARY} shlwapi)
+    target_link_libraries(validate ${BENCHMARK_LIBRARY} shlwapi)
+  else()
+    target_link_libraries(lab ${BENCHMARK_LIBRARY} pthread m)
+    target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
+  endif()
 
   # MinGW
   if(MINGW)
