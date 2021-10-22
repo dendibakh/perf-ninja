@@ -1,5 +1,6 @@
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 
 // Assume this constant never changes

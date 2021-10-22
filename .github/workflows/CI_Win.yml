@@ -1,4 +1,4 @@
-name: Benchmark
+name: Benchmark on Windows
 
 on: [push]
 
@@ -7,8 +7,8 @@ env:
 
 jobs:
   build:
-    runs-on: [self-hosted, Linux]
-    timeout-minutes: 5
+    runs-on: [self-hosted, windows]
+    timeout-minutes: 7
     
     steps:
     - uses: actions/checkout@v2
@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 0
 
     - name: Benchmark
-      shell: bash
+      shell: powershell
       working-directory: ${{github.workspace}}
-      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs
+      run: python buildbot\runCI.py -workdir ${{github.workspace}}\labs
 

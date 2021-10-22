@@ -87,7 +87,10 @@ def buildAndValidate(labBuildDir):
   os.chdir(labBuildDir)
 
   try:
-    subprocess.check_call("cmake -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
+    if sys.platform != 'win32':
+      subprocess.check_call("cmake -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
+    else:
+      subprocess.check_call("cmake -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -DCI=ON " + os.path.join(labBuildDir, ".."), shell=True)
     print("CMake - OK")
   except:
     print(bcolors.FAIL + "CMake - Failed" + bcolors.ENDC)
@@ -122,9 +125,22 @@ def buildLab(labDir, solutionOrBaseline):
 def noChangesToTheBaseline(labDir):
   solutionDir = os.path.join(labDir, "build_solution")
   baselineDir = os.path.join(labDir, "build_baseline")
-  solutionExe = os.path.join(solutionDir, "lab" if sys.platform != 'win32' else os.path.join("Release", "lab.exe"))
-  baselineExe = os.path.join(baselineDir, "lab" if sys.platform != 'win32' else os.path.join("Release", "lab.exe"))
-  exit_code = subprocess.call(("cmp " if sys.platform != 'win32' else "fc /b >NUL ") + solutionExe + " " + baselineExe, shell=True)
+  if sys.platform != 'win32':
+    solutionExe = os.path.join(solutionDir, "lab")
+    baselineExe = os.path.join(baselineDir, "lab")
+    exit_code = subprocess.call("cmp " + solutionExe + " " + baselineExe, shell=True)
+  else:
+    # This is the ugly way of comparing whether binaries are similar on Windows.
+    # We disassemble both binaries and compare textual output.
+    solutionExe = os.path.join(solutionDir, "lab.exe")
+    solutionDisasm = os.path.join(solutionDir, "lab.disasm")
+    baselineExe = os.path.join(baselineDir, "lab.exe")
+    baselineDisasm = os.path.join(baselineDir, "lab.disasm")
+    subprocess.call("llvm-objdump.exe -d " + solutionExe + " >" + solutionDisasm, shell=True)
+    subprocess.call("llvm-objdump.exe -d " + baselineExe + " >" + baselineDisasm, shell=True)
+    subprocess.call("powershell -Command \"((Get-Content -path " + baselineDisasm + " -Raw) -replace 'baseline','') | Set-Content -Path " + baselineDisasm + "\"", shell=True)
+    subprocess.call("powershell -Command \"((Get-Content -path " + solutionDisasm + " -Raw) -replace 'solution','') | Set-Content -Path " + solutionDisasm + "\"", shell=True)
+    exit_code = subprocess.call("fc >NUL " + solutionDisasm + " " + baselineDisasm, shell=True)
   return exit_code == 0
 
 def checkoutBaseline(workdir):

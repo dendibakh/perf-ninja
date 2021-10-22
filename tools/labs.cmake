@@ -21,16 +21,29 @@ if(NOT MSVC)
   set(CMAKE_C_FLAGS "-O3 -ffast-math -march=native ${CMAKE_C_FLAGS}")
 else()
   set(CMAKE_C_FLAGS "/O2 /fp:fast /arch:AVX2 ${CMAKE_C_FLAGS}")
-
-  # Set stack size as on Linux: 2MB on 32-bit, 8MB on 64-bit
-  math(EXPR stack_size "${CMAKE_SIZEOF_VOID_P}*${CMAKE_SIZEOF_VOID_P}*128*1024")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:${stack_size}")
 endif()
+
+# Set Windows stack size as on Linux: 2MB on 32-bit, 8MB on 64-bit
+if (WIN32)
+  math(EXPR stack_size "${CMAKE_SIZEOF_VOID_P}*${CMAKE_SIZEOF_VOID_P}*128*1024")
+  if (MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:${stack_size}")
+  else()
+    # compiling with clang + lld
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker /stack:${stack_size}")
+  endif()
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
+if (NOT WIN32)
+  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
+  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
+else()
+  set(BENCHMARK_FOLDER "C:/Program Files (x86)/benchmark")
+  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}" REQUIRED)
+endif()
 
 # Find source files
 file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
@@ -92,8 +105,13 @@ endif()
 
 # Other settings
 if(NOT MSVC)
-  target_link_libraries(lab ${BENCHMARK_LIBRARY} pthread m)
-  target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
+  if (WIN32)
+    target_link_libraries(lab ${BENCHMARK_LIBRARY} shlwapi)
+    target_link_libraries(validate ${BENCHMARK_LIBRARY} shlwapi)
+  else()
+    target_link_libraries(lab ${BENCHMARK_LIBRARY} pthread m)
+    target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
+  endif()
 
   # MinGW
   if(MINGW)

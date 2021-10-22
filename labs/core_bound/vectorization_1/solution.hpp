@@ -1,4 +1,6 @@
-#include <array>  // std::array
+#include <array>   // std::array
+#include <cstddef> // size_t
+#include <cstdint> // fixed width types
 #include <utility> // std::pair
 #include <vector>  // std::vector
 
