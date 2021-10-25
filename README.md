@@ -35,6 +35,8 @@ Current sponsors:
 * Pavel Davydov
 * Maya Lekova (@MayaLekova)
 
+Thanks to Mansur Mavliutov (@Mansur) for providing an AMD-based machine for running CI jobs.
+
 ## Contributing
 
 We warmly welcome contributions! See [Contributing.md](Contributing.md) for the details.
