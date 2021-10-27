@@ -1,5 +1,15 @@
 # Get started
 
+## How to set up the environment
+
+Here is the list of tools you *absolutely* have to install to build labs in this video course:
+* CMake 3.13
+* [Google benchmark](https://github.com/google/benchmark), you can also use the scripts in the [tools](tools) directory.
+
+Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform: Windows, Linux (TODO: add instructions).
+
+## How to build lab assignments
+
 Watch the warmup video:
 
 [<img src="https://drive.google.com/uc?export=view&id=1AbuZJdfc-BbpNLdxZukMILs2l5_HBH32" width="30%">](https://www.youtube.com/watch?v=jFRwAcIoLgQ&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
@@ -31,12 +41,6 @@ Lab assignments are build on top of Google Benchmark library, which by default p
 ```
 
 This will instruct the Google Benchmark framework to execute exactly 10 iterations of the benchmark. Now when you improve your code you can also compare performance profiles since the wall time will be different.
-
-## Project dependencies
-
-To build labs in this video course you need to install the following dependencies:
-* CMake 3.13
-* [Google benchmark](https://github.com/google/benchmark), you can also use the scripts in the [tools](tools) directory.
 
 ## Target platform
 
