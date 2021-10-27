@@ -18,7 +18,7 @@
     ```
     $ENV:PATH="$ENV:PATH;C:\Program Files (x86)\benchmark\lib"
     ```
-5. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](https://github.com/dendibakh/perf-ninja/blob/main/GetStarted.md#how-to-build-lab-assignments), but note that you need to add `-G Ninja` to the CMake invocation.
+5. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](GetStarted.md#how-to-build-lab-assignments), but note that you need to add `-G Ninja` to the CMake invocation.
 
 6. If everything works as expected, you can set environment variables permanently (run as Administrator):
     ```
