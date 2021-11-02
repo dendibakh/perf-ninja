@@ -4,12 +4,13 @@
 
 S create_entry(int first_value, int second_value) {
   S entry;
+  // first_value and second_value range : [0;99]
 
-  entry.i = first_value;
-  entry.s = static_cast<short>(second_value);
-  entry.l = static_cast<long long>(first_value * second_value);
-  entry.d = static_cast<double>(first_value) / maxRandom;
-  entry.b = first_value < second_value;
+  entry.i = static_cast<unsigned char>(first_value);                 // 128 = 2^7 -> 7 bits for i
+  entry.s = static_cast<unsigned char>(second_value);                // same for s
+  entry.l = static_cast<unsigned short>(entry.i * entry.s);          // 99 * 99 < 10000 -> 2^14 -> 14 bits for l
+  entry.d = static_cast<float>(first_value) / maxRandom;
+  entry.b = first_value < second_value;                              // 1 bit
 
   return entry;
 }
