@@ -3,59 +3,83 @@
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <cstring> // std::memset
 
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int width, const int height,
                              const int *kernel, const int radius,
                              const int shift) {
+
+  std::unique_ptr<int> temp(new int[width]);
+  int *cache = temp.get();
+
   const int rounding = 1 << (shift - 1);
 
-  for (int c = 0; c < width; c++) {
-    // Top part of line, partial kernel
-    for (int r = 0; r < std::min(radius, height); r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = &kernel[radius - r];
-      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
+  // Top part of line, partial kernel
+  for (int r = 0; r < std::min(radius, height); ++r) {
+    // Accumulation
+    std::memset(cache, 0, width * sizeof(int));
+    int sum = 0;
+    auto p = &kernel[radius - r];
 
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
+    for (int y = 0; y <= std::min(r + radius, height - 1); ++y) {
+      const int weight = *p++;
+      sum += weight;
+      
+      for (int c = 0; c < width; ++c) {
+        cache[c] += input[y * width + c] * weight;
+      }
     }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
+    // Normalization
+    for (int c = 0; c < width; ++c) {
+      const int value = static_cast<int>(cache[c] / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
 
+  // Middle part of computations with full kernel
+  for (int r = radius; r < height - radius; ++r) {
+    // Accumulation
+
+    // First (i=0) iteration
+    for (int c = 0; c < width; ++c) {
+      cache[c] = input[(r - radius + 0) * width + c] * kernel[0];
+    }   
+
+    for (int i = 1; i < radius + 1 + radius; ++i) {
+      for (int c = 0; c < width; ++c) {
+        cache[c] += input[(r - radius + i) * width + c] * kernel[i];
+      }
+    }
+
+    for (int c = 0; c < width; ++c) {
       // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
+      const int value = (cache[c] + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
-    // Bottom part of line, partial kernel
-    for (int r = std::max(radius, height - radius); r < height; r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = kernel;
-      for (int y = r - radius; y < height; y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
+  // Bottom part of line, partial kernel
+  for (int r = std::max(radius, height - radius); r < height; ++r) {
+    // Accumulation
+    std::memset(cache, 0, width * sizeof(int));
+    int sum = 0;
+    auto p = kernel;
+
+    for (int y = r - radius; y < height; ++y) {
+      const int weight = *p++;
+      sum += weight;
+
+      for (int c = 0; c < width; ++c) {
+        cache[c] += input[y * width + c] * weight;
       }
+    }
 
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+    // Normalization
+    for (int c = 0; c < width; ++c) {
+      const int value = static_cast<int>(cache[c] / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
