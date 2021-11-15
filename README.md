@@ -18,6 +18,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
 * Core Bound:
   * [Vectorization 1](labs/core_bound/vectorization_1)
+  * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining 1](labs/core_bound/function_inlining_1)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
 * Bad Speculation:
