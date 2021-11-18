@@ -16,6 +16,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
+  * [SW memory prefetching 1](labs/memory_bound/swmem_prefetch_1)
 * [Core Bound](labs/core_bound):
   * [Vectorization 1](labs/core_bound/vectorization_1)
   * [Vectorization 2](labs/core_bound/vectorization_2)
