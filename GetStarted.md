@@ -30,6 +30,18 @@ cmake --build . --config Release --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
 ```
+
+with debug:
+
+```
+cmake -E make_directory build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .. -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g"
+cmake --build . --config Debug --parallel 8
+cmake --build . --target validateLab
+cmake --build . --target benchmarkLab
+```
+
 When you push changes to your private branch, it will automatically trigger CI benchmarking job. More details about it at the bottom of the page.
 
 ## Profiling
