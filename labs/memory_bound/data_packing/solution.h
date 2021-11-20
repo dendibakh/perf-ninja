@@ -8,9 +8,9 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
-  unsigned i : 8;
-  unsigned l : 15;
-  unsigned s : 8;
+  unsigned char i;
+  unsigned char s;
+  unsigned short l : 15;
   bool b : 1;
   float d;
 
