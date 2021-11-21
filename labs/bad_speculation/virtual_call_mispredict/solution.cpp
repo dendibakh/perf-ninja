@@ -1,6 +1,7 @@
 #include "solution.h"
 
 #include <random>
+#include <algorithm>
 
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
@@ -20,6 +21,13 @@ void generateObjects(InstanceArray& array) {
 
 // Invoke the `handle` method on all instances in `output`
 void invoke(InstanceArray& array, std::size_t& data) {
+    std::sort(
+        begin(array)
+        , end(array)
+        , [](const std::unique_ptr<BaseClass> &a, const std::unique_ptr<BaseClass> &b) {
+            return a->classType < b->classType;
+        });
+
     for (const auto& item: array) {
         item->handle(data);
     }
