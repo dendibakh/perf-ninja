@@ -7,5 +7,6 @@ int solution(int *arr, int N) {
 //     res += arr[i];
 //   }
 //  return res;
+
  return (N * (N + 1)) / 2;
 }
