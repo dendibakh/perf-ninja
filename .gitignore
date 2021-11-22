@@ -17,3 +17,5 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+build-debug
+build-release
