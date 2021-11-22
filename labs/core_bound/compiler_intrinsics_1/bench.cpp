@@ -17,7 +17,7 @@ static void bench_partial_sum(benchmark::State &state) {
 }
 
 // Register the function as a benchmark
-BENCHMARK(bench_partial_sum);
+BENCHMARK(bench_partial_sum)->Unit(benchmark::kMicrosecond);
 
 // Run the benchmark
 BENCHMARK_MAIN();
