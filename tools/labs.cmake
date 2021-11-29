@@ -37,12 +37,12 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-if (NOT WIN32)
-  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
-else()
+if (WIN32 AND EXISTS "C:/Program Files (x86)/benchmark")
   set(BENCHMARK_FOLDER "C:/Program Files (x86)/benchmark")
   find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}" REQUIRED)
+else()
+  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
+  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
 endif()
 
 # Find source files
