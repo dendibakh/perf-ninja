@@ -11,6 +11,8 @@ CTestTestfile.cmake
 _deps
 __pycache__
 *.pyc
+.idea/
+cmake-build-debug/
 
 build_solution
 build_baseline
