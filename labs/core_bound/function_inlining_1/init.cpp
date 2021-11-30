@@ -5,7 +5,7 @@
 void init(std::array<S, N> &arr) {
   std::default_random_engine generator;
   std::uniform_int_distribution<uint32_t> distribution(
-      0, 1000u);
+      0, 9000u);
 
   for (size_t i = 0; i < N; i++) {
     uint32_t random_int1 = distribution(generator);
