@@ -62,15 +62,11 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1, std::vecto
     }
   }
 
-  // Cache arrays
-  column_arr_t last_vertical_gap_arr;
-  column_arr_t last_score_column;
-
   /*
    * Compute the main recursion to fill the matrix.
    */
   for (size_t col = 1; col <= sequences2Transposed.size(); ++col) {
-    last_score_column = score_column;
+    score_arr_t last_diagonal_score = score_column[0];
 
     for (size_t s = 0; s < sequence_count_v; ++s) {
       score_column[0][s] = horizontal_gap_column[0][s];
@@ -79,30 +75,28 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1, std::vecto
     }
 
     for (size_t row = 1; row <= sequences1Transposed.size(); ++row) {
+      
+      score_arr_t best_cell_score;
       for (size_t s = 0; s < sequence_count_v; ++s) {
         // Compute next score from diagonal direction with match/mismatch.
-        score_t best_cell_score = last_score_column[row - 1][s] + (sequences1Transposed[row - 1][s] == sequences2Transposed[col - 1][s] ? match : mismatch); // ok
+        best_cell_score[s] = last_diagonal_score[s] + (sequences1Transposed[row - 1][s] == sequences2Transposed[col - 1][s] ? match : mismatch); // ok
+      }
 
+      for (size_t s = 0; s < sequence_count_v; ++s) {
         // Determine best score from diagonal and horizontal direction.
-        best_cell_score = max(best_cell_score, horizontal_gap_column[row][s]); // ok
+        best_cell_score[s] = max(best_cell_score[s], last_vertical_gap[s]); // ok
+        best_cell_score[s] = max(best_cell_score[s], horizontal_gap_column[row][s]); // ok
 
         // Store optimum in score_column.
-        score_column[row][s] = best_cell_score;
+        last_diagonal_score[s] = score_column[row][s];
+        score_column[row][s] = best_cell_score[s];
 
         // Store optimum between gap open and gap extension.
-        last_vertical_gap_arr[row - 1][s] = last_vertical_gap[s];
-        last_vertical_gap[s] = max(last_vertical_gap[s] + gap_extension, best_cell_score + gap_open);
-      }
-    }
-
-    for (size_t row = 1; row <= sequences1Transposed.size(); ++row) {
-      for (size_t s = 0; s < sequence_count_v; ++s) {
-        score_column[row][s] = max(score_column[row][s], last_vertical_gap_arr[row - 1][s]);
+        last_vertical_gap[s] = max(last_vertical_gap[s] + gap_extension, best_cell_score[s] + gap_open);
         horizontal_gap_column[row][s] = max(horizontal_gap_column[row][s] + gap_extension, score_column[row][s] + gap_open);
       }
     }
   }
-
 
   for (size_t s = 0; s < sequence_count_v; ++s) {
     // Report the best score.
