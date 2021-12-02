@@ -18,5 +18,5 @@ jobs:
     - name: Benchmark
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: python buildbot\runCI.py -workdir ${{github.workspace}}\labs
+      run: python buildbot\runCI.py -workdir ${{github.workspace}}\labs -runner WinAMD
 
