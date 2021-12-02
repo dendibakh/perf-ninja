@@ -57,7 +57,6 @@ Labs["data_driven"] = dict()
 Labs["misc"] = dict()
 
 if runner == "LinuxIntel":
-  print ("LinuxIntel")
   Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
   Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
@@ -70,7 +69,6 @@ if runner == "LinuxIntel":
   Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)
 elif runner == "WinAMD":
-  print ("WinAMD")
   Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
   Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
