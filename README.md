@@ -16,12 +16,15 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
-* Core Bound:
+  * [SW memory prefetching 1](labs/memory_bound/swmem_prefetch_1)
+* [Core Bound](labs/core_bound):
   * [Vectorization 1](labs/core_bound/vectorization_1)
+  * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining 1](labs/core_bound/function_inlining_1)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
-* Bad Speculation:
+* [Bad Speculation](labs/bad_speculation):
   * [Conditional Store 1](labs/bad_speculation/conditional_store_1)
+  * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
 * CPU Frontend Bound:
 * Data-Driven optimizations:
 * Misc:
