@@ -18,5 +18,5 @@ jobs:
     - name: Benchmark
       shell: bash
       working-directory: ${{github.workspace}}
-      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs
+      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner LinuxIntel
 

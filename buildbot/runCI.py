@@ -40,10 +40,12 @@ class LabPath:
 
 parser = argparse.ArgumentParser(description='test results')
 parser.add_argument("-workdir", type=str, help="working directory", default="")
+parser.add_argument("-runner", type=str, help="CI runner machine", default="LinuxIntel")
 parser.add_argument("-v", help="verbose", action="store_true", default=False)
 
 args = parser.parse_args()
 workdir = args.workdir
+runner = args.runner
 verbose = args.v
 
 Labs = dict()
