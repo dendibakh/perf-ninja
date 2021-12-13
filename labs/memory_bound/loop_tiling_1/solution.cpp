@@ -12,7 +12,7 @@ bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
     for (size_t j = 0; j < full_strides; j += kStride) {
       for (size_t k = 0; k < kStride; k++) {
         for (size_t l = 0; l < kStride; l++) {
-          out[i + k][j + l] = in[j + l][i + k];
+          out[j + l][i + k] = in[i + k][j + l];
         }
       }
     }
