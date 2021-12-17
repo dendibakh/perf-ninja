@@ -15,6 +15,9 @@ The code for this lab is taken from aobench, which was originally written by Syo
 License: New BSD License
 
 Modifications for Performance Ninja:
-The original single source file is split into multiple to expose the performance problem that LTO can fix. Also lowered the values for `WIDTH` and `HEIGHT` to 256 to decrease the runtime.
+- The original single source file is split into multiple to expose the performance problem that LTO can fix.
+- drand48 is not available on Windows, so I implemented it myself.
+- Compile the code with C++ compiler, not C compiler.
+- Lowered the values for `WIDTH` and `HEIGHT` to 256 to decrease the runtime.
 
 Co-authored-by: @dendibakh
