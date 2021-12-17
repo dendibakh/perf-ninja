@@ -1,4 +1,18 @@
 #include "ao.h"
+#include <random>
+
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
+// this is an implementation of drand48 as defined in 
+// https://man7.org/linux/man-pages/man3/drand48.3.html
+// (linear_congruential_engine)
+double mydrand48() {
+  static std::minstd_rand generator;
+  static std::uniform_real_distribution<double> distribution(0,1);
+  return distribution(generator);
+}
 
 void ambient_occlusion(vec *col, const Isect *isect)
 {
@@ -20,8 +34,8 @@ void ambient_occlusion(vec *col, const Isect *isect)
 
     for (j = 0; j < ntheta; j++) {
         for (i = 0; i < nphi; i++) {
-            double theta = sqrt(drand48());
-            double phi   = 2.0 * M_PI * drand48();
+            double theta = sqrt(mydrand48());
+            double phi   = 2.0 * M_PI * mydrand48();
 
             double x = cos(phi) * theta;
             double y = sin(phi) * theta;

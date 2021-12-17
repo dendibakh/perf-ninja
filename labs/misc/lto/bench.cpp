@@ -2,7 +2,7 @@
 #include "benchmark/benchmark.h"
 #include "ao.h"
 
-extern "C" { int ao_bench(); }
+int ao_bench();
 
 Sphere spheres[3];
 Plane  plane;
