@@ -1,6 +1,7 @@
 #include "solution.h"
 
 #include <random>
+#include <iterator>
 
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
