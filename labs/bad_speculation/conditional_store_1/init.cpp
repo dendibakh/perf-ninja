@@ -2,6 +2,7 @@
 #include "solution.h"
 #include <limits>
 #include <random>
+#include <algorithm>
 
 void init(std::array<S, N> &arr) {
   std::default_random_engine generator;
@@ -13,4 +14,6 @@ void init(std::array<S, N> &arr) {
     arr[i].first = distribution(generator);
     arr[i].second = distribution(generator);
   }
+
+  std::sort(std::begin(arr), std::end(arr));
 }

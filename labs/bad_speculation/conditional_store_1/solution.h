@@ -14,3 +14,12 @@ std::size_t select(std::array<S, N> &output, const std::array<S, N> &input,
                    const std::uint32_t lower, const std::uint32_t upper);
 
 void init(std::array<S, N> &arr);
+
+namespace std{
+    template<>
+    struct less<S>{
+        bool operator()(const S& lhs, const S& rhs){
+            return lhs.first < rhs.first;
+        }
+    };
+}
