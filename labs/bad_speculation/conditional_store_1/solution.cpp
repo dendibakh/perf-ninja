@@ -7,20 +7,14 @@
 // Select items which have S.first in range [lower..upper]
 std::size_t select(std::array<S, N> &output, const std::array<S, N> &input,
                    const std::uint32_t lower, const std::uint32_t upper) {
-  const auto cmp = [](const auto& lhs, const auto& rhs){
-    return lhs.first < rhs.first;
-  };
-
   const auto begin = std::lower_bound(
     std::cbegin(input),
     std::cend(input),
-    S{lower, 0},
-    cmp);
+    S{lower, 0});
   const auto end = std::upper_bound(
     begin,
     std::cend(input),
-    S{upper,0},
-    cmp);
+    S{upper,0});
   
   std::copy(begin, end, std::begin(output));
   return std::distance(begin, end);
