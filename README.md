@@ -30,6 +30,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
 * Data-Driven optimizations:
 * Misc:
   * [Warmup](labs/misc/warmup)
+  * [LTO](labs/misc/lto)
 
 ## Support the project
 
@@ -38,6 +39,7 @@ Performance Ninja is in a very much work-in-progress state. We will be adding ne
 Current sponsors:
 * Pavel Davydov
 * Maya Lekova (@MayaLekova)
+* Aaron St. George (@AaronStGeorge)
 
 Thanks to Mansur Mavliutov (@Mansur) for providing an AMD-based machine for running CI jobs.
 
