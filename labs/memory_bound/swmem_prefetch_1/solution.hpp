@@ -1,6 +1,10 @@
 #include <vector>
 #include <limits>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#include <xmmintrin.h>
+#endif
+
 static constexpr size_t HASH_MAP_SIZE = 32 * 1024 * 1024 - 5;
 static constexpr size_t NUMBER_OF_LOOKUPS = 1024 * 1024;
 
@@ -27,7 +31,11 @@ public:
 
     void prefetchForVal(int val) const {
         int bucket = val % N_Buckets;
+#if defined(_MSC_VER) && !defined(__clang__)
+        _mm_prefetch(reinterpret_cast<char const*>(&m_vector[bucket]), 0);
+#else
         __builtin_prefetch(&m_vector[bucket]);
+#endif
     }
 };
 
