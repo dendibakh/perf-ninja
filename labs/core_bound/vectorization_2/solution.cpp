@@ -6,8 +6,11 @@ uint16_t checksum(const Blob &blob) {
   for (auto value : blob) {
     acc += value;
   }
-  uint16_t res = acc;
-  acc >>= std::numeric_limits<uint16_t>::digits;
-  res += acc;
-  return res;
+
+  while(auto overflow = (acc >> std::numeric_limits<uint16_t>::digits)){
+    acc &= std::numeric_limits<uint16_t>::max();
+    acc += overflow;
+  }
+  
+  return acc;
 }
