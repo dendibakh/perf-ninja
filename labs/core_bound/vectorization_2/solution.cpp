@@ -1,10 +1,13 @@
 #include "solution.hpp"
+#include <limits>
 
 uint16_t checksum(const Blob &blob) {
-  uint16_t acc = 0;
+  uint32_t acc = 0;
   for (auto value : blob) {
     acc += value;
-    acc += acc < value; // add carry
   }
-  return acc;
+  uint16_t res = acc;
+  acc >>= std::numeric_limits<uint16_t>::digits;
+  res += acc;
+  return res;
 }
