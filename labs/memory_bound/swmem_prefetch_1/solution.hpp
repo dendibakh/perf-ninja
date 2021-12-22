@@ -32,7 +32,7 @@ public:
     void prefetchForVal(int val) const {
         int bucket = val % N_Buckets;
 #if defined(_MSC_VER) && !defined(__clang__)
-        _mm_prefetch(reinterpret_cast<char const*>(&m_vector[bucket]), 0);
+        _mm_prefetch(reinterpret_cast<char const*>(&m_vector[bucket]), _MM_HINT_T0);
 #else
         __builtin_prefetch(&m_vector[bucket]);
 #endif
