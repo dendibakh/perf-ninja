@@ -19,3 +19,4 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+.DS_Store
