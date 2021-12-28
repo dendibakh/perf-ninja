@@ -7,7 +7,7 @@ static void bench1(benchmark::State &state) {
   // Init benchmark data
   auto hash_map = std::make_unique<hash_map_t>(HASH_MAP_SIZE);
   std::vector<int> lookups;
-  lookups.resize(NUMBER_OF_LOOKUPS);
+  lookups.reserve(NUMBER_OF_LOOKUPS);
   init(hash_map.get(), lookups);
 
   // Run the benchmark
