@@ -1,8 +1,18 @@
 #include <vector>
 #include <limits>
 
-static constexpr std::size_t HASH_MAP_SIZE = 32 * 1024 * 1024 - 5;
-static constexpr std::size_t NUMBER_OF_LOOKUPS = 1024 * 1024;
+#ifdef _MSC_VER
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#define builtin_prefetch(address) PreFetchCacheLine(PF_TEMPORAL_LEVEL_1, address)
+#else
+#define builtin_prefetch(address) __builtin_prefetch(address)
+#endif
+
+static constexpr size_t HASH_MAP_SIZE = 32 * 1024 * 1024 - 5;
+static constexpr size_t NUMBER_OF_LOOKUPS = 1024 * 1024;
 
 class hash_map_t {
     static constexpr int UNUSED = std::numeric_limits<int>::max();
@@ -23,6 +33,11 @@ public:
     bool find(int val) const {
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
+    }
+
+    void prefetchForVal(int val) const {
+        int bucket = val % N_Buckets;
+        builtin_prefetch(&m_vector[bucket]);
     }
 };
 

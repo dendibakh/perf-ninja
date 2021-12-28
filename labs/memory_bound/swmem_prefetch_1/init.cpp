@@ -4,8 +4,8 @@
 
 void init(hash_map_t *hash_map, std::vector<int> &lookups) {
   std::default_random_engine generator;
-  std::uniform_int_distribution<int> distribution(
-      0, std::numeric_limits<int>::max());
+  std::uniform_int_distribution<int> distribution(0, std::numeric_limits<int>::max());
+
   for (int i = 0; i < HASH_MAP_SIZE; i++) {
     hash_map->insert(distribution(generator));
   }
