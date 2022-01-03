@@ -9,9 +9,9 @@ constexpr int maxRandom = 100;
 // FIXME: this data structure can be reduced in size
 struct alignas(8) S {
   unsigned short l: 16;
-  unsigned char i : 8;
   unsigned char s : 7;
   unsigned char b : 1;
+  unsigned char i : 8;
   float d;
 
   bool operator<(const S &s) const { return this->i < s.i; }
