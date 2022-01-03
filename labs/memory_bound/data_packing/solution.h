@@ -12,10 +12,11 @@ struct alignas(8) S {
   unsigned int l: 16; // 0..10000
   unsigned int i: 8; // 0..100
   unsigned int s: 7; // 0..100
-  bool b: 1; // 0..1
+  unsigned int b: 1; // 0..1
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
+#pragma pack()
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
