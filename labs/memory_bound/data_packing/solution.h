@@ -8,15 +8,14 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct alignas(8) S {
+  unsigned short l: 16;
+  unsigned char i : 8;
+  unsigned char s : 7;
+  unsigned char b : 1;
   float d;
-  unsigned int l: 16; // 0..10000
-  unsigned int i: 8; // 0..100
-  unsigned int s: 7; // 0..100
-  unsigned int b: 1; // 0..1
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
-#pragma pack()
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
