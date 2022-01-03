@@ -19,3 +19,5 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+labs/debug.sh
+labs/run.sh
