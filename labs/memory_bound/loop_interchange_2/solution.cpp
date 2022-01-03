@@ -118,6 +118,65 @@ static void filterHorizontally(uint8_t *output, const uint8_t *input,
   }
 }
 
+
+// Applies Gaussian blur in independent horizontal lines
+static void filterHorizontallyAndTranspose(uint8_t *output, const uint8_t *input,
+                               const int width, const int height,
+                               const int *kernel, const int radius,
+                               const int shift) {
+  const int rounding = 1 << (shift - 1);
+
+  for (int r = 0; r < height; r++) {
+    // Left part of line, partial kernel
+    for (int c = 0; c < std::min(radius, width); c++) {
+      // Accumulation
+      int dot = 0;
+      int sum = 0;
+      auto p = &kernel[radius - c];
+      for (int x = 0; x <= std::min(c + radius, width - 1); x++) {
+        int weight = *p++;
+        dot += input[r * width + x] * weight;
+        sum += weight;
+      }
+
+      // Normalization
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[c * height + r] = static_cast<uint8_t>(value);
+    }
+
+    // Middle part of computations with full kernel
+    for (int c = radius; c < width - radius; c++) {
+      // Accumulation
+      int dot = 0;
+      for (int i = 0; i < radius + 1 + radius; i++) {
+        dot += input[r * width + c - radius + i] * kernel[i];
+      }
+
+      // Fast shift instead of division
+      int value = (dot + rounding) >> shift;
+      output[c * height + r] = static_cast<uint8_t>(value);
+    }
+
+    // Right part of line, partial kernel
+    for (int c = std::max(radius, width - radius); c < width; c++) {
+      // Accumulation
+      int dot = 0;
+      int sum = 0;
+      auto p = kernel;
+      for (int x = c - radius; x < width; x++) {
+        int weight = *p++;
+        dot += input[r * width + x] * weight;
+        sum += weight;
+      }
+
+      // Normalization
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[c * height + r] = static_cast<uint8_t>(value);
+    }
+  }
+}
+
+
 // Applies Gaussian blur to a grayscale image
 void blur(uint8_t *output, const uint8_t *input, const int width,
           const int height, uint8_t *temp) {
@@ -128,9 +187,15 @@ void blur(uint8_t *output, const uint8_t *input, const int width,
   // An alternative to division by power of two = sum(kernel)
   constexpr int shift = 4;
 
+
+#if 1
+  filterHorizontallyAndTranspose(temp, input, width, height, kernel, radius, shift);
+  filterHorizontallyAndTranspose(output, temp, height, width, kernel, radius, shift);
+#else
   // A pair of 1-dimensional passes to achieve 2-dimensional transform
   filterVertically(temp, input, width, height, kernel, radius, shift);
   filterHorizontally(output, temp, width, height, kernel, radius, shift);
+#endif
 }
 
 // Loads grayscale image. Format is
