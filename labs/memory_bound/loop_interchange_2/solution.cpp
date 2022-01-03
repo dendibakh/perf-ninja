@@ -188,7 +188,7 @@ void blur(uint8_t *output, const uint8_t *input, const int width,
   constexpr int shift = 4;
 
 
-#if 1
+#if 0
   filterHorizontallyAndTranspose(temp, input, width, height, kernel, radius, shift);
   filterHorizontallyAndTranspose(output, temp, height, width, kernel, radius, shift);
 #else
