@@ -7,12 +7,12 @@ constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
-struct S {
+struct alignas(8) S {
+  float d;
+  short l;
   unsigned char i;
   unsigned char s: 7;
   unsigned char b: 1;
-  short l;
-  float d;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
