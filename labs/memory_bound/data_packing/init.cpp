@@ -5,10 +5,10 @@
 S create_entry(int first_value, int second_value) {
   S entry;
 
-  entry.i = static_cast<char>(first_value); // could be char due to 0 <= maxRandom < 100
-  entry.s = static_cast<char>(second_value); // could be char due to 0 <= maxRandom < 100
-  entry.l = static_cast<short>(first_value * second_value); // multipl of two char should fit in a short
-  entry.d = static_cast<float>(first_value) / maxRandom;  // doublr to flat, loosing precision is fine I guess
+  entry.i = first_value;
+  entry.s = static_cast<short>(second_value);
+  entry.l = static_cast<long long>(first_value * second_value);
+  entry.d = static_cast<double>(first_value) / maxRandom;
   entry.b = first_value < second_value;
 
   return entry;
