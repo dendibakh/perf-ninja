@@ -1,5 +1,5 @@
 # https://cmake.org/documentation/
-
+include(CheckCXXCompilerFlag)
 # Check usage of 'build' subdirectory
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message("CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
@@ -18,7 +18,12 @@ endif()
 
 # Set compiler options
 if(NOT MSVC)
-  set(CMAKE_C_FLAGS "-O3 -ffast-math -march=native ${CMAKE_C_FLAGS}")
+  set(CMAKE_C_FLAGS "-O3 -ffast-math ${CMAKE_C_FLAGS}")
+  CHECK_CXX_COMPILER_FLAG(-march=native COMPILER_SUPPORTS_MARCH_NATIVE)
+  if(COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_C_FLAGS "-march=native ${CMAKE_C_FLAGS}")
+  endif()
+
 else()
   set(CMAKE_C_FLAGS "/O2 /fp:fast /arch:AVX2 ${CMAKE_C_FLAGS}")
 endif()
