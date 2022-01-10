@@ -73,6 +73,10 @@ int main() {
   if (!checks_passed) {
     return 2;
   }
+  std::cout << "s" << sizeof(S) << std::endl;
+  std::cout << "s" << sizeof(bool) << std::endl;
+  std::cout << "s" << sizeof(short) << std::endl;
+  std::cout << "s" << sizeof(int) << std::endl;
 
   std::cout << "Validation Successful" << std::endl;
   return 0;
