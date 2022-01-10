@@ -9,6 +9,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "-falign-functions=6 ${CMAKE_CXX_FLAGS}")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  set(CMAKE_CXX_FLAGS "-mllvm -align-all-functions=6 ${CMAKE_CXX_FLAGS}")
 endif()
 
 string(REGEX MATCH "^(.*)[\\/]labs[\\/].*$" repo "${CMAKE_CURRENT_SOURCE_DIR}")
