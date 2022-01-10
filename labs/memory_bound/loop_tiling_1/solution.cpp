@@ -4,7 +4,7 @@
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   size_t size = in.size();
 
-  constexpr size_t kStride = 4;
+  constexpr size_t kStride = 40;
 
   const size_t full_strides = size - size % kStride;
 
