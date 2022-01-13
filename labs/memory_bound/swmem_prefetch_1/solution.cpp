@@ -23,6 +23,7 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
 
   for (int val : found) {
     result += getSumOfDigits(val);
+  }
 
   return result;
 }
