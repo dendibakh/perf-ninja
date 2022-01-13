@@ -4,8 +4,8 @@
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   constexpr int CACHE_LINE_SIZE = 64;
   constexpr int ELMNS_PER_CL = CACHE_LINE_SIZE / sizeof(MatrixOfDoubles::value_type::value_type);
-  constexpr int HORIZONTAL_STRIP = 8 * ELMNS_PER_CL;
-  constexpr int VERTICAL_STRIP = HORIZONTAL_STRIP / 2;
+  constexpr int HORIZONTAL_STRIP = 6 * ELMNS_PER_CL;
+  constexpr int VERTICAL_STRIP = HORIZONTAL_STRIP;
 
   const int size = static_cast<int>(in.size());
 
