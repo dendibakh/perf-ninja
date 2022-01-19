@@ -299,8 +299,8 @@ if not workdir:
 os.chdir(workdir)
 
 checkAll = False
-benchLabPath = 0
-DirLabPathRegex = re.compile(r'labs/(.*)/(.*)/')
+benchLabPath = ""
+DirLabPathRegex = re.compile(r'labs/([a-zA-Z0-9-_]+?)/([a-zA-Z0-9-_]+?)/(.*)')
 
 try:
   outputGitLog = subprocess.check_output("git log -1 --oneline" , shell=True)
