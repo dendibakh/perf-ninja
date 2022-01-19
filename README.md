@@ -31,6 +31,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
 * Misc:
   * [Warmup](labs/misc/warmup)
   * [LTO](labs/misc/lto)
+  * [PGO](labs/misc/pgo)
 
 ## Support the project
 
