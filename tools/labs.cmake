@@ -61,8 +61,8 @@ list(FILTER srcs EXCLUDE REGEX ".*bench.cpp$")
 list(FILTER srcs EXCLUDE REGEX ".*validate.cpp$")
 
 # Add main targets
-add_executable(lab bench.cpp ${srcs})
-add_executable(validate validate.cpp ${srcs})
+add_executable(lab bench.cpp ${srcs} ${EXT_LAB_srcs})
+add_executable(validate validate.cpp ${srcs} ${EXT_VALIDATE_srcs})
 
 # Add path to a local benchmark library
 if(EXISTS "${BENCHMARK_FOLDER}/include")
