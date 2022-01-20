@@ -44,6 +44,14 @@ Current sponsors:
 
 Thanks to Mansur Mavliutov (@Mansur) for providing an AMD-based machine for running CI jobs.
 
+Lab authors:
+* Andrew Evstyukhin (@andrewevstyukhin)
+* Ivica Bogosavljevic (@ibogosavljevic)
+* René Rahn (@rrahn)
+* Adam Folwarczny (@adamf88)
+* Jakub Beránek (@Kobzol)
+* Denis Bakhvalov (@dendibakh)
+
 ## Contributing
 
 We warmly welcome contributions! See [Contributing.md](Contributing.md) for the details.
