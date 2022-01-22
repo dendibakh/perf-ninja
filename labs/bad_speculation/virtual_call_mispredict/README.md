@@ -7,3 +7,5 @@ object. The CPU does not know which exact method will be called beforehand (it d
 which slows its execution down.
 
 Your task here is to reduce the number of branch target mispredictions by making the virtual method calls more predictable.
+
+Authored-by: Jakub Beránek (@Kobzol)
