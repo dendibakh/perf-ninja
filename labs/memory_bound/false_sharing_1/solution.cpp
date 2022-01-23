@@ -10,6 +10,7 @@ size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // to `target` stays inside the loop.
   struct Accumulator {
     std::atomic<uint32_t> value = 0;
+    uint8_t buffer[1024 - sizeof(std::atomic<uint32_t>)];
   };
   std::vector<Accumulator> accumulators(thread_count);
 
