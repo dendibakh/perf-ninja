@@ -62,6 +62,35 @@ Machine 2
 
 Keep in mind that sometimes you may see different speedups on different platforms.
 
+## Local experiments:
+
+Here are a few tips that will help you compare results of your experiments against the baseline. You can run the baseline version and write down the results, which you will later use to compare with your experiments. But there is a better way to automate this process. You can choose between two options:
+
+1) Use `compare.py` script, which is a part of the Google benchmark library:
+
+    ```
+    # 1. Benchmark the baseline and save score into a JSON file
+    ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=baseline.json
+    # 2. Change the code
+    # 3. Benchmark your solution and save score into a JSON file
+    ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=solution.json
+    # 4. Compare solution.json against baseline.json
+    /path/to/benchmark/tools/compare.py benchmarks baseline.json solution.json
+    ```
+
+2) Use `check_speedup.py` script, which is inside Performance Ninja repo (uses `compare.py` script under the hood):
+
+    ```
+    # 1. Change the baseline code and guard it with `#ifdef SOLUTION`:
+      #ifdef SOLUTION
+        // your solution
+      #else
+        // baseline version
+      #endif
+    # 2. Run the script, which will build and run your solution against the baseline N times
+    python3 tools/check_speedup.py -lab_path labs/misc/warmup -bench_lib_path path/to/google_benchmark_lib -num_runs 3
+    ```
+
 ## Submission guidelines:
 
 **IMPORTANT:** Send a request to be added as a collaborator to this Github repo. Otherwise, you won't be able to push your private branch[es]. Send your github handle to dendibakh@gmail.com with the topic "[PerfNinjaAccessRequest]". Do not fork the repo and submit a pull request with your solution, the CI job won't be triggered.
