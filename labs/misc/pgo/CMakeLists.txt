@@ -8,5 +8,7 @@ file(GLOB EXT_VALIDATE_srcs lua/*.c)
 
 set(VALIDATE_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/reference_output.txt")
 
+set(CMAKE_C_FLAGS "-fprofile-instr-use=\"${CMAKE_CURRENT_SOURCE_DIR}/fd.profdata\"" ${CMAKE_C_FLAGS})
+
 string(REGEX MATCH "^(.*)[\\/]labs[\\/].*$" repo "${CMAKE_CURRENT_SOURCE_DIR}")
 include(${CMAKE_MATCH_1}/tools/labs.cmake)
