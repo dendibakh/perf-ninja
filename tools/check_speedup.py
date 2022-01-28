@@ -59,7 +59,10 @@ def buildAndRunBench(iterNumber, variant, cmakeFlags):
   try:
     callWrapper("cmake -E make_directory " + variant +"Build" + str(iterNumber))
     os.chdir(buildPath)
-    callWrapper("cmake -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release " + cmakeFlags + " \"" + labRootPath + "\"")
+    labAbsPath = labRootPath
+    if not os.path.isabs(labAbsPath):
+      labAbsPath = os.path.join(saveCWD, labRootPath)
+    callWrapper("cmake -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release " + cmakeFlags + " \"" + labAbsPath + "\"")
     callWrapper("cmake --build . --config Release --parallel 8")
     # this will save score in result.json file
     callWrapper("cmake --build . --target benchmarkLab")
