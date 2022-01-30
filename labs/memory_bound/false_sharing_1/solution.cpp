@@ -4,13 +4,20 @@
 #include <omp.h>
 #include <vector>
 
-std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
+size_t solution(const std::vector<uint32_t> &data, int thread_count) {
+	// [Problem 1] False sharing.
+  constexpr uint32_t CACHE_LINE = 64;
+  
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
   struct Accumulator {
     std::atomic<uint32_t> value = 0;
+
+  private:
+	uint8_t padding[CACHE_LINE];
   };
+
   std::vector<Accumulator> accumulators(thread_count);
 
 #pragma omp parallel num_threads(thread_count) default(none)                   \
@@ -28,7 +35,12 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
       item |= (item >> 24);
 
       // Write result to accumulator
-      target.value += item % 13;
+
+	  // [Problem 2] Expensive lock instruction.
+	  // Operator += and fetch_add() are RMW operations that lock the bus. However, only a single
+	  // thread does modify the given target and there is no need for such an expensive lock instruction.
+	  const auto new_value = target.value.load(std::memory_order_relaxed) + (item % 13);
+      target.value.store(new_value, std::memory_order_relaxed);
     }
   }
 

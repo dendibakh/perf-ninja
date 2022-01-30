@@ -28,8 +28,7 @@ static void bench1(benchmark::State &state) {
 }
 
 // Register the function as a benchmark
-BENCHMARK(bench1)->UseRealTime()->Unit(
-    benchmark::kMillisecond); // ->Iterations(100)
+BENCHMARK(bench1)->UseRealTime()->Unit(benchmark::kMillisecond);// ->Iterations(100);
 
 // Run the benchmark
 BENCHMARK_MAIN();
