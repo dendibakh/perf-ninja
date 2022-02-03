@@ -7,5 +7,7 @@ The task of this lab assignment is to find the longest line in a file. There is 
 Bonus exercise: whether solution that uses intrinsics is faster than the baseline is heavily affected by the input data. Run your solution on different input files to determine the speedup/slowdown.
 
 The idea for this lab was proposed by Yuriy Lyfenko (@obender12).
+
 Co-authored-by: Andrew Evstyukhin (@andrewevstyukhin)
+
 Co-authored-by: Jakub Beránek (@Kobzol)
