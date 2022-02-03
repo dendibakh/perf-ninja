@@ -80,7 +80,11 @@ endif()
 if(NOT DEFINED LAB_ARGS)
   set(LAB_ARGS "")
 endif()
-set(LAB_BENCHMARK_ARGS --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=result.json)
+
+if("${BENCHMARK_MIN_TIME}" STREQUAL "")
+  set(BENCHMARK_MIN_TIME "1")
+endif()
+set(LAB_BENCHMARK_ARGS --benchmark_min_time=${BENCHMARK_MIN_TIME} --benchmark_out_format=json --benchmark_out=result.json)
 
 if(CI)
   # Add CI targets without dependencies
