@@ -23,7 +23,8 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Vectorization 1](labs/core_bound/vectorization_1)
   * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining](labs/core_bound/function_inlining_1)
-  * [Compiler Intrinsics](labs/core_bound/compiler_intrinsics_1)
+  * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
+  * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * [Bad Speculation](labs/bad_speculation):
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
   * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
