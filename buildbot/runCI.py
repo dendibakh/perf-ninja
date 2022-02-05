@@ -72,6 +72,7 @@ if runner == "LinuxIntel":
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=75.0)
   Labs["core_bound"]["vectorization_2"] = LabParams(threshold=85.0)
   Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
+  Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)
 elif runner == "WinAMD":
   Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
@@ -89,6 +90,7 @@ elif runner == "WinAMD":
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=70.0)
   Labs["core_bound"]["vectorization_2"] = LabParams(threshold=85.0)
   Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
+  Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)
 
 def getLabCurrentStatus(labPath):
