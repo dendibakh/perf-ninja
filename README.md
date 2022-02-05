@@ -27,6 +27,7 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * [Bad Speculation](labs/bad_speculation):
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
+  * [Replacing Branches With Lookup Tables](labs/bad_speculation/lookup_tables_1)
   * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
 * CPU Frontend Bound:
 * Data-Driven optimizations:
