@@ -11,10 +11,18 @@ static size_t mapToBucket(size_t v) {    // diff
   return -1;  // let it crash
 }
 
+const std::array<int, 100> kLookupTable = []() -> std::array<int, 100>{
+  std::array<int, 100> table;
+  for (int i = 0; i < 100; i++) {
+    table[i] = mapToBucket(i);
+  }
+  return table;
+}();
+
 std::array<size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   std::array<size_t, NUM_BUCKETS> retBuckets{0};
   for (auto v : values) {
-    retBuckets[mapToBucket(v)]++;
+    retBuckets[kLookupTable[v]]++;
   }
   return retBuckets;
 }
