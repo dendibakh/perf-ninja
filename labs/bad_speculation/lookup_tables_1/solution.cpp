@@ -11,7 +11,7 @@ static size_t mapToBucket(size_t v) {    // diff
   return -1;  // let it crash
 }
 
-const std::array<int, 100> kLookupTable = []() -> std::array<int, 100>{
+const std::array<int, 100> kLookupTable = []() -> std::array<int, 100> {
   std::array<int, 100> table;
   for (int i = 0; i < 100; i++) {
     table[i] = mapToBucket(i);
