@@ -1,4 +1,4 @@
-**TODO**: add introductory and summary videos.
+[<img src="https://drive.google.com/uc?export=view&id=1pqmSJVPLCP8n-MIvSPKZqSZJ6RdMvWhP" width="30%">](https://www.youtube.com/watch?v=wPcDgju8VkI&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Loop tiling (blocking) is an important technique that you can use to speed up code that is working with multi-dimensional arrays. If one of the memory access patterns on your array is column-wise, or if in the code you are accessing the same data several times in the loop, this technique can be very beneficial for the performance. It is often seen in matrix multiplication and matrix rotation operations, to speed them up.
 
