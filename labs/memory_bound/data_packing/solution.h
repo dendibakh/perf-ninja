@@ -40,7 +40,10 @@ struct S {
     // d == first / second               ==> use float (could really even do a 16-bit fixed floating point...)
 
     // XXX: honestly I feel like this is a little cheating since with basically
-    //      any conversion warnings turned on this ould fail to compile...
+    //      any conversion warnings turned on this would fail to compile...
+    //      Even though I dislike them in general, this is where having
+    //      accessors would be nice to 1) do the correct casting, and 2)
+    //      verify that the inputs match the expectations.
     u8  i;      // 1B [0, 100]
     u8  s;      // 1B [0, 100]
     u16 l : 14; // 2B [0, 10000]
