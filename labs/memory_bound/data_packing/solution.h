@@ -19,20 +19,8 @@ using i64 = int64_t;
 using f32 = float;
 using f64 = double;
 
-// given that maxRandom = 100, almost all of these can be stored in i8
-
-// FIXME: this data structure can be reduced in size
 struct S {
 #ifdef SOLUTION
-    // // XXX: l holds result `short * short` of which is only 4B so could
-    // //      reduce this to an int?
-    // i64  l;  // 8B
-    // f64  d;  // 8B
-    // i32  i;  // 4B
-    // i16  s;  // 2B // XXX: this is compared against `second` which is an int...
-    // bool b;  // 1B
-    // // pad   // 1B
-
     // first  := [0, 100]
     // second := [0, 100]
     // s == second := [0, 100]
@@ -52,6 +40,12 @@ struct S {
     f32 d;      // 4B  // XXX: theoretically could compress this more, but would very likely end up with padding anyways
                 // ---
                 // Total: 8B
+
+    // NOTE: I don't think it's in the spirit of the lab, but ofc w.r.t.
+    //     information theory, the only values that we actually need to store
+    //     are first and second, and everything else can be computed from those
+    //     values. We'll pretend that the calculation of those values is
+    //     expensive so we want to cache them in this struct.
 
 #else
   int i;         // 4B
