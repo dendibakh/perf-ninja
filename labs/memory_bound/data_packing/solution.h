@@ -11,8 +11,8 @@ struct S {
   float d;
   long long l:16;
   int i:8;
-  short s:7;
-  bool b:1;
+  short s:8;
+  bool b;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
