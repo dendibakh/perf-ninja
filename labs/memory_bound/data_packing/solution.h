@@ -6,7 +6,7 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-#define SOLUTION
+// #define SOLUTION
 
 using u8  = uint8_t;
 using u16 = uint16_t;
