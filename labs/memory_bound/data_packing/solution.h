@@ -2,6 +2,7 @@
 #include <array>
 
 // Assume those constants never change
+// comments
 constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
