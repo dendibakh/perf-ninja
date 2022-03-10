@@ -1,5 +1,4 @@
 #include "solution.hpp"
-
 #include <atomic>
 #include <cstring>
 #include <omp.h>
