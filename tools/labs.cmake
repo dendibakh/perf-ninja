@@ -4,7 +4,11 @@
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message("CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
   message("Please always use the 'build' subdirectory:")
-  message(FATAL_ERROR "  git clean -dfx & mkdir build & cd build & cmake -DCMAKE_BUILD_TYPE=Release ..")
+  if(MSVC)
+    message(FATAL_ERROR "git clean -dfx & cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -T ClangCL")
+  else()
+    message(FATAL_ERROR "git clean -dfx & mkdir build & cd build & cmake -DCMAKE_BUILD_TYPE=Release ..")
+  endif()
 endif()
 
 # Just use the variable
