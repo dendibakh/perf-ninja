@@ -10,10 +10,10 @@ constexpr int maxRandom = 100;
 // this data structure can be reduced in size
 struct S {
   float d;
-  long long l:14;
-  int i:8;
-  short s:8;
-  bool b;
+  unsigned l:14;
+  unsigned i:8;
+  unsigned s:8;
+  unsigned b:2;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };//}__attribute__((packed));
