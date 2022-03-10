@@ -11,8 +11,8 @@ constexpr int maxRandom = 100;
 struct S {
   unsigned i:8;
   unsigned s:8;
-  unsigned l:14;
   unsigned b:2;
+  unsigned l:14;
   float d;
 
   bool operator<(const S &s) const { return this->i < s.i; }
