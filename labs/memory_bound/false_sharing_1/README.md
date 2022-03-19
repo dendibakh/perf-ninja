@@ -1,4 +1,5 @@
-**TODO**: add an introductory and a summary videos.
+[<img src="https://drive.google.com/uc?export=view&id=1xYhEv7la96grMjUSyFNryQPOEONUl4vV" width="30%">](https://www.youtube.com/watch?v=uRmQSHsZoxE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+
 
 This lab assignment focuses on improving performance by eliminating false sharing. In this lab, we
 have several threads that modify data located close together in memory in parallel. This causes a lot
