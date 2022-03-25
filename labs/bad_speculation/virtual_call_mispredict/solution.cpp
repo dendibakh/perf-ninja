@@ -1,13 +1,19 @@
 #include "solution.h"
 
+#include <algorithm>
 #include <random>
 
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
     std::uniform_int_distribution<std::uint32_t> distribution(0, 2);
 
+    std::vector<uint32_t> values;
+    values.reserve(N);
     for (std::size_t i = 0; i < N; i++) {
-        int value = distribution(generator);
+        values.push_back(distribution(generator));
+    }
+    std::sort(values.begin(), values.end());
+    for (const auto value : values) {
         if (value == 0) {
             array.push_back(std::make_unique<ClassA>());
         } else if (value == 1) {
