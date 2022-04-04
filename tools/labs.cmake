@@ -73,6 +73,10 @@ if(EXISTS "${BENCHMARK_FOLDER}/include")
   target_include_directories(lab BEFORE PRIVATE "${BENCHMARK_FOLDER}/include")
   target_include_directories(validate BEFORE PRIVATE "${BENCHMARK_FOLDER}/include")
 endif()
+if(EXISTS "${BENCHMARK_FOLDER}/build/include")
+  target_include_directories(lab BEFORE PRIVATE "${BENCHMARK_FOLDER}/build/include")
+  target_include_directories(validate BEFORE PRIVATE "${BENCHMARK_FOLDER}/build/include")
+endif()
 
 # Check optional arguments
 if(NOT DEFINED CI)
