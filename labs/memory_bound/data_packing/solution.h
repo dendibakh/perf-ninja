@@ -33,12 +33,12 @@ constexpr int maxRandom = 100;
 
 // solution 2 ==> 279
 struct S {
-  float d;      // 8
-  int l;        // 4
-  short s;      // 2
-  short i;      // 2
-  bool b;       // 1
   bool operator<(const S &s) const { return this->i < s.i; }
+  bool b;       // 1
+  short i;      // 2
+  short s;      // 2
+  int l;        // 4
+  float d;      // 8
 };
 
 void init(std::array<S, N> &arr);
