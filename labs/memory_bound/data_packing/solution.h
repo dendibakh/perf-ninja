@@ -6,7 +6,7 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-struct S {  // TD<24>
+struct S {
   float d;
   long long l:16;
   int i:8;
@@ -15,11 +15,6 @@ struct S {  // TD<24>
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
-
-template <int N>
-class TD;
-
-// TD<sizeof(S)> td;
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
