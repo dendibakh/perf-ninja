@@ -18,11 +18,11 @@ struct S {
 };
 #else
 struct S {
-  bool b;
-  short s;
   int i;
-  double d;
-  long long l;
+  float d;
+  unsigned b : 1;
+  unsigned s : 7;
+  short l;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
