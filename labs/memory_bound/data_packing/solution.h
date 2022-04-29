@@ -21,7 +21,7 @@ constexpr int maxRandom = 100;
 struct S {  // 24 bits
   float d;
   long l;
-  int i;
+  short i;
   short s;
   bool b;
 
