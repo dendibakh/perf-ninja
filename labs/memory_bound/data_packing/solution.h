@@ -30,7 +30,7 @@ struct S {  // 24 bits
 
 template <int N>
 class TD;
-TD<sizeof(S)> td;
+// TD<sizeof(S)> td;
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
