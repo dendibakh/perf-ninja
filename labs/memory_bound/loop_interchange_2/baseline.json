@@ -1,0 +1,32 @@
+{
+  "context": {
+    "date": "2022-04-30T17:33:59-04:00",
+    "host_name": "0d98c03bb5c0",
+    "executable": "./build/lab",
+    "num_cpus": 5,
+    "mhz_per_cpu": 48,
+    "cpu_scaling_enabled": false,
+    "caches": [
+    ],
+    "load_avg": [0.23,0.15,0.05],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "bench1",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "bench1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "error_occurred": true,
+      "error_message": "An IO problem",
+      "iterations": 0,
+      "real_time": 0.0000000000000000e+00,
+      "cpu_time": 0.0000000000000000e+00,
+      "time_unit": "ns"
+    }
+  ]
+}
