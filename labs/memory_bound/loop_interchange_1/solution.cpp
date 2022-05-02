@@ -22,6 +22,7 @@ void identity(Matrix &result) {
   }
 }
 
+#ifdef BASELINE
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
@@ -34,6 +35,19 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
     }
   }
 }
+#else
+void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
+  zero(result);
+
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      for (int k = 0; k < N; k++) {
+        result[i][k] += a[i][j] * b[j][k];
+      }
+    }
+  }
+}
+#endif
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
