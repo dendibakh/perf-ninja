@@ -1,4 +1,5 @@
 
+
 #include <array>
 
 // Assume those constants never change
@@ -8,11 +9,11 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
-  int i;
-  long long l;
-  short s;
-  double d;
-  bool b;
+  float d;
+  uint32_t l: 14; //  10000
+  uint32_t i : 7;
+  uint32_t s : 7;
+  uint32_t b : 1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
