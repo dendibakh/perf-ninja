@@ -34,8 +34,20 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     }
   }
 
-  // Middle part of computations with full kernel
+    //// Origin implementation 
+    // for (int r = radius; r < height - radius; r++) {
+    //   // Accumulation
+    //   int dot = 0;
+    //   for (int i = 0; i < radius + 1 + radius; i++) {
+    //     dot += input[(r - radius + i) * width + c] * kernel[i];
+    //   }
 
+    //   // Fast shift instead of division
+    //   int value = (dot + rounding) >> shift;
+    //   output[r * width + c] = static_cast<uint8_t>(value);
+    // }
+
+  // New implementation: Middle part of computations with full kernel
   for (int r = radius; r < height - radius; r++) {
     int dot[width];
     // Initialization
