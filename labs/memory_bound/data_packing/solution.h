@@ -6,12 +6,11 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-// FIXME: this data structure can be reduced in size
 struct S {
   float d;
-  uint16_t l:15;
-  uint8_t i:7;
-  short s;
+  uint32_t l:15;
+  uint32_t i:7;
+  uint32_t s:7;
   bool b:1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
