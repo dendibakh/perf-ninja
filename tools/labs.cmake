@@ -48,7 +48,7 @@ if (WIN32)
   endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Rpass-analysis=.* -Rpass=.* -Rpass-missed=.*")
 
 # https://github.com/google/benchmark
 find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)

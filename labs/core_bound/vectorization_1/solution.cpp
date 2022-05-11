@@ -57,8 +57,10 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
       last_vertical_gap = horizontal_gap_column[0] + gap_open;
       horizontal_gap_column[0] += gap_extension;
 
+      // hot inner loop
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Compute next score from diagonal direction with match/mismatch.
+	// last_diagonal_score depends on previous iteration
         score_t best_cell_score =
             last_diagonal_score +
             (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
