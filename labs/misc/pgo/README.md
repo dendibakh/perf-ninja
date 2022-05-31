@@ -1,4 +1,4 @@
-**TODO**: add introductory and summary videos.
+[<img src="https://drive.google.com/uc?export=view&id=183oi_PRQ_m29kMF-Tcsl7Ppc0gcmfDHO" width="30%">](https://www.youtube.com/watch?v=ERqFtOZ61AA&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Profile Guided Optimizations (PGO) are a set of transformations in most optimizing compilers that can adjust their algorithms based on the profiling data. Sometimes in literature, one can find the term Feedback Directed Optimizations (FDO), which essentially refers to the same thing. The quality and relevance of the profiling data has a critical impact on performance since compiler will be "trained" using that data and use it for generating machine code. Profiling data helps compiler improve its inlining decisions, code placement, register allocation, and more. It is not uncommon to see real workloads performance increase by up to 15% from using PGO.
 
