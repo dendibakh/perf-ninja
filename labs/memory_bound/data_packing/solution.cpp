@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 
+
 void solution(std::array<S, N> &arr) {
   // 1. shuffle
   static std::random_device rd;
