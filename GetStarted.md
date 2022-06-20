@@ -56,14 +56,14 @@ Machine 1
 * Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz, 6MB L3-cache
 * 8 GB RAM
 * Ubuntu 20.04
-* Clang C++ compiler, version 12.0
+* Clang C++ compiler, version 14.0
 
 Machine 2
 
 * AMD Ryzen 7 3700X 8-Core Processor @ 3.6GHz, 32MB L3-cache
 * 64 GB RAM
 * Windows 11 Version 21H2, build 22000.282
-* Clang C++ compiler, version 12.0
+* Clang C++ compiler, version 14.0
 
 Keep in mind that sometimes you may see different speedups on different platforms.
 
