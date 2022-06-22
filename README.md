@@ -1,5 +1,7 @@
 <p align="center"> <img src="/logo.jpg" width=200> </p>
 
+![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux.yml/badge.svg) ![Windows](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Win.yml/badge.svg)
+
 # Performance Ninja Class
 
 This is an online course where you can learn to find and fix low-level performance issues, for example CPU cache misses and branch mispredictions. It's all about practice. So we offer you this course in a form of lab assignments and youtube videos. You will spend at least 90% of the time analyzing performance of the code and trying to improve it.
