@@ -51,13 +51,8 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-if (WIN32 AND EXISTS "C:/Program Files (x86)/benchmark")
-  set(BENCHMARK_FOLDER "C:/Program Files (x86)/benchmark")
-  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}" REQUIRED)
-else()
-  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
-endif()
+find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)
+set(BENCHMARK_LIBRARY "benchmark::benchmark")
 
 # Find source files
 file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
@@ -141,10 +136,8 @@ if(NOT MSVC)
     target_link_libraries(validate shlwapi)
   endif()
 else()
-  find_library(BENCHMARK_LIBRARYD NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Debug")
-
-  target_link_libraries(lab Shlwapi.lib optimized ${BENCHMARK_LIBRARY} debug ${BENCHMARK_LIBRARYD})
-  target_link_libraries(validate Shlwapi.lib optimized ${BENCHMARK_LIBRARY} debug ${BENCHMARK_LIBRARYD})
+  target_link_libraries(wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
+  target_link_libraries(validate_wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
 
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT lab)
 
