@@ -4,7 +4,11 @@
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message("CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
   message("Please always use the 'build' subdirectory:")
-  message(FATAL_ERROR "  git clean -dfx & mkdir build & cd build & cmake -DCMAKE_BUILD_TYPE=Release ..")
+  if(MSVC)
+    message(FATAL_ERROR "git clean -dfx & cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -T ClangCL")
+  else()
+    message(FATAL_ERROR "git clean -dfx & mkdir build & cd build & cmake -DCMAKE_BUILD_TYPE=Release ..")
+  endif()
 endif()
 
 # Just use the variable
@@ -47,13 +51,8 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-if (WIN32 AND EXISTS "C:/Program Files (x86)/benchmark")
-  set(BENCHMARK_FOLDER "C:/Program Files (x86)/benchmark")
-  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}" REQUIRED)
-else()
-  set(BENCHMARK_FOLDER "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-  find_library(BENCHMARK_LIBRARY NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Release" "${BENCHMARK_FOLDER}/build/src" REQUIRED)
-endif()
+find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)
+set(BENCHMARK_LIBRARY "benchmark::benchmark")
 
 # Find source files
 file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
@@ -68,6 +67,10 @@ add_executable(validate validate.cpp ${srcs} ${EXT_VALIDATE_srcs})
 if(EXISTS "${BENCHMARK_FOLDER}/include")
   target_include_directories(lab BEFORE PRIVATE "${BENCHMARK_FOLDER}/include")
   target_include_directories(validate BEFORE PRIVATE "${BENCHMARK_FOLDER}/include")
+endif()
+if(EXISTS "${BENCHMARK_FOLDER}/build/include")
+  target_include_directories(lab BEFORE PRIVATE "${BENCHMARK_FOLDER}/build/include")
+  target_include_directories(validate BEFORE PRIVATE "${BENCHMARK_FOLDER}/build/include")
 endif()
 
 # Check optional arguments
@@ -133,10 +136,8 @@ if(NOT MSVC)
     target_link_libraries(validate shlwapi)
   endif()
 else()
-  find_library(BENCHMARK_LIBRARYD NAMES benchmark PATHS "${BENCHMARK_FOLDER}/build/src/Debug")
-
-  target_link_libraries(lab Shlwapi.lib optimized ${BENCHMARK_LIBRARY} debug ${BENCHMARK_LIBRARYD})
-  target_link_libraries(validate Shlwapi.lib optimized ${BENCHMARK_LIBRARY} debug ${BENCHMARK_LIBRARYD})
+  target_link_libraries(wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
+  target_link_libraries(validate_wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
 
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT lab)
 

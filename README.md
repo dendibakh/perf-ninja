@@ -1,5 +1,7 @@
 <p align="center"> <img src="/logo.jpg" width=200> </p>
 
+![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux.yml/badge.svg) ![Windows](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Win.yml/badge.svg)
+
 # Performance Ninja Class
 
 This is an online course where you can learn to find and fix low-level performance issues, for example CPU cache misses and branch mispredictions. It's all about practice. So we offer you this course in a form of lab assignments and youtube videos. You will spend at least 90% of the time analyzing performance of the code and trying to improve it.
@@ -12,6 +14,13 @@ Before you start working on lab assignments, make sure you read [Get Started pag
 
 ## Lab assignments
 
+* [Core Bound](labs/core_bound):
+  * [Vectorization 1](labs/core_bound/vectorization_1)
+  * [Vectorization 2](labs/core_bound/vectorization_2)
+  * [Function Inlining](labs/core_bound/function_inlining_1)
+  * [Dependency Chains 1](labs/core_bound/dep_chains_1)  
+  * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
+  * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * [Memory Bound](labs/memory_bound):
   * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
@@ -19,12 +28,6 @@ Before you start working on lab assignments, make sure you read [Get Started pag
   * [Loop Tiling](labs/memory_bound/loop_tiling_1)
   * [SW memory prefetching](labs/memory_bound/swmem_prefetch_1)
   * [False Sharing](labs/memory_bound/false_sharing_1)
-* [Core Bound](labs/core_bound):
-  * [Vectorization 1](labs/core_bound/vectorization_1)
-  * [Vectorization 2](labs/core_bound/vectorization_2)
-  * [Function Inlining](labs/core_bound/function_inlining_1)
-  * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
-  * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * [Bad Speculation](labs/bad_speculation):
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
   * [Replacing Branches With Lookup Tables](labs/bad_speculation/lookup_tables_1)

@@ -65,6 +65,7 @@ def buildAndRunBench(iterNumber, variant, cmakeFlags):
     callWrapper("cmake -B . -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release " + cmakeFlags + " -S \"" + labAbsPath + "\"")
     callWrapper("cmake --build . --config Release --parallel 8")
     # this will save score in result.json file
+    callWrapper("cmake --build . --config Release --target validateLab")
     callWrapper("cmake --build . --config Release --target benchmarkLab")
   except:
     print(bcolors.FAIL + variant + ": iteration " + str(iterNumber) + " - Failed" + bcolors.ENDC)

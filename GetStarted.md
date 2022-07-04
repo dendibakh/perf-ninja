@@ -34,6 +34,11 @@ When you push changes to your private branch, it will automatically trigger CI b
 
 ## Profiling
 
+To match assembly code back to the source in the profile, build you binaries with the debug information:
+```
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" ..
+```
+
 Lab assignments are build on top of Google Benchmark library, which by default performs a variable number of benchmark iterations. That makes it hard to compare performance profiles of two runs since they will not do the same amount of work. You can see the same wall time even though the number of iterations is different. To fix the number of iterations, you can do the following change:
 
 ```
@@ -51,14 +56,14 @@ Machine 1
 * Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz, 6MB L3-cache
 * 8 GB RAM
 * Ubuntu 20.04
-* Clang C++ compiler, version 12.0
+* Clang C++ compiler, version 14.0
 
 Machine 2
 
 * AMD Ryzen 7 3700X 8-Core Processor @ 3.6GHz, 32MB L3-cache
 * 64 GB RAM
 * Windows 11 Version 21H2, build 22000.282
-* Clang C++ compiler, version 12.0
+* Clang C++ compiler, version 14.0
 
 Keep in mind that sometimes you may see different speedups on different platforms.
 
