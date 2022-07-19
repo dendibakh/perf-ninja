@@ -41,10 +41,7 @@ constexpr uint64_t Ntz(uint64_t x) {
 }
 
 constexpr uint64_t MarkZeroBytes(uint64_t x) {
-  uint64_t y =
-      ((x & PopulateByte<uint64_t>(0x7F)) + PopulateByte<uint64_t>(0x7F)) &
-      PopulateByte<uint64_t>(0x80);
-  return ~(y | x | PopulateByte<uint64_t>(0x7F));
+  return PopulateByte<uint64_t>(0x80) & ~((x & PopulateByte<uint64_t>(0x7F)) + PopulateByte<uint64_t>(0x7F));
 }
 
 unsigned solution(const std::string& inputContents) {
@@ -73,10 +70,10 @@ unsigned solution(const std::string& inputContents) {
     constexpr uint64_t kMask = UINT64_C(0x0A0A0A0A0A0A0A0A);
     const uint64_t u64 = *pu64;
     const uint64_t masked = u64 ^ kMask;
-    if (!ContainsZeroByte(masked)) {
+    const uint64_t x80ed = MarkZeroBytes(masked);
+    if (x80ed == 0) {
       continue;
     }
-    const uint64_t x80ed = MarkZeroBytes(masked);
     const char* pch = reinterpret_cast<const char*>(pu64);
     ptrdiff_t lsf = pch - last_line_beg;
     if (lsf + 8 >= longest) {
