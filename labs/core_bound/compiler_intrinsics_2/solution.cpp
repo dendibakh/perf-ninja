@@ -20,9 +20,8 @@ constexpr uint64_t PopCount(uint64_t x) {
   return x * PopulateByte<uint64_t>(0x01) >> 56;
 }
 
-constexpr bool ContainsZeroByte(uint64_t v) {
-  return ((v - PopulateByte<uint64_t>(0x01)) & ~v &
-          PopulateByte<uint64_t>(0x80)) != 0;
+constexpr uint64_t MarkZeroBytes(uint64_t v) {
+  return (v - PopulateByte<uint64_t>(0x01)) & ~v & PopulateByte<uint64_t>(0x80);
 }
 
 constexpr uint64_t Nlz(uint64_t x) {
@@ -38,10 +37,6 @@ constexpr uint64_t Nlz(uint64_t x) {
 
 constexpr uint64_t Ntz(uint64_t x) {
   return PopCount(~x & (x - 1));
-}
-
-constexpr uint64_t MarkZeroBytes(uint64_t x) {
-  return PopulateByte<uint64_t>(0x80) & ~((x & PopulateByte<uint64_t>(0x7F)) + PopulateByte<uint64_t>(0x7F));
 }
 
 unsigned solution(const std::string& inputContents) {
