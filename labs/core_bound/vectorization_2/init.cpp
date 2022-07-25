@@ -3,7 +3,8 @@
 #include <random>
 
 void init(Blob &blob) {
-  std::default_random_engine generator;
+  std::random_device r;
+  std::default_random_engine generator(r());
   std::uniform_int_distribution<uint16_t> distribution(
       0, std::numeric_limits<uint16_t>::max());
 
