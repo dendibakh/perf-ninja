@@ -12,6 +12,8 @@ Each lab assignment focuses on a specific performance problem and can take anywh
 
 Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ). Join our [discord channel](https://discord.gg/8h6gEzgMDY) to collaborate with others.
 
+Lab assignments in this project are implemented in C++. If you're more comfortable with Rust, perf-ninja was also ported to Rust [here](https://github.com/grahamking/perf-ninja-rs), thanks to @grahamking.
+
 ## Lab assignments
 
 * [Core Bound](labs/core_bound):
