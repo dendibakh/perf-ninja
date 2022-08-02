@@ -136,8 +136,8 @@ if(NOT MSVC)
     target_link_libraries(validate shlwapi)
   endif()
 else()
-  target_link_libraries(wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
-  target_link_libraries(validate_wordcount Shlwapi.lib ${BENCHMARK_LIBRARY})
+  target_link_libraries(lab Shlwapi.lib ${BENCHMARK_LIBRARY})
+  target_link_libraries(validate Shlwapi.lib ${BENCHMARK_LIBRARY})
 
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT lab)
 
