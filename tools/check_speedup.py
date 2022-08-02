@@ -8,7 +8,6 @@
 # $ cd check_speedup
 # $ python "C:\workspace\perf-ninja\tool\check_noise.py"
 #   -lab_path "C:\workspace\perf-ninja\labs\misc\warmup" 
-#   -bench_lib_path "C:\workspace\perf-ninja\benchmark"
 #   -num_runs 3 -v
 
 import subprocess
@@ -16,16 +15,17 @@ import os
 import argparse
 from pathlib import Path
 import shutil
+import gbench
+from gbench import util, report
+from gbench.util import *
 
 parser = argparse.ArgumentParser(description='test results')
 parser.add_argument("-num_runs", type=int, help="Number of runs", default=5)
-parser.add_argument("-bench_lib_path", type=str, help="Path to the Google benchmark library.")
 parser.add_argument("-lab_path", type=str, help="Path to the root of the lab.")
 parser.add_argument("-v", help="verbose", action="store_true", default=False)
 
 args = parser.parse_args()
 numRuns = args.num_runs
-gbenchPath = args.bench_lib_path
 labRootPath = args.lab_path
 verbose = args.v
 
@@ -78,15 +78,20 @@ def compareResults(iterNumber):
   baselineResultPath = os.path.join(baselineBuildPath, "result.json")
   solutionBuildPath = os.path.join(saveCWD, "solutionBuild" + str(iterNumber))
   solutionResultPath = os.path.join(solutionBuildPath, "result.json")
-  compareScriptPath = os.path.join(gbenchPath, os.path.join("tools", "compare.py"))
+
+  outJsonSolution = gbench.util.load_benchmark_results(solutionResultPath)
+  outJsonBaseline = gbench.util.load_benchmark_results(baselineResultPath)
+
+  # Parse two report files and compare them
+  diff_report = gbench.report.get_difference_report(
+    outJsonBaseline, outJsonSolution, True)
+  output_lines = gbench.report.print_difference_report(
+    diff_report,
+    False, True, 0.05, True)
   
-  cmdLine = "python \"" + compareScriptPath + "\" benchmarks " + "\"" + baselineResultPath + "\" " + "\"" + solutionResultPath + "\""
-  if verbose:
-    print(bcolors.OKCYAN + "Running: " + cmdLine + bcolors.ENDC)
-  try:
-    subprocess.check_call(cmdLine, shell=True)
-  except:
-    return False
+  for ln in output_lines:
+    print(ln)
+
   return True
 
 for i in range(0, numRuns):
