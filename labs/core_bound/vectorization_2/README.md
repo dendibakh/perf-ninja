@@ -1,4 +1,4 @@
-**TODO**: add introductory and summary videos.
+[<img src="https://drive.google.com/uc?export=view&id=16Zg-PInJ8bQilDY1zBXiAIBIL3C7iStZ" width="30%">](https://www.youtube.com/watch?v=m4SWal8EAgM&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 This is a second lab about [auto vectorization](https://llvm.org/docs/Vectorizers.html). The subject of this lab assignment is a part of a checksum algorithm from the 80s, which has risen from the popularity of the Internet and [accompanying needs to validate transmitted packets](https://www.alpharithms.com/internet-checksum-calculation-steps-044921/). Even the problem is old, similar issues may exist nowadays in production code.
 
