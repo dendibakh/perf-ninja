@@ -40,6 +40,7 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [Warmup](labs/misc/warmup)
   * [LTO](labs/misc/lto)
   * [PGO](labs/misc/pgo)
+  * [Optimize IO](labs/misc/io_opt1)
 
 ## Support the project
 
@@ -58,6 +59,7 @@ Lab authors:
 * René Rahn (@rrahn)
 * Adam Folwarczny (@adamf88)
 * Jakub Beránek (@Kobzol)
+* Jakub Gałecki (@kubagalecki)
 * Denis Bakhvalov (@dendibakh)
 
 ## Contributing
