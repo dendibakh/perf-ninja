@@ -16,21 +16,21 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
 
 ## Lab assignments
 
-* [Core Bound](labs/core_bound):
+* Core Bound:
   * [Vectorization 1](labs/core_bound/vectorization_1)
   * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining](labs/core_bound/function_inlining_1)
   * [Dependency Chains 1](labs/core_bound/dep_chains_1)  
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
   * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
-* [Memory Bound](labs/memory_bound):
+* Memory Bound:
   * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
   * [Loop Tiling](labs/memory_bound/loop_tiling_1)
   * [SW memory prefetching](labs/memory_bound/swmem_prefetch_1)
   * [False Sharing](labs/memory_bound/false_sharing_1)
-* [Bad Speculation](labs/bad_speculation):
+* Bad Speculation:
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
   * [Replacing Branches With Lookup Tables](labs/bad_speculation/lookup_tables_1)
   * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
