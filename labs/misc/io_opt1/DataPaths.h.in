@@ -1,0 +1,3 @@
+inline constexpr auto small_data = "@SMALL_DATA_PATH@";
+inline constexpr auto medium_data = "@MEDIUM_DATA_PATH@";
+inline constexpr auto large_data = "@LARGE_DATA_PATH@";
