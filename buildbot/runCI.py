@@ -257,7 +257,7 @@ def benchmarkLab(labPath):
     return False
 
   print ("Measured speedup:", "{:.2f}".format(speedup), "%")
-  print (bcolors.OKGREEN + "Submission for the lab " + getLabNameStr(labPath) + "succeded" + bcolors.ENDC)
+  print (bcolors.OKGREEN + "Submission for the lab " + getLabNameStr(labPath) + " succeded" + bcolors.ENDC)
   return True
 
 def runActionForAllLabs(workdir, func):
