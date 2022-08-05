@@ -1,5 +1,7 @@
 # Data packing
 
+### NOTE: after migrating from clang12 to clang14 the speedup is no longer measurable.
+
 This is a lab about data packing.
 
 [<img src="https://drive.google.com/uc?export=view&id=16uvUgz327TXrysAf2HXYRe_KRBALHw2j" width="30%">](https://www.youtube.com/watch?v=-V-oIXrqA2s&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
