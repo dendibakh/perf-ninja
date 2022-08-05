@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import gbench
 from gbench import util, report
 from gbench.util import *
+import statistics
 
 class bcolors:
     HEADER = '\033[95m'
