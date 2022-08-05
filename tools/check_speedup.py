@@ -7,8 +7,8 @@
 # $ mkdir check_speedup
 # $ cd check_speedup
 # $ python "C:\workspace\perf-ninja\tool\check_noise.py"
-#   -lab_path "C:\workspace\perf-ninja\labs\misc\warmup" 
-#   -num_runs 3 -v
+#   -lab_path "C:\workspace\perf-ninja\labs\misc\warmup"
+#   -DSOLUTION -num_runs 3 -v
 
 import subprocess
 import os
@@ -22,11 +22,13 @@ from gbench.util import *
 parser = argparse.ArgumentParser(description='test results')
 parser.add_argument("-num_runs", type=int, help="Number of runs", default=5)
 parser.add_argument("-lab_path", type=str, help="Path to the root of the lab.")
+parser.add_argument("-D", type=str, help="Path to the root of the lab.", default="SOLUTION")
 parser.add_argument("-v", help="verbose", action="store_true", default=False)
 
 args = parser.parse_args()
 numRuns = args.num_runs
 labRootPath = args.lab_path
+defines = args.D
 verbose = args.v
 
 saveCWD = os.getcwd()
@@ -96,7 +98,7 @@ def compareResults(iterNumber):
 
 for i in range(0, numRuns):
   buildAndRunBench(i, "baseline", "")
-  buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-DSOLUTION")
+  buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-D" + defines)
 
 os.chdir(saveCWD)
 
