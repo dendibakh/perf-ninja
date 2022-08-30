@@ -86,7 +86,7 @@ Here are a few tips that will help you compare results of your experiments again
 2) Use `check_speedup.py` script, which is inside Performance Ninja repo (uses `compare.py` script under the hood):
 
     ```
-    # 1. Change the baseline code and guard it with `#ifdef SOLUTION`:
+    # 1. Put your solution under `#ifdef SOLUTION`:
       #ifdef SOLUTION
         // your solution
       #else
