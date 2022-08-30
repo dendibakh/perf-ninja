@@ -93,7 +93,8 @@ Here are a few tips that will help you compare results of your experiments again
         // baseline version
       #endif
     # 2. Run the script, which will build and run your solution against the baseline N times
-    python3 tools/check_speedup.py -lab_path labs/misc/warmup -bench_lib_path path/to/google_benchmark_lib -num_runs 3
+    cd build
+    python3 ~/workspace/perf-ninja/tools/check_speedup.py -lab_path ../ -num_runs 3
     ```
 
 ## Submission guidelines:
