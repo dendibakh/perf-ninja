@@ -1,4 +1,4 @@
-**TODO**: add introductory and summary videos.
+[<img src="https://drive.google.com/uc?export=view&id=1ZQG3JW5sQK4bQdLxgblAIouRnXVbse7k" width="30%">](https://www.youtube.com/watch?v=0WUihFxjzSE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 This is a second lab about using [compiler intrinsics](https://en.wikipedia.org/wiki/Intrinsic_function) to speed up parts of the code, where compilers fail to generate optimal code.
 
