@@ -22,7 +22,7 @@ This example is rather simple (at the level of a 2nd year mechanical engineering
 ## Hint
 Note that the compiler generates fairly optimal code for the floating-point computations, so there are little gains to be had by optimizing those.
 Instead, focus on the memory access pattern, which is extremely random, meaning many distant memory addresses are accessed in rapid succession, which puts stress on the TLB.
-This situation could be alleviated by allocating the memory which is accessed in a random fashion on huge pages (see `HugePagesSetupTips.md`).
+This situation could be alleviated by allocating the memory which is accessed in a random fashion on huge pages (see [HugePagesSetupTips](HugePagesSetupTips.md)).
 For the convenience of your solution, all such allocations are done using the `allocateDoublesArray` function.
 In fact, this is the only place of the code which is modified in the suggested solution.
 
