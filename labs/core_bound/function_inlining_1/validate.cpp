@@ -31,7 +31,7 @@ int main() {
   init(arr);
 
   auto expected = arr;
-  solution(arr);
+  Solution(arr);
   originalSolution(expected);
 
   for (size_t i = 0; i < N; i++) {
