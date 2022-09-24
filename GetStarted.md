@@ -51,17 +51,27 @@ This will instruct the Google Benchmark framework to execute exactly 10 iteratio
 
 You are free to work on whatever platform you have at your disposal. However, we use the following CI machines to run your submissions:
 
-Machine 1
+**Machine 1 - (Linux + Alderlake)**
 
-* Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz, 6MB L3-cache
-* 8 GB RAM
-* Ubuntu 20.04
+* 12th Gen Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache
+* 16 GB RAM, DDR4 @ 2400 MT/s
+* 256GB NVMe PCIe M.2 SSD
+* 64-bit Ubuntu 22.04.1 LTS (Jammy Jellyfish)
 * Clang C++ compiler, version 14.0
 
-Machine 2
+**Machine 2 - (Linux + CoffeeLake)**
 
-* AMD Ryzen 7 3700X 8-Core Processor @ 3.6GHz, 32MB L3-cache
+* Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache
+* 8 GB RAM, DDR4 @ 2400 MT/s
+* 256GB NVME INTEL SSDPEKKW256G8
+* 64-bit Ubuntu 20.04, kernel version 5.13.0-27
+* Clang C++ compiler, version 14.0
+
+**Machine 3 - (Windows + Zen3)**
+
+* AMD Ryzen 7 3700X 8-Core Processor @ 3.6GHz (4.40GHz Turbo), 32MB L3-cache
 * 64 GB RAM
+* ADATA XPG SX8200 Pro 1TB 3D NAND NVMe SSD
 * Windows 11 Version 21H2, build 22000.282
 * Clang C++ compiler, version 14.0
 
