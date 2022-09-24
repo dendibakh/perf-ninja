@@ -149,6 +149,55 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+#if defined(ON_WINDOWS)
+
+inline auto allocateDoublesArray(size_t size) {
+  static const bool privileges_set = setRequiredPrivileges();
+  if (!privileges_set)
+    throw std::bad_alloc{};
+
+  const SIZE_T page_size = GetLargePageMinimum();
+  const auto n_bytes_requested = size * sizeof(double);
+  const auto n_pages_requested =
+      n_bytes_requested / page_size + (n_bytes_requested % page_size != 0);
+  const auto alloc_size = n_pages_requested * page_size;
+
+  auto alloc =
+      VirtualAlloc(NULL, alloc_size, MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES,
+                   PAGE_READWRITE);
+  if (!alloc)
+    throw std::bad_alloc{};
+
+  auto deleter = [](double *ptr) { VirtualFree(ptr, 0, MEM_RELEASE); };
+  return std::unique_ptr<double[], decltype(deleter)>(
+      static_cast<double *>(alloc), deleter);
+}
+
+#elif defined(ON_LINUX)
+
+// Allocate an array of doubles of size `size`, return it as a
+// std::unique_ptr<double[], D>, where `D` is a custom deleter type
+inline auto allocateDoublesArray(size_t size) {
+  size *= sizeof(double);
+
+  // Allocate full pages
+  constexpr size_t page_size = 1ul << 21; // 2MB
+  const auto pages_to_alloc = size / page_size + (size % page_size != 0);
+  size = pages_to_alloc * page_size;
+
+  const auto alloc = mmap(nullptr, size, PROT_READ | PROT_WRITE,
+                          MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+  if (alloc == MAP_FAILED)
+    throw std::bad_alloc{};
+
+  auto deleter = [s = size](double *addr) { munmap(addr, s); };
+
+  return std::unique_ptr<double[], decltype(deleter)>(
+      static_cast<double *>(alloc), deleter);
+}
+
+#else
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
@@ -168,3 +217,5 @@ inline auto allocateDoublesArray(size_t size) {
   // The more verbose version is meant to demonstrate the use of a custom
   // (potentially stateful) deleter
 }
+
+#endif
