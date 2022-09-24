@@ -25,7 +25,12 @@
 
 5. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](GetStarted.md#how-to-build-lab-assignments). 
 
-6. (Optional) Install [ninja](https://github.com/ninja-build).
+6. Set the frequency scaling governor to `performance`.
+    ```
+    sudo cpupower frequency-set --governor performance
+    ```
+
+7. (Optional) Install [ninja](https://github.com/ninja-build).
     
     ```
     $ sudo apt install ninja-build
