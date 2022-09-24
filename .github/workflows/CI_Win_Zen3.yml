@@ -1,4 +1,4 @@
-name: Benchmark on Windows
+name: Benchmark on Windows + Zen3
 
 on: [push]
 
