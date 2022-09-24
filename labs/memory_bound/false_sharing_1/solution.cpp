@@ -4,7 +4,7 @@
 #include <omp.h>
 #include <vector>
 
-size_t solution(const std::vector<uint32_t> &data, int thread_count) {
+std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
@@ -32,7 +32,7 @@ size_t solution(const std::vector<uint32_t> &data, int thread_count) {
     }
   }
 
-  size_t result = 0;
+  std::size_t result = 0;
   for (const auto &accumulator : accumulators) {
     result += accumulator.value;
   }
