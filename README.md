@@ -69,4 +69,4 @@ We warmly welcome contributions! See [Contributing.md](Contributing.md) for the 
 
 Please write to dendibakh@gmail.com with suggestions.
 
-Copyright © 2021 by Denis Bakhvalov under Creative Commons license (CC BY 4.0).
+Copyright © 2022 by Denis Bakhvalov under Creative Commons license (CC BY 4.0).
