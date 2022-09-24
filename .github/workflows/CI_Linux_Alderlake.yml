@@ -1,4 +1,4 @@
-name: Benchmark on Linux
+name: Benchmark on Linux + Alderlake
 
 on: [push]
 
@@ -7,7 +7,7 @@ env:
 
 jobs:
   build:
-    runs-on: [self-hosted, Linux]
+    runs-on: [self-hosted, Linux, alderlake]
     timeout-minutes: 5
     
     steps:
@@ -18,5 +18,5 @@ jobs:
     - name: Benchmark
       shell: bash
       working-directory: ${{github.workspace}}
-      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner LinuxIntel
+      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner LinuxIntelAlderlake
 

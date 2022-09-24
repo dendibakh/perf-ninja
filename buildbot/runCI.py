@@ -57,7 +57,7 @@ Labs["frontend_bound"] = dict()
 Labs["data_driven"] = dict()
 Labs["misc"] = dict()
 
-if runner == "LinuxIntel":
+if runner == "LinuxIntelAlderlake":
   Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=70.0)
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
@@ -78,7 +78,28 @@ if runner == "LinuxIntel":
   Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
   Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)
-elif runner == "WinAMD":
+elif runner == "LinuxIntelCoffeelake":
+  Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
+  Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=70.0)
+  Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
+  Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
+  Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
+  Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=65.0)
+  Labs["memory_bound"]["swmem_prefetch_1"] = LabParams(threshold=40.0)
+  Labs["misc"]["warmup"] = LabParams(threshold=50.0)
+  Labs["misc"]["lto"] = LabParams(threshold=20.0)
+  Labs["misc"]["pgo"] = LabParams(threshold=5.0)
+  Labs["misc"]["io_opt1"] = LabParams(threshold=70.0)
+  Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
+  Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
+  Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
+  Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
+  Labs["core_bound"]["vectorization_1"] = LabParams(threshold=75.0)
+  Labs["core_bound"]["vectorization_2"] = LabParams(threshold=85.0)
+  Labs["bad_speculation"]["conditional_store_1"] = LabParams(threshold=70.0)
+  Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
+  Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)  
+elif runner == "WinZen3":
   Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=60.0)
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=50.0)
