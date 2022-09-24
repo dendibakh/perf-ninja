@@ -63,7 +63,7 @@ if runner == "LinuxIntelAlderlake":
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
   Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
-  Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=65.0)
+  Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=35.0)
   Labs["memory_bound"]["swmem_prefetch_1"] = LabParams(threshold=40.0)
   Labs["misc"]["warmup"] = LabParams(threshold=50.0)
   Labs["misc"]["lto"] = LabParams(threshold=20.0)
