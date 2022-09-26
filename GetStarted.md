@@ -12,7 +12,7 @@ Others are optional depend on your platform of choice. So far we support native 
 
 Watch the warmup video:
 
-[<img src="https://drive.google.com/uc?export=view&id=1AbuZJdfc-BbpNLdxZukMILs2l5_HBH32" width="30%">](https://www.youtube.com/watch?v=jFRwAcIoLgQ&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+[<img src="img/WarmupLabAssignment.png">](https://www.youtube.com/watch?v=jFRwAcIoLgQ&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Every lab assignment has the following:
 * Video that introduces a particular transformation.

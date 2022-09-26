@@ -1,4 +1,4 @@
-[<img src="https://drive.google.com/uc?export=view&id=1NdSmpytK0QOpkLcJ_dpl6KNnN7XMxmOf" width="30%">](https://www.youtube.com/watch?v=bhz4t5QYApE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+[<img src="../../../img/LookupTables1.png">](https://www.youtube.com/watch?v=bhz4t5QYApE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Welcome to the next lab assignment, where we will fight branch mispredictions by replacing them with lookup tables. The code in this lab assignment maps values from `[0;99]` into buckets, which involves a lot of comparisons, and so, branches. To solve this assignment you need to figure out a way how to replace branches.
 

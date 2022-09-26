@@ -1,4 +1,4 @@
-[<img src="https://drive.google.com/uc?export=view&id=1QLyhFannnuqJw8heBnBsexMnE7tWNZIi" width="30%">](https://www.youtube.com/watch?v=j2sND8ATjsE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+[<img src="../../../img/LTO.png">](https://www.youtube.com/watch?v=j2sND8ATjsE&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Link Time Optimization (LTO) is a collection of compiler transformations that are performed across multiple translation units. It is also frequently referred to as IPO ([Interprocedural optimizations](https://en.wikipedia.org/wiki/Interprocedural_optimization)). Traditionally, compilers perform optimization within one translation unit. LTO helps a lot in situations when many function calls cross translation unit boundaries. In this lab, you will see the effect of LTO in practice.
 

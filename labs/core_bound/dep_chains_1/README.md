@@ -1,6 +1,6 @@
 # Speed up data dependency chains #1.
 
-[<img src="https://drive.google.com/uc?export=view&id=1S26wtb3hwSPpz85wF0tctnff8G4TSqT_" width="30%">](https://www.youtube.com/watch?v=nXf6MxNlXdg&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
+[<img src="../../../img/DepChains1.png">](https://www.youtube.com/watch?v=nXf6MxNlXdg&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
 Critical data dependency chains are increasingly becoming the [only thing that matters](https://easyperf.net/blog/2022/05/11/Visualizing-Performance-Critical-Dependency-Chains) for performance of a general-purpose application. That is why it is very important to identify those and know possible ways to make them run faster. On a SW level, you can sometimes occasionally introduce an artificial data dependency, which should not exist in the first place. Those cases are usually easy to find. In a contrast, some data dependency chains are inherent to a particular type of data structure.
 
