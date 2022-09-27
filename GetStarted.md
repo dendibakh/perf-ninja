@@ -6,7 +6,7 @@ Here is the list of tools you *absolutely* have to install to build labs in this
 * CMake 3.13
 * [Google benchmark](https://github.com/google/benchmark), you can also use the scripts in the [tools](tools) directory.
 
-Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md))([MacOS](QuickstartMacOS.md)).
+Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md)) ([MacOS](QuickstartMacOS.md)).
 
 ## How to build lab assignments
 
@@ -59,13 +59,13 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 64-bit Ubuntu 22.04.1 LTS (Jammy Jellyfish)
 * Clang C++ compiler, version 14.0
 
-**Machine 2 - (Linux + CoffeeLake)**
+**Machine 2 - (Mac OS + M1)**
 
-* Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache
-* 8 GB RAM, DDR4 @ 2400 MT/s
-* 256GB NVME INTEL SSDPEKKW256G8
-* 64-bit Ubuntu 20.04, kernel version 5.13.0-27
-* Clang C++ compiler, version 14.0
+* Mac mini (M1, 2020) @ 3.20GHz max frequency, 4P+4E cores, 8 MB LLC
+* 16 GB RAM, LPDDR4
+* 256GB NVME APPLE SSD AP0256Q
+* macOS 12.5.1 Monterey (21G83), Darwin 21.6.0
+* Clang C++ compiler, version 15.0
 
 **Machine 3 - (Windows + Zen3)**
 
@@ -73,6 +73,14 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 64 GB RAM
 * ADATA XPG SX8200 Pro 1TB 3D NAND NVMe SSD
 * Windows 11 Version 21H2, build 22000.282
+* Clang C++ compiler, version 14.0
+
+**Machine 4 - (Linux + CoffeeLake)**
+
+* Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache
+* 8 GB RAM, DDR4 @ 2400 MT/s
+* 256GB NVME INTEL SSDPEKKW256G8
+* 64-bit Ubuntu 20.04, kernel version 5.13.0-27
 * Clang C++ compiler, version 14.0
 
 Keep in mind that sometimes you may see different speedups on different platforms.
