@@ -126,7 +126,7 @@ elif runner == "MacosM1":
   # FIXME: Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
   Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
-  Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=30.0)
+  Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=25.0)
   Labs["memory_bound"]["swmem_prefetch_1"] = LabParams(threshold=50.0)
   Labs["misc"]["warmup"] = LabParams(threshold=50.0)
   Labs["misc"]["lto"] = LabParams(threshold=10.0)
