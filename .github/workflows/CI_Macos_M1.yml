@@ -1,4 +1,4 @@
-name: Benchmark on Linux + Alderlake
+name: Benchmark on Mac OS + M1
 
 on: [push]
 
