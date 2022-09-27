@@ -1,6 +1,6 @@
 <p align="center"> <img src="/logo.jpg" width=200> </p>
 
-![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux_Alderlake.yml/badge.svg) ![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux_Coffeelake.yml/badge.svg) ![Windows](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Win_Zen3.yml/badge.svg)
+![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux_Alderlake.yml/badge.svg) ![Windows](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Macos_M1.yml/badge.svg) ![Windows](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Win_Zen3.yml/badge.svg) ![Linux](https://github.com/dendibakh/perf-ninja/actions/workflows/CI_Linux_Coffeelake.yml/badge.svg) 
 
 # Performance Ninja Class
 
