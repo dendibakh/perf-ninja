@@ -1,7 +1,5 @@
 
 #include "solution.h"
-#include <emmintrin.h>
-#include <immintrin.h>
 #include <memory>
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
