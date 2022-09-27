@@ -6,7 +6,7 @@ Here is the list of tools you *absolutely* have to install to build labs in this
 * CMake 3.13
 * [Google benchmark](https://github.com/google/benchmark), you can also use the scripts in the [tools](tools) directory.
 
-Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md)).
+Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md))([MacOS](QuickstartMacOS.md)).
 
 ## How to build lab assignments
 
