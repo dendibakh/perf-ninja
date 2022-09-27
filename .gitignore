@@ -13,6 +13,9 @@ __pycache__
 *.pyc
 .idea/
 cmake-build-debug/
+.DS_Store
+labs/misc/io_opt1/DataPaths.h
+labs/misc/io_opt1/data/
 
 build_solution
 build_baseline
