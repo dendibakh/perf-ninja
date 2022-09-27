@@ -1,0 +1,22 @@
+name: Benchmark on Linux + Alderlake
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 5
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Benchmark
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner MacosM1
+
