@@ -1,6 +1,7 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
+#include <algorithm>
 
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
@@ -23,19 +24,34 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
-  List *head2 = l2;
-  // O(N^2) algorithm:
+  List * const head2 = l2;
+
+  const int buffSize = N;
+  static unsigned buffer[buffSize];
+
+  // Complexity: N + N/S * (S*logS + N*logS), S := buffer size
   while (l1) {
-    unsigned v = l1->value;
+    int i = 0;
+    for (; l1 && i < buffSize; ++i) {
+        buffer[i] = l1->value;
+        l1 = l1->next;
+    }
+
+    auto begin = buffer;
+    auto end = buffer + i;
+
+    std::sort(begin, end);
+
     l2 = head2;
     while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        break;
+      const unsigned l2value = l2->value;
+
+      if (bool found = std::binary_search(begin, end, l2value); found) {
+        retVal += getSumOfDigits(l2value);
       }
+
       l2 = l2->next;
     }
-    l1 = l1->next;
   }
 
   return retVal;
