@@ -21,8 +21,12 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
 endif()
 
 # Set compiler options
-if(NOT MSVC)
+if(APPLE)
+  set(CMAKE_C_FLAGS "-O3 -ffast-math -mcpu=apple-m1 ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "-O3 -ffast-math -mcpu=apple-m1 ${CMAKE_C_FLAGS}")
+elseif(NOT MSVC)
   set(CMAKE_C_FLAGS "-O3 -ffast-math -march=native ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "-O3 -ffast-math -march=native ${CMAKE_C_FLAGS}")
 else()
   include("${CMAKE_CURRENT_LIST_DIR}/msvc_simd_isa.cmake")
   if(SUPPORT_MSVC_AVX512)
@@ -35,6 +39,16 @@ else()
     set(MSVC_SIMD_FLAGS "")
   endif()
   set(CMAKE_C_FLAGS "/O2 /fp:fast ${MSVC_SIMD_FLAGS} ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "/O2 /fp:fast ${MSVC_SIMD_FLAGS} ${CMAKE_C_FLAGS}")
+endif()
+
+# assume built-in pthreads on MacOS
+if(APPLE)
+  set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+  set(CMAKE_HAVE_THREADS_LIBRARY 1)
+  set(CMAKE_USE_WIN32_THREADS_INIT 0)
+  set(CMAKE_USE_PTHREADS_INIT 1)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
 endif()
 
 # Set Windows stack size as on Linux: 2MB on 32-bit, 8MB on 64-bit
