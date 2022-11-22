@@ -2,11 +2,36 @@
 #include <cassert>
 #include <type_traits>
 
+// Intro a vector of scores
+using simd_score_t = std::array<int16_t,sequence_count_v>;
+using simd_sequence_t = std::array<simd_score_t,sequence_size_v>;
+//Transpose a collection of squences 
+simd_sequence_t transpose(std::vector<sequence_t> const & sequences) {
+  assert(sequences.size() == sequence_count_v);
+  simd_sequence_t simd_sequence{};
+  for (size_t i = 0; i < sequence_size_v; ++i) {
+    for (size_t j = 0; j < sequence_count_v; ++j) {
+      simd_sequence[i][j] = sequences[j][i];
+    }
+  }
+  return simd_sequence;
+}
+
+
+
+
+
+
+
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2) {
   result_t result{};
+
+  // Transpose the sequences
+  auto trSeq1 = transpose(sequences1);
+  auto trSeq2 = transpose(sequences2);
 
   for (size_t sequence_idx = 0; sequence_idx < sequences1.size();
        ++sequence_idx) {
