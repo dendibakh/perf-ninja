@@ -1,10 +1,9 @@
 
 #include "solution.h"
 
-int solution(int *arr, int N) {
-  int res = 0;
-  for (int i = 0; i < N; i++) {
-    res += arr[i];
-  }
-  return res;
+int solution(int *arr, const int N)
+{
+  // All the numbers in array are positive and sequential
+  // from 1 to N. Use a formula to calculate the sum of them
+  return (N * (N + 1)) / 2;
 }

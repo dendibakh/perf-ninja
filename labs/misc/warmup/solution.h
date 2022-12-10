@@ -1,2 +1,2 @@
 
-int solution(int *arr, int N);
+int solution(int *arr, const int N);
