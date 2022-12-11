@@ -1,6 +1,15 @@
-
+#pragma once
 #include <cstdint>
 #include <vector>
+
+#if defined(__linux__) || defined(__linux) || defined(linux) ||                \
+    defined(__gnu_linux__)
+#define ON_LINUX
+#elif defined(__APPLE__) && defined(__MACH__) && defined (__ARM_NEON__)
+#define ON_MACOS
+#elif defined(_WIN32) || defined(_WIN64)
+#define ON_WINDOWS
+#endif
 
 using InputVector = std::vector<uint8_t>;
 using OutputVector = std::vector<uint16_t>;
