@@ -71,7 +71,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   
 #if defined(ON_WINDOWS) || defined(ON_LINUX)
   // Initialize to the currentSum value. Will be used to store the intermediate results
-  _m128i current = _mm_set1_epi16(currentSum);
+  __m128i current = _mm_set1_epi16(currentSum);
 
   int i = 0;
   // Process up to 8 elements at a time
