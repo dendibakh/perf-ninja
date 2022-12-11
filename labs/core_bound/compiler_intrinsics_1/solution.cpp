@@ -4,7 +4,10 @@
 #if defined(ON_MACOS)
 #include "arm_neon.h" // https://developer.arm.com/documentation/den0018/a/NEON-Intrinsics/Using-NEON-intrinsics
 #elif defined(ON_LINUX) || defined(ON_WINDOWS)
-#include "x86intrin.h" // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+#include "xmmintrin.h"
+#include "smmintrin.h"
+#include "immintrin.h"
+#include "mmintrin.h" // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 #endif
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
