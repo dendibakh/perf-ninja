@@ -2,6 +2,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <algorithm>
 
 // Assume this constant never changes
 constexpr size_t N = 10000;
