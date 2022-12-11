@@ -1,7 +1,15 @@
 
 #include "solution.h"
 #include <memory>
-#include "sse2neon.h"
+
+#if defined(ON_MACOS)
+#include "sse2neon.h" // https://github.com/DLTcollab/sse2neon
+#elif defined(ON_LINUX) || defined(ON_WINDOWS)
+#include "xmmintrin.h"
+#include "smmintrin.h"
+#include "immintrin.h"
+#include "mmintrin.h" // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+#endif
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
