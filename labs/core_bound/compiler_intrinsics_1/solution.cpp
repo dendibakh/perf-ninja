@@ -3,7 +3,7 @@
 #include <memory>
 
 #if defined(ON_MACOS)
-#include "sse2neon.h" // https://github.com/DLTcollab/sse2neon
+#include "sse2neon.h" // https://github.com/DLTcollab/sse2neon - https://developer.arm.com/documentation/den0018/a/Introduction/Data-processing-technologies/Single-Instruction-Single-Data
 #elif defined(ON_LINUX) || defined(ON_WINDOWS)
 #include "xmmintrin.h"
 #include "smmintrin.h"
