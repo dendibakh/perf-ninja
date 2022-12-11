@@ -96,18 +96,18 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // Calculate vector prefix sum for 8 elements
 
     // We shift the diff vector to the left by 2 bytes, 1 element
-    __m128i prefixSum = __mm_add_epi16(diff, _mm_slli_si128(diff, 2));
+    __m128i prefixSum = _mm_add_epi16(diff, _mm_slli_si128(diff, 2));
 
     // We shift the diff vector to the left by 4 bytes, 2 elements
-    prefixSum = __mm_add_epi16(prefixSum, _mm_slli_si128(prefixSum, 4));
+    prefixSum = _mm_add_epi16(prefixSum, _mm_slli_si128(prefixSum, 4));
 
     // We shift the diff vector to the left by 8 bytes, 4 elements
     // We do left shift because of the endianness
-    prefixSum = __mm_add_epi16(prefixSum, _mm_slli_si128(prefixSum, 8));
+    prefixSum = _mm_add_epi16(prefixSum, _mm_slli_si128(prefixSum, 8));
 
     // Store the result
-    __m128i result = __mm_add_epi16(prefixSum, current);
-    __mm_storeu_si128((__m128i*)(outputPtr + i), result);
+    __m128i result = _mm_add_epi16(prefixSum, current);
+    _mm_storeu_si128((__m128i*)(outputPtr + i), result);
 
     // Broadcast currentSum for the next iteration
     currentSum = (int16_t)_mm_extract_epi16(result, 7);
