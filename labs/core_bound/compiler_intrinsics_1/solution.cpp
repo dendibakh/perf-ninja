@@ -1,9 +1,9 @@
 
 #include "solution.h"
 #include <memory>
-#ifdef ON_MACOS
+#if defined(ON_MACOS)
 #include "arm_neon.h" // https://developer.arm.com/documentation/den0018/a/NEON-Intrinsics/Using-NEON-intrinsics
-#elif ON_LINUX || ON_WINDOWS
+#elif defined(ON_LINUX) || defined(ON_WINDOWS)
 #include "x86intrin.h" // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 #endif
 
