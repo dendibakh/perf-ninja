@@ -1,14 +1,7 @@
 
 #include "solution.h"
 #include <memory>
-#if defined(ON_MACOS)
-#include "arm_neon.h" // https://developer.arm.com/documentation/den0018/a/NEON-Intrinsics/Using-NEON-intrinsics
-#elif defined(ON_LINUX) || defined(ON_WINDOWS)
-#include "xmmintrin.h"
-#include "smmintrin.h"
-#include "immintrin.h"
-#include "mmintrin.h" // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
-#endif
+#include "sse2neon.h"
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -58,8 +51,8 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   // The function returns the prefix sum of the last element in the array
   // in the output array. This is used for the next iteration.
 
-
   // SSE4.1 Solution
+
   // Will be used to access the elements in the input array that need to be substracted from each other
   const uint8_t* substractPtr = input.data() + pos - radius - 1;
 
@@ -68,8 +61,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   
   // Store the resulting prefix sum values
   const uint16_t* outputPtr = output.data() + pos;
-  
-#if defined(ON_WINDOWS) || defined(ON_LINUX)
+
   // Initialize to the currentSum value. Will be used to store the intermediate results
   __m128i current = _mm_set1_epi16(currentSum);
 
@@ -116,23 +108,13 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   pos += i;
 
-// Still need to process the remaining elements
+  // Still need to process the remaining elements
   for(; pos < limit; ++pos)
   {
     currentSum += input[pos + radius];
     currentSum -= input[pos - radius - 1];
     output[pos] = currentSum;
   }
-#elif defined(ON_MACOS)
-
-  // Just process the elements sequentially on MacOS for now
-  for(; pos < limit; ++pos)
-  {
-    currentSum += input [pos - radius - 1];
-    currentSum += input [pos + radius];
-    output[pos] = currentSum;
-  }
-#endif
 
   // 3. special case, executed only if size <= 2*radius + 1
   limit = std::min(radius + 1, size);
