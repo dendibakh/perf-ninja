@@ -3,6 +3,7 @@
 #include <random>
 #include <algorithm>
 #include <iterator>
+#include <array>
 
 // push back classes in order, to avoid cache misses
 
