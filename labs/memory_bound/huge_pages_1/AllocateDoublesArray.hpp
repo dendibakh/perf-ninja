@@ -13,13 +13,23 @@
 #if defined(ON_MACOS)
 #include <mach/mach_vm.h>
 #include <mach/mach.h>
-#include <map>
+#endif
+
+#if defined(ON_LINUX)
+#include <sys/mman.h>
+#endif
+
+#if defined(ON_LINUX) || defined(ON_MACOS)
+
+// HINT: allocate huge pages using mmap/munmap
+// NOTE: See HugePagesSetupTips.md for how to enable huge pages in the OS
+
 #include <new>
 #include <vector>
 
-#define NUMBER_OF_SUPERPAGES 10
-#define SUPERPAGE_SIZE (NUMBER_OF_SUPERPAGES * 16 * 1024 * 1024) // Allocate 10 superpages of 16MB each
- 
+// Allocate 1GB of Huge Pages
+#define SUPERPAGE_SIZE (1 * 1024 * 1024 * 1024)
+
 template <typename T>
 class PreallocatedAllocator {
  public:
@@ -29,8 +39,9 @@ class PreallocatedAllocator {
   typedef const value_type* const_pointer;
   typedef value_type& reference;
   typedef const value_type& const_reference;
-  typedef long long int size_type;
-  typedef unsigned long long int block_type;
+  typedef unsigned long size_type;
+  typedef unsigned long long* block_type;
+  typedef unsigned long long block_address_type;
   typedef std::ptrdiff_t difference_type;
 
   // Rebind allocator to type U
@@ -51,29 +62,55 @@ class PreallocatedAllocator {
       num_elements_(num_elements),
       block_size_(num_elements * sizeof(T))
     {
+      #if defined(ON_LINUX)
+      // Allocate the block of memory using platform specific functions
+      // HINT: use mmap
+      block_ = (block_type)mmap(&block_address_, block_size_, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      #elif defined(ON_MACOS)
       // Allocate the block of memory using mach_vm_allocate
       kern_return_t ret;
-      ret = mach_vm_allocate(mach_task_self(), &block_, block_size_, VM_FLAGS_ANYWHERE | SUPERPAGE_SIZE_ANY);
+      ret = mach_vm_allocate(mach_task_self(), &block_address_, block_size_, VM_FLAGS_ANYWHERE | SUPERPAGE_SIZE_ANY);
       if (ret != KERN_SUCCESS) {
         throw std::bad_alloc();
       }
+      block_ = reinterpret_cast<block_type>(block_address_);
+      #endif 
+      if(!block_) {
+        throw std::bad_alloc();
+      }
   }
+
   PreallocatedAllocator(const PreallocatedAllocator&) = delete;
   template <typename U>
   PreallocatedAllocator(const PreallocatedAllocator<U>&) = delete;
+
   ~PreallocatedAllocator() {
-    // Deallocate the block of memory using mach_vm_deallocate
-    kern_return_t ret;
-    ret = vm_deallocate(mach_task_self(), block_, block_size_);
-    if (ret != KERN_SUCCESS) {
-      throw std::bad_alloc();
-    }
+    // Deallocate the block of memory using platform specific functions
+    // HINT: use munmap
+    #if defined(ON_LINUX)
+      int res = munmap((void*)&block_address_, block_size_);
+      if (!res) {
+        throw std::bad_alloc();
+      }
+    #elif defined(ON_MACOS)
+      // Deallocate the block of memory using platform specific functions
+      // HINT: use mach_vm_deallocate
+      // Deallocate the block of memory using mach_vm_deallocate
+      kern_return_t ret;
+      ret = mach_vm_deallocate(mach_task_self(), block_address_, block_size_);
+      if (ret != KERN_SUCCESS) {
+        throw std::bad_alloc();
+      }
+
+      // Set block_ to nullptr
+      block_ = nullptr;
+    #endif
   }
 
   // Return maximum number of elements that can be allocated
   size_type max_size() const noexcept { return num_elements_; }
 
-  pointer allocate(size_type num, const void* = 0) {
+  pointer allocate(size_type num) {
     // Check if there is enough available memory to satisfy the allocation request
     if (next_free_index + num > num_elements_) {
       // Return nullptr if there is not enough available memory
@@ -85,48 +122,30 @@ class PreallocatedAllocator {
     // Update next_free_index to point to the next available index
     next_free_index += num;
     // Return a pointer to the found block
-    return static_cast<pointer>((void*)(block_ + index * sizeof(T)));
+    // Use the memory from the huge page to allocate objects of type T
+    return new (block_ + index * sizeof(T)) T;
   }
   
   // Deallocate storage p of deleted elements
   void deallocate(pointer p, size_type num) {
     // Calculate the offset of the block within the preallocated block
-    block_type offset = (block_type)p - block_;
+    std::ptrdiff_t offset = (block_type)p - block_;
     // Calculate the index of the block within the memory block
     size_type index = offset / sizeof(T);
     // Update next_free_index to point to the deallocated block
     next_free_index = index;
   }
 
-  // Initialize elements of allocated storage p with value value
-  void construct(pointer p, const T& value) {
-    // Initialize memory with placement new
-    new((void*)p) T(value);
-  }
-
-  // Destroy elements of initialized storage p
-  void destroy(pointer p) {
-    // Call the destructor of T
-    p->~T();
-  }
-
 private:
   // The preallocated block of memory
   block_type block_;
+  block_address_type block_address_;
   // The size of the preallocated block, in bytes
   size_type block_size_;
   // The number of elements that can be stored in the preallocated block
   size_type num_elements_;
   size_type next_free_index = 0;
 };
-#endif
-
-#if defined(ON_LINUX)
-
-// HINT: allocate huge pages using mmap/munmap
-// NOTE: See HugePagesSetupTips.md for how to enable huge pages in the OS
-#include <sys/mman.h>
-
 #elif defined(ON_WINDOWS)
 
 // HINT: allocate huge pages using VirtualAlloc/VirtualFree
@@ -260,7 +279,7 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
-#if defined(ON_MACOS)
+#if defined(ON_MACOS) || defined(ON_LINUX)
 
 PreallocatedAllocator<double> GlobalAllocator (SUPERPAGE_SIZE);
 
