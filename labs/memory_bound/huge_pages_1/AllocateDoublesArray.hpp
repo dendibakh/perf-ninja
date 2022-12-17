@@ -10,6 +10,117 @@
 #define ON_WINDOWS
 #endif
 
+#if defined(ON_MACOS)
+#include <mach/mach_vm.h>
+#include <mach/mach.h>
+#include <map>
+#include <new>
+#include <vector>
+
+#define NUMBER_OF_SUPERPAGES 10
+#define SUPERPAGE_SIZE (NUMBER_OF_SUPERPAGES * 16 * 1024 * 1024) // Allocate 10 superpages of 16MB each
+ 
+template <typename T>
+class PreallocatedAllocator {
+ public:
+  // Type definitions
+  typedef T value_type;
+  typedef value_type* pointer;
+  typedef const value_type* const_pointer;
+  typedef value_type& reference;
+  typedef const value_type& const_reference;
+  typedef long long int size_type;
+  typedef unsigned long long int block_type;
+  typedef std::ptrdiff_t difference_type;
+
+  // Rebind allocator to type U
+  template <typename U>
+  struct rebind {
+    typedef PreallocatedAllocator<U> other;
+  };
+
+  // Return address of values
+  pointer address(reference value) const noexcept { return &value; }
+  const_pointer address(const_reference value) const noexcept { return &value; }
+
+  /* Constructors and destructor
+   * - The constructor preallocates a large block of memory
+   * - The destructor deallocates the block
+   */
+  explicit PreallocatedAllocator(size_type num_elements) :
+      num_elements_(num_elements),
+      block_size_(num_elements * sizeof(T))
+    {
+      // Allocate the block of memory using mach_vm_allocate
+      kern_return_t ret;
+      ret = mach_vm_allocate(mach_task_self(), &block_, block_size_, VM_FLAGS_ANYWHERE | SUPERPAGE_SIZE_ANY);
+      if (ret != KERN_SUCCESS) {
+        throw std::bad_alloc();
+      }
+  }
+  PreallocatedAllocator(const PreallocatedAllocator&) = delete;
+  template <typename U>
+  PreallocatedAllocator(const PreallocatedAllocator<U>&) = delete;
+  ~PreallocatedAllocator() {
+    // Deallocate the block of memory using mach_vm_deallocate
+    kern_return_t ret;
+    ret = vm_deallocate(mach_task_self(), block_, block_size_);
+    if (ret != KERN_SUCCESS) {
+      throw std::bad_alloc();
+    }
+  }
+
+  // Return maximum number of elements that can be allocated
+  size_type max_size() const noexcept { return num_elements_; }
+
+  pointer allocate(size_type num, const void* = 0) {
+    // Check if there is enough available memory to satisfy the allocation request
+    if (next_free_index + num > num_elements_) {
+      // Return nullptr if there is not enough available memory
+      throw std::bad_alloc();
+      return nullptr;
+    }
+    // Calculate the index of the block within the memory block
+    size_type index = next_free_index;
+    // Update next_free_index to point to the next available index
+    next_free_index += num;
+    // Return a pointer to the found block
+    return static_cast<pointer>((void*)(block_ + index * sizeof(T)));
+  }
+  
+  // Deallocate storage p of deleted elements
+  void deallocate(pointer p, size_type num) {
+    // Calculate the offset of the block within the preallocated block
+    block_type offset = (block_type)p - block_;
+    // Calculate the index of the block within the memory block
+    size_type index = offset / sizeof(T);
+    // Update next_free_index to point to the deallocated block
+    next_free_index = index;
+  }
+
+  // Initialize elements of allocated storage p with value value
+  void construct(pointer p, const T& value) {
+    // Initialize memory with placement new
+    new((void*)p) T(value);
+  }
+
+  // Destroy elements of initialized storage p
+  void destroy(pointer p) {
+    // Call the destructor of T
+    p->~T();
+  }
+
+private:
+  // The preallocated block of memory
+  block_type block_;
+  // The size of the preallocated block, in bytes
+  size_type block_size_;
+  // The number of elements that can be stored in the preallocated block
+  size_type num_elements_;
+  size_type next_free_index = 0;
+};
+#endif
+
 #if defined(ON_LINUX)
 
 // HINT: allocate huge pages using mmap/munmap
@@ -149,6 +260,25 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+#if defined(ON_MACOS)
+
+PreallocatedAllocator<double> GlobalAllocator (SUPERPAGE_SIZE);
+
+// Allocate an array of doubles of size `size`, return it as a
+// std::unique_ptr<double[], D>, where `D` is a custom deleter type
+inline auto allocateDoublesArray(size_t size) {
+ // Allocate memory from the huge page just for size passed in
+  double *alloc = GlobalAllocator.allocate(size);
+
+  // remember to cast the; pointer to double* if your allocator returns void*
+  // Deleters can be conveniently defined as lambdas, but you can explicitly
+  // define a class i you're not comfortable with the syntax
+  auto deleter = [/* state = ... */size](double *ptr) { GlobalAllocator.deallocate(ptr, size);};
+
+  return std::unique_ptr<double[], decltype(deleter)>(alloc,
+                                                      std::move(deleter));
+} 
+#else
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
@@ -164,7 +294,7 @@ inline auto allocateDoublesArray(size_t size) {
                                                       std::move(deleter));
 
   // The above is equivalent to:
-  // return std::make_unique<double[]>(size);
-  // The more verbose version is meant to demonstrate the use of a custom
+  // return std::make_uniquePROT_READ, MAP_ANON | MAP_PRIVATE, VM_FLAGS_SUPERPAGE_SIZE_2MB vse version is meant to demonstrate the use of a custom
   // (potentially stateful) deleter
 }
+#endif
