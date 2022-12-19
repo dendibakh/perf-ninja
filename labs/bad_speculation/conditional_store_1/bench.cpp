@@ -8,9 +8,9 @@ static void bench1(benchmark::State &state) {
   init(arr);
 
   std::array<S, N> temp;
-  constexpr auto lower = (std::numeric_limits<std::uint32_t>::max() / 4) + 1;
+  constexpr auto lower = (std::numeric_limits<std::int32_t>::max() / 4) + 1;
   constexpr auto upper =
-      (std::numeric_limits<std::uint32_t>::max() / 2) + lower;
+      (std::numeric_limits<std::int32_t>::max() / 2) + lower;
 
   for (auto _ : state) {
     select(temp, arr, lower, upper);

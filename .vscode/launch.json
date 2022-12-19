@@ -11,6 +11,14 @@
             "program": "${workspaceFolder}/labs/memory_bound/huge_pages_1/build/lab",
             "args": [],
             "cwd": "${workspaceFolder}/labs/memory_bound/huge_pages_1/"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug Conditional Stores",
+            "program": "${workspaceFolder}/labs/bad_speculation/conditional_store_1/build/lab",
+            "args": [],
+            "cwd": "${workspaceFolder}/labs/bad_speculation/conditional_store_1/"
         }
     ]
 }

@@ -5,8 +5,8 @@
 
 static std::size_t originalSelect(std::array<S, N> &output,
                                   const std::array<S, N> &input,
-                                  const std::uint32_t lower,
-                                  const std::uint32_t upper) {
+                                  const std::int32_t lower,
+                                  const std::int32_t upper) {
   std::size_t count = 0;
   for (const auto item : input) {
     if ((lower <= item.first) && (item.first <= upper)) {
@@ -45,9 +45,9 @@ int main() {
   std::array<S, N> arr;
   init(arr);
 
-  constexpr auto lower = (std::numeric_limits<std::uint32_t>::max() / 4) + 1;
+  constexpr auto lower = (std::numeric_limits<std::int32_t>::max() / 4) + 1;
   constexpr auto upper =
-      (std::numeric_limits<std::uint32_t>::max() / 2) + lower;
+      (std::numeric_limits<std::int32_t>::max() / 2) + lower;
 
   std::array<S, N> expected, result;
   auto expectedSize = originalSelect(expected, arr, lower, upper);
