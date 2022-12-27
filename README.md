@@ -14,7 +14,7 @@ Performance Ninja is supported on Linux, Windows, and Mac, and is run on all the
 
 Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://book.easyperf.net/perf_book) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
 
-Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ). Join our [discord channel](https://discord.gg/8h6gEzgMDY) to collaborate with others.
+Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
 
 Lab assignments in this project are implemented in C++. If you're more comfortable with Rust, perf-ninja was also ported to Rust [here](https://github.com/grahamking/perf-ninja-rs), thanks to @grahamking.
 
