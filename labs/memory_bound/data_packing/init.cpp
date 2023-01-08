@@ -16,12 +16,17 @@ S create_entry(int first_value, int second_value) {
 
 void init(std::array<S, N> &arr) {
   std::default_random_engine generator;
-  std::uniform_int_distribution<int> distribution(minRandom, maxRandom - 1);
+  std::uniform_int_distribution<unsigned short> distribution(minRandom, maxRandom - 1);
 
   for (int i = 0; i < N; i++) {
-    int random_int1 = distribution(generator);
-    int random_int2 = distribution(generator);
+    unsigned short random_int1 = distribution(generator);
+    unsigned short random_int2 = distribution(generator);
 
-    arr[i] = create_entry(random_int1, random_int2);
+    // arr[i] = create_entry(random_int1, random_int2);
+    arr[i].i = random_int1;
+    arr[i].s = (random_int2);
+    arr[i].l = (random_int1 * random_int2);
+    arr[i].d = static_cast<float>(random_int1) / maxRandom;
+    arr[i].b = random_int1 < random_int2;
   }
 }

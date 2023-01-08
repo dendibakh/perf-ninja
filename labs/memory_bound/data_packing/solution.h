@@ -3,14 +3,14 @@
 
 // Assume those constants never change
 constexpr int N = 10000;
-constexpr int minRandom = 0;
-constexpr int maxRandom = 100;
+constexpr unsigned short minRandom = 0;
+constexpr unsigned short maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
   float d;
-  long long l : 16;
-  unsigned int i : 7;
+  unsigned short l;
+  unsigned short i : 8;
   unsigned short s : 7;
   bool b : 1;
 
