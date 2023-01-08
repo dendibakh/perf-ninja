@@ -3,7 +3,7 @@
 // Assume those constants never change
 constexpr int N = 10000;
 constexpr unsigned short minRandom = 0;
-constexpr unsigned short maxRandom = 70;
+constexpr unsigned short maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
