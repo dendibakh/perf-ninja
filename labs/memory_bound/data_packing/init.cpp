@@ -24,7 +24,7 @@ void init(std::array<S, N> &arr) {
 
     // arr[i] = create_entry(random_int1, random_int2);
     arr[i].i = random_int1;
-    arr[i].s = (random_int2);
+    arr[i].s = random_int2;
     arr[i].l = (random_int1 * random_int2);
     arr[i].d = static_cast<float>(random_int1) / maxRandom;
     arr[i].b = random_int1 < random_int2;
