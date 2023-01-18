@@ -1,4 +1,5 @@
 #include "solution.hpp"
+#include <algorithm>
 #include <cassert>
 #include <type_traits>
 
@@ -63,8 +64,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
             (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
-        best_cell_score = max(best_cell_score, last_vertical_gap);
-        best_cell_score = max(best_cell_score, horizontal_gap_column[row]);
+        best_cell_score = std::max(best_cell_score, last_vertical_gap);
+        best_cell_score = std::max(best_cell_score, horizontal_gap_column[row]);
         // Cache next diagonal value and store optimum in score_column.
         last_diagonal_score = score_column[row];
         score_column[row] = best_cell_score;
@@ -73,9 +74,9 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         last_vertical_gap += gap_extension;
         horizontal_gap_column[row] += gap_extension;
         // Store optimum between gap open and gap extension.
-        last_vertical_gap = max(last_vertical_gap, best_cell_score);
+        last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
         horizontal_gap_column[row] =
-            max(horizontal_gap_column[row], best_cell_score);
+            std::max(horizontal_gap_column[row], best_cell_score);
       }
     }
 
