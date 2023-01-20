@@ -26,10 +26,10 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int i = 0; i < N; i++) {
-    for (int k = 0; k < N; k++) {
+  for (int i = 0; i < N; ++i) {
+    for (int k = 0; k < N; ++k) {
       auto s = a[i][k];
-      for (int j = 0; j < N; j++) {
+      for (int j = 0; j < N; ++j) {
         result[i][j] += s * b[k][j];
       }
     }
