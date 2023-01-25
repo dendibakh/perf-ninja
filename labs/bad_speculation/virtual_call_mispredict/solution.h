@@ -7,26 +7,22 @@ constexpr std::size_t N = 64 * 1024;
 
 struct BaseClass {
     virtual ~BaseClass() = default;
-
-    virtual void handle(std::size_t& data) const = 0;
+    int a;
+    void handle(std::size_t& data) const {
+        data += a;
+    }
 };
 
 struct ClassA : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 1;
-    }
+    int a=1;
 };
 
 struct ClassB : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 2;
-    }
+    int a = 2;
 };
 
 struct ClassC : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 3;
-    }
+    int a = 3;
 };
 
 using InstanceArray = std::vector<std::unique_ptr<BaseClass>>;
