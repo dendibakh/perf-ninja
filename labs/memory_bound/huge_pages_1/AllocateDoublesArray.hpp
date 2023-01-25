@@ -149,18 +149,25 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+constexpr static size_t huge_page_size = 1 << 21;
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
+  void *alloc = nullptr;
+  posix_memalign(&alloc, huge_page_size, sizeof(double) * size);
+  if (madvise(alloc, sizeof(double) * size, MADV_HUGEPAGE)) {
+    exit(-1);
+  }
+
   // Allocate memory
-  double *alloc = new double[size];
+  // double *alloc = new double[size];
   // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  auto deleter = [](double *ptr) { free(ptr); };
 
-  return std::unique_ptr<double[], decltype(deleter)>(alloc,
+  return std::unique_ptr<double[], decltype(deleter)>((double *)alloc,
                                                       std::move(deleter));
 
   // The above is equivalent to:
