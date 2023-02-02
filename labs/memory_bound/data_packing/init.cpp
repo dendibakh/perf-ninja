@@ -3,21 +3,15 @@
 #include <random>
 
 S create_entry(int first_value, int second_value) {
-  return S {
-    static_cast<float>(first_value) / maxRandom,
-    first_value,
-    static_cast<int>(first_value * second_value),
-    static_cast<short>(second_value),
-    first_value < second_value
-  };
+  S entry;
 
-  // entry.i = first_value;
-  // entry.s = static_cast<short>(second_value);
-  // entry.l = static_cast<long long>(first_value * second_value);
-  // entry.d = static_cast<double>(first_value) / maxRandom;
-  // entry.b = first_value < second_value;
+  entry.i = first_value;
+  entry.s = static_cast<short>(second_value);
+  entry.l = static_cast<long long>(first_value * second_value);
+  entry.d = static_cast<double>(first_value) / maxRandom;
+  entry.b = first_value < second_value;
 
-  // return entry;
+  return entry;
 }
 
 void init(std::array<S, N> &arr) {
