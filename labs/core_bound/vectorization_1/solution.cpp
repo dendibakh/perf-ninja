@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
+#include <iostream>
+
 #define SOLUTION
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
@@ -31,6 +33,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     for (size_t b{}; b < batch_size_v; ++b) {
       horizontal_gap_column[b][0] = gap_open;
       last_vertical_gap[b] = gap_open;
+    }
+    for (size_t b{}; b < batch_size_v; ++b) {
       for (size_t i = 1; i < sequence_size_v + 1; ++i) {
         score_column[b][i] = last_vertical_gap[b];
         horizontal_gap_column[b][i] = last_vertical_gap[b] + gap_open;
