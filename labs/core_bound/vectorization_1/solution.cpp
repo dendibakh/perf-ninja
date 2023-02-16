@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
-
+#define SOLUTION
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
