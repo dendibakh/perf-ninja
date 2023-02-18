@@ -12,7 +12,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 {
 #ifdef SOLUTION
   result_t result{};
-  constexpr size_t bs{1};
+  constexpr size_t bs{8};
   for (size_t sequence_idx = 0; sequence_idx < sequences1.size(); sequence_idx += bs) {
     using score_t = int16_t;
     using column_t = std::array<score_t, sequence_size_v + 1>;
