@@ -58,7 +58,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       score_t score_column_0 = horizontal_gap_column[0];
-      vgap[0] = horizontal_gap_column[0] + gap_open;
+      vgap[0] = horizontal_gap_column[0];
       horizontal_gap_column[0] += gap_extension;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
@@ -72,16 +72,16 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
       }
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        vgap[row] = std::max<score_t>(vgap[row - 1] + gap_extension, best[row - 1] + gap_open);
+        vgap[row] = std::max<score_t>(vgap[row - 1] + gap_extension, best[row - 1]);
       }
 
       score_column[0] = score_column_0;
       //#pragma clang loop vectorize(enable)
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        score_column[row] = std::max(best[row-1], vgap[row - 1]);
+        score_column[row] = std::max<score_t>(best[row-1], vgap[row - 1] + gap_open);
       }
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        auto L = std::max(best[row-1], vgap[row]);
+        auto L = std::max<score_t>(best[row-1], vgap[row] + gap_open);
         horizontal_gap_column[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, L + gap_open);
       }
     }
