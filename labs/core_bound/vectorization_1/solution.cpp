@@ -12,14 +12,10 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 {
 #ifdef SOLUTION
   result_t result{};
-
-  for (size_t sequence_idx = 0; sequence_idx < sequences1.size();
-       ++sequence_idx) {
+  constexpr size_t bs{1};
+  for (size_t sequence_idx = 0; sequence_idx < sequences1.size(); sequence_idx += bs) {
     using score_t = int16_t;
     using column_t = std::array<score_t, sequence_size_v + 1>;
-
-    sequence_t const &sequence1 = sequences1[sequence_idx];
-    sequence_t const &sequence2 = sequences2[sequence_idx];
 
     /*
      * Initialise score values.
@@ -35,59 +31,69 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      * since we are only interested in the last value of the last column in the
      * score matrix.
      */
-    column_t score_column{};
-    column_t horizontal_gap_column{};
-    score_t last_vertical_gap{};
-    column_t vgap{};
-    column_t best{};
+    std::array<column_t, bs> score_column{};
+    std::array<column_t, bs> horizontal_gap_column{};
+    std::array<column_t, bs> vgap{};
+    std::array<column_t, bs> best{};
 
     /*
      * Initialise the first column of the matrix.
      */
-    horizontal_gap_column[0] = gap_open;
-    last_vertical_gap = gap_open;
-
-    for (size_t i = 1; i < score_column.size(); ++i) {
-      score_column[i] = last_vertical_gap;
-      horizontal_gap_column[i] = last_vertical_gap + gap_open;
-      last_vertical_gap += gap_extension;
+    for (size_t b{}; b < bs; ++b) {
+      horizontal_gap_column[b][0] = gap_open;
+      score_t last_vertical_gap{gap_open};
+      for (size_t i = 1; i < sequence_size_v + 1; ++i) {
+        score_column[b][i] = last_vertical_gap;
+        horizontal_gap_column[b][i] = last_vertical_gap + gap_open;
+        last_vertical_gap += gap_extension;
+      }
     }
 
     /*
      * Compute the main recursion to fill the matrix.
      */
-    for (unsigned col = 1; col <= sequence2.size(); ++col) {
-      score_t score_column_0 = horizontal_gap_column[0];
-      vgap[0] = horizontal_gap_column[0];
-      horizontal_gap_column[0] += gap_extension;
+    for (unsigned col = 1; col <= sequence_size_v; ++col) {
+      std::array<score_t, bs> score_column_0;
 
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        // Compute next score from diagonal direction with match/mismatch.
-        score_t best_cell_score =
-            score_column[row - 1] +
-            (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
-        // Determine best score from diagonal, vertical, or horizontal
-        // direction.
-        best[row-1] = std::max(best_cell_score, horizontal_gap_column[row]);
+      for (size_t b{}; b < bs; ++b) {
+        score_column_0[b] = horizontal_gap_column[b][0];
+        vgap[b][0] = horizontal_gap_column[b][0];
+        horizontal_gap_column[b][0] += gap_extension;
+
+        for (unsigned row = 1; row <= sequence_size_v; ++row) {
+          // Compute next score from diagonal direction with match/mismatch.
+          score_t best_cell_score =
+              score_column[b][row - 1] +
+              (sequences1[sequence_idx + b][row - 1] == sequences2[sequence_idx + b][col - 1] ? match : mismatch);
+          // Determine best score from diagonal, vertical, or horizontal
+          // direction.
+          best[b][row-1] = std::max(best_cell_score, horizontal_gap_column[b][row]);
+        }
       }
 
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        vgap[row] = std::max<score_t>(vgap[row - 1] + gap_extension, best[row - 1]);
+      for (unsigned row = 1; row <= sequence_size_v; ++row) {
+        for (size_t b{}; b < bs; ++b) {
+          vgap[b][row] = std::max<score_t>(vgap[b][row - 1] + gap_extension, best[b][row - 1]);
+        }
       }
 
-      score_column[0] = score_column_0;
-      //#pragma clang loop vectorize(enable)
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        score_column[row] = std::max<score_t>(best[row-1], vgap[row - 1] + gap_open);
-      }
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        auto L = std::max<score_t>(best[row-1], vgap[row] + gap_open);
-        horizontal_gap_column[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, L + gap_open);
+
+      for (size_t b{}; b < bs; ++b) {
+        score_column[b][0] = score_column_0[b];
+        //#pragma clang loop vectorize(enable)
+        for (unsigned row = 1; row <= sequence_size_v; ++row) {
+          score_column[b][row] = std::max<score_t>(best[b][row-1], vgap[b][row - 1] + gap_open);
+        }
+        for (unsigned row = 1; row <= sequence_size_v; ++row) {
+          auto L = std::max<score_t>(best[b][row-1], vgap[b][row] + gap_open);
+          horizontal_gap_column[b][row] = std::max<score_t>(horizontal_gap_column[b][row] + gap_extension, L + gap_open);
+        }
       }
     }
 
     // Report the best score.
-    result[sequence_idx] = score_column.back();
+    for (size_t b{}; b < bs; ++b)
+      result[sequence_idx + b] = score_column[b].back();
   }
 #else
   result_t result{};
