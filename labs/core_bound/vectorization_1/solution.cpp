@@ -61,7 +61,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       score_column_tmp[0] = horizontal_gap_column[0];
       vgap[0] = horizontal_gap_column[0] + gap_open;
-      horizontal_gap_column_tmp[0] = horizontal_gap_column[0] + gap_extension;
+      //horizontal_gap_column_tmp[0] = horizontal_gap_column[0] + gap_extension;
+      horizontal_gap_column[0] += gap_extension;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Compute next score from diagonal direction with match/mismatch.
@@ -76,15 +77,17 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         vgap[row] = std::max<score_t>(vgap[row - 1] + gap_extension, best[row - 1] + gap_open);
       }
-
+      #pragma clang loop vectorize(enable)
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         score_column_tmp[row] = std::max(best[row-1], vgap[row - 1]);
+      }
+      for (unsigned row = 1; row <= sequence1.size(); ++row) {
         auto L = std::max(best[row-1], vgap[row]);
-        horizontal_gap_column_tmp[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, L + gap_open);
+        horizontal_gap_column[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, L + gap_open);
       }
 
       std::swap(score_column, score_column_tmp);
-      std::swap(horizontal_gap_column, horizontal_gap_column_tmp);
+      //std::swap(horizontal_gap_column, horizontal_gap_column_tmp);
     }
 
     // Report the best score.
