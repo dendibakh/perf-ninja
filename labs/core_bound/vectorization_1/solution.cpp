@@ -40,6 +40,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     column_t horizontal_gap_column{};
     column_t horizontal_gap_column_tmp{};
     score_t last_vertical_gap{};
+    column_t vgap{};
+    column_t best{};
 
     /*
      * Initialise the first column of the matrix.
@@ -58,7 +60,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       score_column_tmp[0] = horizontal_gap_column[0];
-      last_vertical_gap = horizontal_gap_column[0] + gap_open;
+      vgap[0] = horizontal_gap_column[0] + gap_open;
       horizontal_gap_column_tmp[0] = horizontal_gap_column[0] + gap_extension;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
@@ -68,20 +70,17 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
             (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
-        best_cell_score = std::max(best_cell_score, horizontal_gap_column[row]);
+        best[row-1] = std::max(best_cell_score, horizontal_gap_column[row]);
+      }
 
+      for (unsigned row = 1; row <= sequence1.size(); ++row) {
+        vgap[row] = std::max<score_t>(vgap[row - 1] + gap_extension, best[row - 1] + gap_open);
+      }
 
-
-        score_column_tmp[row] = std::max(best_cell_score, last_vertical_gap);
-        auto last_vertical_gap0 = last_vertical_gap;
-        last_vertical_gap = std::max<score_t>(last_vertical_gap + gap_extension, best_cell_score + gap_open);
-        
-
-        //horizontal_gap_column_tmp[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, std::max(best_cell_score, last_vertical_gap) + gap_open);
-        horizontal_gap_column_tmp[row] = std::max<score_t>({
-            static_cast<score_t>(horizontal_gap_column[row] + gap_extension),
-            static_cast<score_t>(best_cell_score + gap_open),
-            static_cast<score_t>(last_vertical_gap0 + gap_extension + gap_open)});
+      for (unsigned row = 1; row <= sequence1.size(); ++row) {
+        score_column_tmp[row] = std::max(best[row-1], vgap[row - 1]);
+        auto L = std::max(best[row-1], vgap[row]);
+        horizontal_gap_column_tmp[row] = std::max<score_t>(horizontal_gap_column[row] + gap_extension, L + gap_open);
       }
 
       std::swap(score_column, score_column_tmp);
