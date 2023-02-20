@@ -31,7 +31,8 @@ uint16_t checksum(const Blob &blob) {
   auto high = acc >> 16;
   auto low = acc & 0xFFFFu;
   acc = low + high;
-  return (uint16_t)acc;
+
+  return static_cast<uint16_t>(acc) + !!(acc >= 0xFFFu);
 }
 #endif // THEIRS
 #else
