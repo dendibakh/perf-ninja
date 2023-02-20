@@ -6,8 +6,8 @@
 #define SOLUTION
 #ifdef SOLUTION
 
-static int compare(const S &a, const S &b) {
-
+#if 0
+static inline __attribute__((always_inline))  int compare(const S &a, const S &b) {
   if (a.key1 < b.key1)
     return true;
 
@@ -22,9 +22,24 @@ static int compare(const S &a, const S &b) {
 
   return false;
 }
-
+#endif
 void solution(std::array<S, N> &arr) {
-  std::sort(arr.begin(), arr.end(), compare);
+  //std::sort(arr.begin(), arr.end(), compare);
+  std::sort(arr.begin(), arr.end(), [] (const S &a, const S &b) {
+    if (a.key1 < b.key1)
+      return true;
+
+    if (a.key1 > b.key1)
+      return false;
+
+    if (a.key2 < b.key2)
+      return true;
+
+    if (a.key2 > b.key2)
+      return false;
+
+    return false;
+  });
 }
 
 #else
