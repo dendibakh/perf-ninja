@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdlib.h>
 
-//#define SOLUTION
+#define SOLUTION
 #ifdef SOLUTION
 
 static int compare(const S &a, const S &b) {
