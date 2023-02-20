@@ -1,8 +1,10 @@
 #include "solution.hpp"
 
 #define SOLUTION
+//#define MYSOLUTION
 
 #ifdef SOLUTION
+#ifdef MYSOLUTION
 uint16_t checksum(const Blob &blob) {
   constexpr unsigned bs{64};
   std::array<uint16_t, bs> acc{};
@@ -21,6 +23,17 @@ uint16_t checksum(const Blob &blob) {
   }
   return acc1;
 }
+#else // MYSOLUTION
+uint16_t checksum(const Blob &blob) {
+  uint32_t acc = 0;
+  for (auto value : blob)
+    acc += value;
+  auto high = acc >> 16;
+  auto low = acc & 0xFFFFu;
+  acc = low + high;
+  return (uint16_t)acc;
+}
+#endif // THEIRS
 #else
 uint16_t checksum(const Blob &blob) {
   uint16_t acc = 0;
