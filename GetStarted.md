@@ -27,8 +27,8 @@ cmake -E make_directory build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release --parallel 8
-cmake --build . --config=Release --target validateLab
-cmake --build . --config=Release --target benchmarkLab
+cmake --build . --target validateLab
+cmake --build . --target benchmarkLab
 ```
 When you push changes to your private branch, it will automatically trigger CI benchmarking job. More details about it at the bottom of the page.
 
