@@ -97,8 +97,8 @@ def compareResults(iterNumber):
   return True
 
 for i in range(0, numRuns):
-  buildAndRunBench(i, "baseline", "")
-  buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-D" + defines)
+  buildAndRunBench(i, "baseline", "-DCMAKE_CXX_FLAGS=-D" + defines + "=0")
+  buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-D" + defines + "=1")
 
 os.chdir(saveCWD)
 
