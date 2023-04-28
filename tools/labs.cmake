@@ -51,7 +51,8 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 # https://github.com/google/benchmark
-find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)
+# find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)
+find_package(benchmark PATHS "/Users/kocchop/karamel/arch_ninja/perf-ninja/benchmark/build" REQUIRED)
 set(BENCHMARK_LIBRARY "benchmark::benchmark")
 
 # Find source files
