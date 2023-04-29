@@ -9,3 +9,7 @@ cmake --build . --target benchmarkLab
 # For debug:
 cmake -DCMAKE_BUILD_TYPE=Debug .. -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g"
 cmake --build . --config Debug --parallel 8
+
+# Failed to get authorization request
+https://github.com/cmyr/cargo-instruments/issues/40
+codesign -s - -f --entitlements ~/ent.plist lab

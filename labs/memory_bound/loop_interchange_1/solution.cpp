@@ -27,8 +27,8 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
       }
     }
@@ -50,8 +50,8 @@ Matrix power(const Matrix &input, const uint32_t k) {
   *elementCurrent = input;
 
   // Use binary representation of k to be O(log(k))
-  for (auto i = k; i > 0; i /= 2) {
-    if (i % 2 != 0) {
+  for (auto i = k; i > 0; i >>= 1) {
+    if (i & 1) {
       // Multiply the product by element
       multiply(*productNext, *productCurrent, *elementCurrent);
       std::swap(productNext, productCurrent);
