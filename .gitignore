@@ -11,6 +11,8 @@ CTestTestfile.cmake
 _deps
 __pycache__
 *.pyc
+*.bkp
+*.vscode/
 .idea/
 cmake-build-debug/
 .DS_Store
