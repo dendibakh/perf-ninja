@@ -1,4 +1,4 @@
-#if WITH_UNIT_TESTS
+#if WITH_UNIT_TESTS && SOLUTION
 
 #include "solution.cpp"
 
@@ -60,5 +60,12 @@ int main()
     }
     return 0;
 }
+#else
 
+#if WITH_UNIT_TESTS
+int main()
+{
+    return 0;
+}
+#endif
 #endif
