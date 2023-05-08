@@ -80,25 +80,34 @@ def compareResults(iterNumber):
   baselineResultPath = os.path.join(baselineBuildPath, "result.json")
   solutionBuildPath = os.path.join(saveCWD, "solutionBuild" + str(iterNumber))
   solutionResultPath = os.path.join(solutionBuildPath, "result.json")
+  facitBuildPath = os.path.join(saveCWD, "facitBuild" + str(iterNumber))
+  facitResultPath = os.path.join(facitBuildPath, "result.json")
 
-  outJsonSolution = gbench.util.load_benchmark_results(solutionResultPath)
   outJsonBaseline = gbench.util.load_benchmark_results(baselineResultPath)
+  outJsonSolution = gbench.util.load_benchmark_results(solutionResultPath)
+  outJsonFacit    = gbench.util.load_benchmark_results(facitResultPath)
 
-  # Parse two report files and compare them
-  diff_report = gbench.report.get_difference_report(
-    outJsonBaseline, outJsonSolution, True)
-  output_lines = gbench.report.print_difference_report(
-    diff_report,
-    False, True, 0.05, True)
+  print(f"\n\n Iteration {iterNumber}:")
 
-  for ln in output_lines:
-    print(ln)
+  def compare(oldName, oldJson, newName, newJson):
+    diff_report = gbench.report.get_difference_report(
+      oldJson, newJson, True)
+    output_lines = gbench.report.print_difference_report(
+      diff_report, False, True, 0.05, True)
+    print(f"\n{oldName} vs {newName}:")
+    for line in output_lines:
+      print(line)
+
+  compare("Baseline", outJsonBaseline, "Solution", outJsonSolution)
+  compare("Baseline", outJsonBaseline, "Facit",    outJsonFacit)
+  compare("Facit",    outJsonFacit,    "Solution", outJsonSolution)
 
   return True
 
 for i in range(0, numRuns):
   buildAndRunBench(i, "baseline", "-DCMAKE_CXX_FLAGS=-D" + defines + "=0")
   buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-D" + defines + "=1")
+  buildAndRunBench(i, "facit",    "-DCMAKE_CXX_FLAGS=-D" + defines + "=2")
 
 os.chdir(saveCWD)
 

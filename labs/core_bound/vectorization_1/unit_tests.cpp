@@ -1,4 +1,4 @@
-#if WITH_UNIT_TESTS && SOLUTION
+#if WITH_UNIT_TESTS && SOLUTION == 1
 
 #include "solution.cpp"
 
@@ -65,6 +65,8 @@ int main()
 #if WITH_UNIT_TESTS
 int main()
 {
+    // Don't have any unit tests for the given solutions yet, so just return
+    // immediately.
     return 0;
 }
 #endif

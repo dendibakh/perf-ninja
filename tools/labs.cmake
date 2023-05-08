@@ -58,6 +58,7 @@ set(BENCHMARK_LIBRARY "benchmark::benchmark")
 file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
 list(FILTER srcs EXCLUDE REGEX ".*bench.cpp$")
 list(FILTER srcs EXCLUDE REGEX ".*validate.cpp$")
+list(FILTER srcs EXCLUDE REGEX "solution_[012]*.cpp$")
 
 # Add main targets
 add_executable(lab bench.cpp ${srcs} ${EXT_LAB_srcs})
