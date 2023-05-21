@@ -3,6 +3,11 @@
 #include <memory>
 #include <string_view>
 
+#ifndef SOLUTION
+#  define SOLUTION 1
+#endif
+
+
 // Make zero matrix
 void zero(Matrix &result) {
   for (int i = 0; i < N; i++) {
@@ -22,6 +27,10 @@ void identity(Matrix &result) {
   }
 }
 
+
+#if SOLUTION == 0
+// Baseline.
+
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
@@ -34,6 +43,43 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
     }
   }
 }
+
+#elif SOLUTION == 1
+// My solution.
+
+// Multiply two square matrices
+void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
+  zero(result);
+
+  for (int i = 0; i < N; i++) {
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j] += a[i][k] * b[k][j];
+      }
+    }
+  }
+}
+
+#elif SOLUTION == 2
+// Facit.
+
+// Multiply two square matrices
+void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
+  zero(result);
+
+  for (int i = 0; i < N; i++) {
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j] += a[i][k] * b[k][j];
+      }
+    }
+  }
+}
+
+#else
+#  pragma error("Unknown solution. Valid values are 0 through 2.")
+#endif
+
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
