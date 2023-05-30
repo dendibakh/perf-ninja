@@ -11,7 +11,7 @@ unsigned getSumOfDigits(unsigned n) {
   return sum;
 }
 
-constexpr unsigned P = 10000;
+constexpr unsigned P = 64;
 
 // Task: lookup all the values from l2 in l1.
 // For every found value, find the sum of its digits.
@@ -41,13 +41,13 @@ unsigned solution(List *l1, List *l2) {
     l2 = head2;
     while (l2) {
       for (size_t j = 0; j < i; j++) {
-        if (vals[j] == l2->value) retVal += getSumOfDigits(vals[i]);
-        break;
+        if (vals[j] == l2->value) {
+          retVal += getSumOfDigits(vals[j]);
+          break;
+        }
       }
       l2 = l2->next;
     }
-    if (!l1) break;
-    l1 = l1->next;
   }
 
   return retVal;
