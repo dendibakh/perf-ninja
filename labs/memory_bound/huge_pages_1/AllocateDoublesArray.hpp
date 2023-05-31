@@ -184,7 +184,7 @@ inline auto allocateDoublesArray(size_t size) {
 #elif defined(ON_WINDOWS)
   static SETUP setup;
   SIZE_T large_page_size = GetLargePageMinimum();
-  SIZE_T large_page_num = (size + large_page_size - 1) / large_page_size;
+  SIZE_T large_page_num = (size * sizeof(double) + large_page_size - 1) / large_page_size;
   LPVOID addr =
       VirtualAlloc(NULL, large_page_num * large_page_size,
                    MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
