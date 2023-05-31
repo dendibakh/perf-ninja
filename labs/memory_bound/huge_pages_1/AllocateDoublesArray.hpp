@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 
-#if defined(__linux__) || defined(__linux) || defined(linux) ||                \
+#if defined(__linux__) || defined(__linux) || defined(linux) || \
     defined(__gnu_linux__)
 #define ON_LINUX
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -126,7 +126,7 @@ inline bool enableProcPrivilege() {
   else
     return true;
 }
-} // namespace detail
+}  // namespace detail
 
 inline bool setRequiredPrivileges() {
   if (detail::enableProcPrivilege())
@@ -147,24 +147,48 @@ inline bool setRequiredPrivileges() {
   }
 }
 
+struct SETUP {
+  bool set;
+  SETUP() : set(true) {
+    adjustAccountPrivilege();
+    enableProcPrivilege();
+  }
+};
+
 #endif
 
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
-  // Allocate memory
-  double *alloc = new double[size];
-  // remember to cast the pointer to double* if your allocator returns void*
+  // // Allocate memory
+  // double *alloc = new double[size];
+  // // remember to cast the pointer to double* if your allocator returns void*
 
-  // Deleters can be conveniently defined as lambdas, but you can explicitly
-  // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  // // Deleters can be conveniently defined as lambdas, but you can explicitly
+  // // define a class if you're not comfortable with the syntax
+  // auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
 
-  return std::unique_ptr<double[], decltype(deleter)>(alloc,
-                                                      std::move(deleter));
+  // return std::unique_ptr<double[], decltype(deleter)>(alloc,
+  //                                                     std::move(deleter));
 
-  // The above is equivalent to:
-  // return std::make_unique<double[]>(size);
-  // The more verbose version is meant to demonstrate the use of a custom
-  // (potentially stateful) deleter
+  // // The above is equivalent to:
+  // // return std::make_unique<double[]>(size);
+  // // The more verbose version is meant to demonstrate the use of a custom
+  // // (potentially stateful) deleter
+
+#if defined(ON_LINUX)
+  void* addr = mmap(NULL, size * sizeof(double), PROT_READ | PROT_WRITE,
+                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  auto deleter = [=](double* ptr) { munmap(ptr, size * sizeof(double)); };
+  return std::unique_ptr<double[], decltype(deleter)>((double*)addr, deleter);
+#elif defined(ON_WINDOWS)
+  static SETUP setup;
+  SIZE_T large_page_size = GetLargePageMinimum();
+  SIZE_T large_page_num = (size + large_page_size - 1) / large_page_size;
+  LPVOID addr =
+      VirtualAlloc(NULL, large_page_num * large_page_size,
+                   MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
+  auto deleter = [](double *ptr) { VirtualFree((void *)ptr, 0, MEM_RELEASE); };
+  return std::unique_pre<double[], decltype(deleter)>((double *)addr, deleter);
+#endif
 }
