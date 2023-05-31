@@ -150,8 +150,8 @@ inline bool setRequiredPrivileges() {
 struct SETUP {
   bool set;
   SETUP() : set(true) {
-    adjustAccountPrivilege();
-    enableProcPrivilege();
+    detail::adjustAccountPrivilege();
+    detail::enableProcPrivilege();
   }
 };
 
@@ -189,6 +189,6 @@ inline auto allocateDoublesArray(size_t size) {
       VirtualAlloc(NULL, large_page_num * large_page_size,
                    MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
   auto deleter = [](double *ptr) { VirtualFree((void *)ptr, 0, MEM_RELEASE); };
-  return std::unique_pre<double[], decltype(deleter)>((double *)addr, deleter);
+  return std::unique_ptr<double[], decltype(deleter)>((double *)addr, deleter);
 #endif
 }
