@@ -178,7 +178,7 @@ inline auto allocateDoublesArray(size_t size) {
 
 #if defined(ON_LINUX)
   void* addr = mmap(NULL, size * sizeof(double), PROT_READ | PROT_WRITE,
-                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+                    MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
   auto deleter = [=](double* ptr) { munmap(ptr, size * sizeof(double)); };
   return std::unique_ptr<double[], decltype(deleter)>((double*)addr, deleter);
 #elif defined(ON_WINDOWS)
