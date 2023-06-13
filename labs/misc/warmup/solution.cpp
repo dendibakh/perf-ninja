@@ -9,6 +9,7 @@ int solution(int *arr, int N) {
   }
   return res;
   #else
+
   return (N * (N + 1)) / 2; 
   #endif
 }
