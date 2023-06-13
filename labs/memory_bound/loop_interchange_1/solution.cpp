@@ -26,10 +26,20 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+  int n = 5;
+  auto NN = N / n;
+  for (int i = 0; i < n; i++) {
+    for (int k = 0; k < n; k++) {
+      for (int j = 0; j < n; j++) {
+        for (int ii = 0; ii < NN; ++ii) {
+          for (int kk = 0; kk < NN; ++kk) {
+            auto a_iikk = a[i * NN + ii][k * NN + kk];
+            for (int jj = 0; jj < NN; ++jj) {
+              result[i * NN + ii][j * NN + jj] +=
+                a_iikk * b[k * NN + kk][j * NN + jj];
+            }
+          }
+        }
       }
     }
   }
