@@ -7,7 +7,7 @@
 
 uint32_t original_solution(const char *file_name) {
   std::fstream file_stream{file_name};
-  if (not file_stream.is_open())
+  if (!file_stream.is_open())
     throw std::runtime_error{"The file could not be opened"};
   uint32_t crc = 0xff'ff'ff'ffu;
   char c;
