@@ -94,7 +94,7 @@ def compareResults(iterNumber):
       oldJson, newJson, True)
     output_lines = gbench.report.print_difference_report(
       diff_report, False, True, 0.05, True)
-    print(f"\n{oldName} vs {newName}:")
+    print(f"\n{oldName} to {newName}:")
     for line in output_lines:
       print(line)
 
