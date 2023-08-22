@@ -22,3 +22,4 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+.vscode
