@@ -77,6 +77,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
         horizontal_gap_column[row] =
             std::max(horizontal_gap_column[row], best_cell_score);
+        assert(true);
       }
     }
 
