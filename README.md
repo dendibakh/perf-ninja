@@ -25,6 +25,7 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining](labs/core_bound/function_inlining_1)
   * [Dependency Chains 1](labs/core_bound/dep_chains_1)  
+  * [Dependency Chains 2](labs/core_bound/dep_chains_2)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
   * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * Memory Bound:
