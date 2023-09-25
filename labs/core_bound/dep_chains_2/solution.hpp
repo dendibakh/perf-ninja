@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 
-constexpr int NumberOfGrids = 10;
+constexpr int NumberOfGrids = 16;
 constexpr int GridXDimension = 1024;
 constexpr int GridYDimension = 1024;
 constexpr int NumberOfSims = 10;
