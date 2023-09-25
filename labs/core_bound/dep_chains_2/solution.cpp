@@ -29,11 +29,11 @@ std::vector<int> solution(const std::vector<Life::Grid>& grids) {
 
   //int i = process<2>(grids, popCounts); // 28% speedup
   //int i = process<3>(grids, popCounts); // 30% speedup
-  int i = process<4>(grids, popCounts); // 50% speedup
+  //int i = process<4>(grids, popCounts); // 50% speedup
   //int i = process<5>(grids, popCounts); // 45% speedup
   //int i = process<6>(grids, popCounts); // 35% speedup
   //int i = process<7>(grids, popCounts); // 44% speedup
-  //int i = process<8>(grids, popCounts); // 50% speedup
+  int i = process<8>(grids, popCounts); // 50% speedup
   //int i = process<16>(grids, popCounts);// 22% speedup
   
   Life life;
