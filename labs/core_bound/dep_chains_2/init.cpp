@@ -4,7 +4,8 @@
 
 // Init random starting grid of the game
 Life::Grid initRandom() {
-  std::mt19937_64 random_engine{};
+  std::random_device r;
+  std::mt19937_64 random_engine(r());
   std::uniform_int_distribution<int> distrib(0, 9);
 
   Life::Grid retGrid;
