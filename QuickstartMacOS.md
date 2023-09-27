@@ -37,7 +37,7 @@
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    cmake --config Release --target install
+    cmake --build . --config Release --target install
     ```
 
 6. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](GetStarted.md#how-to-build-lab-assignments). 
