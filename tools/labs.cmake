@@ -85,7 +85,7 @@ if(NOT DEFINED LAB_ARGS)
 endif()
 
 if("${BENCHMARK_MIN_TIME}" STREQUAL "")
-  set(BENCHMARK_MIN_TIME "1")
+  set(BENCHMARK_MIN_TIME "2s")
 endif()
 set(LAB_BENCHMARK_ARGS --benchmark_min_time=${BENCHMARK_MIN_TIME} --benchmark_out_format=json --benchmark_out=result.json)
 
