@@ -11,10 +11,10 @@
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile\n
     ```
 
-2. Install clang-15 compiler (make sure that the version is not older than 15):
+2. Install clang-17 compiler (make sure that the version is not older than 15, otherwise it will not compile):
 
     ```
-    brew install llvm
+    brew install llvm@17
     export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
     export CC=clang
     export CXX=clang++
