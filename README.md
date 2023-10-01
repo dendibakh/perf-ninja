@@ -37,7 +37,7 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [False Sharing](labs/memory_bound/false_sharing_1)
   * [Huge Pages](labs/memory_bound/huge_pages_1)
 * Bad Speculation:
-  * [Branches To CMOVs](labs/core_bound/branches_to_cmov_1)
+  * [Branches To CMOVs](labs/bad_speculation/branches_to_cmov_1)
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
   * [Replacing Branches With Lookup Tables](labs/bad_speculation/lookup_tables_1)
   * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
