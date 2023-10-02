@@ -42,18 +42,37 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups)
     return result;
   }
 
-  int current_val = lookups[0];
-  hash_map->prefetch(current_val);
-  for (std::size_t i = 1; i < lookups.size(); ++i)
+  constexpr std::size_t block_size {16};
+
+  std::size_t i {0};
+  for (; i < lookups.size() - block_size; i += 16)
   {
-    int next_val = lookups[i];
-    hash_map->prefetch(next_val);
-    if (hash_map->find(current_val))
-      result += getSumOfDigits(current_val);
-    current_val = next_val;
+    // Prefetch a bunch of values.
+    for (int j = 0; j < block_size; ++j)
+    {
+      hash_map->prefetch(lookups[i + j]);
+    }
+
+    // Compute on the prefetched data.
+    for (int j = 0; j < block_size; ++j)
+    {
+      int val = lookups[i+j];
+      if (hash_map->find(val))
+      {
+        result += getSumOfDigits(val);
+      }
+    }
   }
-  if (hash_map->find(current_val))
-    result += getSumOfDigits(current_val);
+
+  // Serial loop for the last <16 elements.
+  for (; i < lookups.size(); i++)
+  {
+    int val = lookups[i];
+    if (hash_map->find(val))
+    {
+      result += getSumOfDigits(val);
+    }
+  }
 
   return result;
 }
