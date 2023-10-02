@@ -36,32 +36,24 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups)
 {
   int result = 0;
+
   if (lookups.size() == 0)
   {
     return result;
   }
 
-  int val_current = lookups[0];
-  bool has_current = hash_map->find(val_current);
-  int val_next;
-  bool has_next;
+  int current_val = lookups[0];
+  hash_map->prefetch(current_val);
   for (std::size_t i = 1; i < lookups.size(); ++i)
   {
-    val_next = lookups[i];
-    has_next = hash_map->find(val_next);
-    if (has_current)
-    {
-      result += getSumOfDigits(val_current);
-    }
-    val_current = val_next;
-    has_current = has_next;
+    int next_val = lookups[i];
+    hash_map->prefetch(next_val);
+    if (hash_map->find(current_val))
+      result += getSumOfDigits(current_val);
+    current_val = next_val;
   }
-
-  if (has_current)
-  {
-    result += getSumOfDigits(val_current);
-  }
-
+  if (hash_map->find(current_val))
+    result += getSumOfDigits(current_val);
 
   return result;
 }

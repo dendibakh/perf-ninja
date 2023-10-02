@@ -24,6 +24,12 @@ public:
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
     }
+
+    void prefetch(int val) const
+    {
+        int bucket = val % N_Buckets;
+        __builtin_prefetch(&m_vector[bucket], 0, 1);
+    }
 };
 
 void init(hash_map_t* hash_map, std::vector<int>& lookups);
