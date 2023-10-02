@@ -1,5 +1,6 @@
 
 #include "solution.h"
+
 #include <algorithm>
 #include <random>
 
