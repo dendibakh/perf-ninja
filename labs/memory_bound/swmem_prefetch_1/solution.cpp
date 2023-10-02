@@ -45,22 +45,24 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups)
   constexpr std::size_t block_size {16};
 
   std::size_t i {0};
-  for (; i < lookups.size() - block_size; i += 16)
-  {
-    // Prefetch a bunch of values.
-    for (int j = 0; j < block_size; ++j)
-    {
-      hash_map->prefetch(lookups[i + j]);
-    }
 
-    // Compute on the prefetched data.
-    for (int j = 0; j < block_size; ++j)
+  // Prefetch a bunch of elements.
+  for (std::size_t j = 0; j < block_size; ++j)
+  {
+    hash_map->prefetch(lookups[j]);
+  }
+
+  // Interleave computation and prefetching.
+  for (; i < lookups.size() - block_size; ++i)
+  {
+    // Prefetch a value far ahead, so that it has time to load before we need it.
+    hash_map->prefetch(lookups[i + block_size]);
+
+    // Compute the current value, which should be fetched already.
+    int val = lookups[i];
+    if (hash_map->find(val))
     {
-      int val = lookups[i+j];
-      if (hash_map->find(val))
-      {
-        result += getSumOfDigits(val);
-      }
+      result += getSumOfDigits(val);
     }
   }
 
