@@ -46,19 +46,14 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups)
 
   std::size_t i {0};
 
-  // Prefetch a bunch of elements.
-  for (std::size_t j = 0; j < block_size; ++j)
-  {
-    hash_map->prefetch(lookups[j]);
-  }
-
   // Interleave computation and prefetching.
   for (; i < lookups.size() - block_size; ++i)
   {
     // Prefetch a value far ahead, so that it has time to load before we need it.
     hash_map->prefetch(lookups[i + block_size]);
 
-    // Compute the current value, which should be fetched already.
+    // Compute the current value, which should be fetched already, unless we
+    // are at the very start of the loop.
     int val = lookups[i];
     if (hash_map->find(val))
     {
@@ -83,12 +78,20 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups)
 #elif SOLUTION == 2
 // Facit.
 
-// TODO Still the baseline implementation.
+constexpr int look_ahead = 16;
 
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
-  for (int val : lookups) {
+  for (int i = 0; i < lookups.size() - look_ahead; i++) {
+    int val = lookups[i];
+    if (hash_map->find(val))
+      result += getSumOfDigits(val);
+    hash_map->prefetch(lookups[i + look_ahead]);
+  }
+
+  for (int i = lookups.size() - look_ahead; i < lookups.size(); i++) {
+    int val = lookups[i];
     if (hash_map->find(val))
       result += getSumOfDigits(val);
   }
