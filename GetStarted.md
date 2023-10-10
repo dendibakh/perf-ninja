@@ -6,7 +6,7 @@ Here is the list of tools you *absolutely* have to install to build labs in this
 * CMake 3.13
 * [Google benchmark](https://github.com/google/benchmark), you can also use the scripts in the [tools](tools) directory.
 
-Others are optional depend on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md)) ([MacOS](QuickstartMacOS.md)).
+Others are optional depending on your platform of choice. So far we support native builds on Windows and Linux. Check out the instructions specific to each platform ([Windows](QuickstartWindows.md)) ([Linux](QuickstartLinux.md)) ([MacOS](QuickstartMacOS.md)).
 
 ## How to build lab assignments
 
@@ -21,7 +21,7 @@ Every lab assignment has the following:
 
 We encourage you to work on the lab assignment first, without watching the summary video.
 
-Every lab can be built and ran using the following commands:
+Every lab can be built and run using the following commands:
 ```
 cmake -E make_directory build
 cd build
@@ -30,16 +30,16 @@ cmake --build . --config Release --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
 ```
-When you push changes to your private branch, it will automatically trigger CI benchmarking job. More details about it at the bottom of the page.
+When you push changes to your private branch, it will automatically trigger a CI benchmarking job. More details about it are at the bottom of the page.
 
 ## Profiling
 
-To match assembly code back to the source in the profile, build you binaries with the debug information:
+To match assembly code back to the source in the profile, build your binaries with the debug information:
 ```
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" ..
 ```
 
-Lab assignments are build on top of Google Benchmark library, which by default performs a variable number of benchmark iterations. That makes it hard to compare performance profiles of two runs since they will not do the same amount of work. You can see the same wall time even though the number of iterations is different. To fix the number of iterations, you can do the following change:
+Lab assignments are built on top of the Google Benchmark library, which by default performs a variable number of benchmark iterations. That makes it hard to compare the performance profiles of two runs since they will not do the same amount of work. You can see the same wall time even though the number of iterations is different. To fix the number of iterations, you can make the following changes:
 
 ```
   BENCHMARK(bench1)->Iterations(10);
@@ -57,7 +57,7 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 16 GB RAM, DDR4 @ 2400 MT/s
 * 256GB NVMe PCIe M.2 SSD
 * 64-bit Ubuntu 22.04.1 LTS (Jammy Jellyfish)
-* Clang C++ compiler, version 14.0
+* Clang C++ compiler, version 17.0
 
 **Machine 2 - (Mac OS + M1)**
 
@@ -65,7 +65,7 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 16 GB RAM, LPDDR4
 * 256GB NVME APPLE SSD AP0256Q
 * macOS 13.5.1 Ventura (22G90)
-* Clang C++ compiler, version 15.0
+* Clang C++ compiler, version 17.0
 
 **Machine 3 - (Windows + Zen3)**
 
@@ -73,7 +73,7 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 64 GB RAM
 * ADATA XPG SX8200 Pro 1TB 3D NAND NVMe SSD
 * Windows 11 Version 21H2, build 22000.282
-* Clang C++ compiler, version 14.0
+* Clang C++ compiler, version 17.0
 
 **Machine 4 - (Linux + CoffeeLake)**
 
@@ -81,27 +81,27 @@ You are free to work on whatever platform you have at your disposal. However, we
 * 8 GB RAM, DDR4 @ 2400 MT/s
 * 256GB NVME INTEL SSDPEKKW256G8
 * 64-bit Ubuntu 20.04, kernel version 5.13.0-27
-* Clang C++ compiler, version 14.0
+* Clang C++ compiler, version 17.0
 
 Keep in mind that sometimes you may see different speedups on different platforms.
 
 ## Local experiments:
 
-Here are a few tips that will help you compare results of your experiments against the baseline. You can run the baseline version and write down the results, which you will later use to compare with your experiments. But there is a better way to automate this process. You can choose between two options:
+Here are a few tips that will help you compare the results of your experiments against the baseline. You can run the baseline version and write down the results, which you will later use to compare with your experiments. But there is a better way to automate this process. You can choose between two options:
 
-1) Use `compare.py` script, which is a part of the Google benchmark library:
+1) Use the `compare.py` script, which is a part of the Google benchmark library:
 
     ```
-    # 1. Benchmark the baseline and save score into a JSON file
+    # 1. Benchmark the baseline and save the score into a JSON file
     ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=baseline.json
     # 2. Change the code
-    # 3. Benchmark your solution and save score into a JSON file
+    # 3. Benchmark your solution and save the score into a JSON file
     ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=solution.json
     # 4. Compare solution.json against baseline.json
     /path/to/benchmark/tools/compare.py benchmarks baseline.json solution.json
     ```
 
-2) Use `check_speedup.py` script, which is inside Performance Ninja repo (uses `compare.py` script under the hood):
+2) Use the `check_speedup.py` script, which is inside the Performance Ninja repo (uses the `compare.py` script under the hood):
 
     ```
     # 1. Put your solution under `#ifdef SOLUTION`:
@@ -121,9 +121,9 @@ Here are a few tips that will help you compare results of your experiments again
 
 Push your submissions into your own branch[es]. CI job will be triggered every time you push changes to your remote Github branch. For now, we use a self-hosted runner, which is configured specifically for benchmarking purposes.
 
-By default, CI will detect which lab was modified in the last commit and will only benchmark affected asignment. If you make changes to more than one lab, CI job will benchmark all the labs. You can also force benchmarking all the labs if you add `[CheckAll]` in the commit message.
+By default, CI will detect which lab was modified in the last commit and will only benchmark affected assignment. If you make changes to more than one lab, the CI job will benchmark all the labs. You can also force benchmarking all the labs if you add `[CheckAll]` in the commit message.
 
-In case all the labs were benchmarked, summary will be provided at the end, e.g.:
+In case all the labs were benchmarked, a summary will be provided at the end, e.g.:
 
 ```
 Lab Assignments Summary:
