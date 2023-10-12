@@ -6,7 +6,7 @@
 void transpose(Matrix &result)
 {
   for (int i = 0; i < N; i++) {
-    for (int j = i; j < N; j++) {
+    for (int j = i + 1; j < N; j++) {
       std::swap(result[i][j], result[j][i]);
     }
   }
@@ -32,20 +32,21 @@ void identity(Matrix &result) {
 }
 
 // Multiply two square matrices
-void multiply(Matrix &result, const Matrix &a,  Matrix &b) {
+void multiply(Matrix &result, const Matrix &a, Matrix &b) {
   zero(result);
 
-  // auto bT = b;
   transpose(b);
+  // transpose(b);
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       for (int k = 0; k < N; k++) {
         result[i][j] += a[i][k] * b[j][k];
+        // result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
-  
+
   transpose(b);
 }
 

@@ -6,7 +6,7 @@
 constexpr int N = 400;
 
 // Square matrix 400 x 400
-using Matrix = std::array<std::array<float, N>, N>;
+using Matrix = std::array<std::array<double, N>, N>;
 
 void transpose(Matrix &result);
 void zero(Matrix &result);
