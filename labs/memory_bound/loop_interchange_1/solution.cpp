@@ -32,22 +32,20 @@ void identity(Matrix &result) {
 }
 
 // Multiply two square matrices
-void multiply(Matrix &result, const Matrix &a, Matrix &b) {
+void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  transpose(b);
   // transpose(b);
 
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[j][k];
-        // result[i][j] += a[i][k] * b[k][j];
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
 
-  transpose(b);
+  // transpose(b);
 }
 
 // Compute integer power of a given square matrix
