@@ -3,11 +3,24 @@
 #include <cassert>
 #include <type_traits>
 
+
+using score_t = int16_t;
+
+std::array<std::array<score_t, sequence_count_v>, sequence_size_v> transpose(const std::vector<sequence_t> &seq) {
+    std::array<std::array<score_t, sequence_count_v>, sequence_size_v> tseq;
+
+    for (size_t col = 0; col < seq.size(); col++) {
+      for (size_t row = 0; row < seq[col].size(); row++) {
+        tseq[row][col] = seq[col][row];
+      }
+    }
+    return tseq;
+}
+
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2) {
-  using score_t = int16_t;
   using column_t = std::array<score_t, sequence_size_v + 1>;
   using matrix_t = std::array<std::array<score_t, sequence_count_v>, sequence_size_v + 1>;
   /*
@@ -18,7 +31,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
   score_t match{6};
   score_t mismatch{-4};
 
-  const size_t sequences_count = sequences1.size();
+  auto sequences1_transposed = transpose(sequences1);
+  auto sequences2_transposed = transpose(sequences2);
   
   /*
    * Setup the matrix.
@@ -33,7 +47,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
   /*
    * Initialise the first column of the matrix.
    */
-  for (size_t seq_id = 0; seq_id < sequences_count; ++seq_id) {
+  for (size_t seq_id = 0; seq_id < sequence_count_v; ++seq_id) {
     horizontal_gap_column[0][seq_id] = gap_open;
     last_vertical_gap[seq_id] = gap_open;
 
@@ -49,7 +63,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
    */
   for (unsigned col = 1; col <= sequence_size_v /*sequence2.size()*/; ++col) {
     std::array<score_t, sequence_count_v> last_diagonal_score {};
-    for (size_t seq_id = 0; seq_id < sequences_count; ++seq_id) {
+    for (size_t seq_id = 0; seq_id < sequence_count_v; ++seq_id) {
       last_diagonal_score[seq_id] =
           score_column[0][seq_id]; // Cache last diagonal score to compute this cell.
       score_column[0][seq_id] = horizontal_gap_column[0][seq_id];
@@ -58,11 +72,11 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
    }
 
     for (unsigned row = 1; row <= sequence_size_v /*sequence1.size()*/; ++row) {
-      for (size_t seq_id = 0; seq_id < sequences_count; ++seq_id) {
+      for (size_t seq_id = 0; seq_id < sequence_count_v; ++seq_id) {
         // Compute next score from diagonal direction with match/mismatch.
         score_t best_cell_score =
             last_diagonal_score[seq_id] +
-            (sequences1[seq_id][row - 1] == sequences2[seq_id][col - 1] ? match : mismatch);
+            (sequences1_transposed[row - 1][seq_id] == sequences2_transposed[col - 1][seq_id] ? match : mismatch);
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
         best_cell_score = std::max(best_cell_score, last_vertical_gap[seq_id]);
