@@ -23,5 +23,7 @@ static int compare(const void *lhs, const void *rhs) {
 }
 
 void solution(std::array<S, N> &arr) {
-  qsort(arr.data(), arr.size(), sizeof(S), compare);
+  std::sort(arr.begin(), arr.end(), [](const S &lhs, const S &rhs) {
+    return compare(reinterpret_cast<const void *>(&lhs), reinterpret_cast<const void *>(&rhs)) < 0;
+  });
 }
