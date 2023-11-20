@@ -21,7 +21,7 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 unsigned solution(List *l1, List *l2) {
-  constexpr unsigned N = 1;
+  constexpr unsigned N = 64;
   unsigned retVal = 0;
   std::array<unsigned, N> res;
   for (unsigned k{}; k < N; ++k)
