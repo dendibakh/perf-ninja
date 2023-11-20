@@ -23,6 +23,7 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
+
   List *head2 = l2;
   // O(N^2) algorithm:
   while (l1) {
