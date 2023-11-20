@@ -24,27 +24,35 @@ unsigned solution(List *l1, List *l2) {
   constexpr unsigned N = 1;
   unsigned retVal = 0;
   std::array<unsigned, N> res;
+  for (unsigned k{}; k < N; ++k)
+    res[k] = 0;
 
 
   while (l2) {
-    std::array<unsigned, N> head2;
-    for (unsigned k{}; k < N; ++ k) {
+    std::array<unsigned, N> values;
+    for (unsigned k{}; k < N; ++k) {
       if (l2) {
-        head2[k] = l2->value;
+        values[k] = l2->value;
         l2 = l2->next;
       } else {
-        head2[k] = 0;
+        values[k] = 0;
       }
     }
 
     List *head1 = l1;
+    unsigned rem = N;
     while (head1) {
       unsigned v = head1->value;
-      // TODO compute getSumOfDigits once?
       for (unsigned k{}; k < N; ++k) {
-        if (v == head2[k])
+        if (v == values[k]) {
           res[k] += getSumOfDigits(v);
+          values[k] = 0; // TODO swap with last element and compare N-1
+          //rem -= 1;
+          break;
+        }
       }
+      //if (!rem)
+      //  break;
       head1 = head1->next;
     }
   }
