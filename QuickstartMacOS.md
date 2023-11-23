@@ -11,6 +11,12 @@
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile\n
     ```
 
+3. Install cmake:
+
+   ```
+   brew install cmake
+   ```
+
 2. Install clang-17 compiler (make sure that the version is not older than 15, otherwise it will not compile):
 
     ```
