@@ -12,6 +12,7 @@ struct S {
     unsigned long long l : 16;  // 2 max 10k
     unsigned int i : 8;         // 1 max 100
     unsigned short s : 7;       // 1 max 100
+    bool b : 1;
 
     bool operator<(const S &s) const { return this->i < s.i; }
 };
