@@ -2,7 +2,7 @@
 #include <algorithm>
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
-  static constexpr int TILE_SIZE = 32;
+  static constexpr int TILE_SIZE = 16;
   int size = in.size();
   for (int ii = 0; ii < size; ii += TILE_SIZE) {
     for (int jj = 0; jj < size; jj += TILE_SIZE) {
