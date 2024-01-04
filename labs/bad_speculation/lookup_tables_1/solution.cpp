@@ -1,6 +1,7 @@
 #include "solution.hpp"
+#include <stdint.h>
 
-std::uint_fast8_t buckets[100] = {
+uint_fast8_t buckets[100] = {
    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
