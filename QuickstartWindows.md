@@ -8,7 +8,7 @@
     ```
     $ENV:PATH="$ENV:PATH;C:\Program Files\ninja"
     ```
-3. Download clang-14 compiler from [here](https://github.com/llvm/llvm-project/releases/tag/llvmorg-14.0.0) (LLVM-14.0.0-win64.exe) and install it. Select "add LLVM to the PATH" while installing.
+3. Download clang-17 compiler from [here](https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.1) (LLVM-17.0.1-win64.exe) and install it. Select "add LLVM to the PATH" while installing.
 
 4. Build release version of google [benchmark library](https://github.com/google/benchmark#installation). It doesn't matter which compiler you use to build it. Install google benchmark library with:
     ```

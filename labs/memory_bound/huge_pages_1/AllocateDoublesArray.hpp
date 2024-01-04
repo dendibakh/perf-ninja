@@ -63,7 +63,7 @@ inline auto openProcToken(DWORD desired_access) {
   using ret_t = std::unique_ptr<handle_t, decltype(+handle_cleanup)>;
 
   HANDLE handle{};
-  if (not OpenProcessToken(GetCurrentProcess(), desired_access, &handle))
+  if (!OpenProcessToken(GetCurrentProcess(), desired_access, &handle))
     throw std::runtime_error{"OpenProcessToken failed"};
   return ret_t{handle, +handle_cleanup};
 }
@@ -73,8 +73,8 @@ inline auto getUserToken() {
 
   // Probe the buffer size reqired for PTOKEN_USER structure
   DWORD dwbuf_sz = 0;
-  if (not GetTokenInformation(proc_token.get(), TokenUser, nullptr, 0,
-                              &dwbuf_sz) and
+  if (!GetTokenInformation(proc_token.get(), TokenUser, nullptr, 0,
+                              &dwbuf_sz) &&
       (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
     throw std::runtime_error{"GetTokenInformation failed"};
 
@@ -82,7 +82,7 @@ inline auto getUserToken() {
   constexpr auto deleter = [](PTOKEN_USER ptr) { free(ptr); };
   PTOKEN_USER ptr = (PTOKEN_USER)malloc(dwbuf_sz);
   std::unique_ptr<TOKEN_USER, decltype(deleter)> user_token{ptr, deleter};
-  if (not GetTokenInformation(proc_token.get(), TokenUser, user_token.get(),
+  if (!GetTokenInformation(proc_token.get(), TokenUser, user_token.get(),
                               dwbuf_sz, &dwbuf_sz))
     throw std::runtime_error{"GetTokenInformation failed"};
 
@@ -113,11 +113,11 @@ inline bool enableProcPrivilege() {
   priv_token.PrivilegeCount = 1;
   priv_token.Privileges->Attributes = SE_PRIVILEGE_ENABLED;
 
-  if (not LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME,
+  if (!LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME,
                                &priv_token.Privileges->Luid))
     throw std::runtime_error{"LookupPrivilegeValue failed"};
 
-  if (not AdjustTokenPrivileges(proc_token.get(), FALSE, &priv_token, 0,
+  if (!AdjustTokenPrivileges(proc_token.get(), FALSE, &priv_token, 0,
                                 nullptr, 0))
     throw std::runtime_error{"AdjustTokenPrivileges failed"};
 

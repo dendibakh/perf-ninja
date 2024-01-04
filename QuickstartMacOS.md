@@ -11,10 +11,10 @@
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile\n
     ```
 
-2. Install clang-15 compiler (make sure that the version is not older than 15):
+2. Install clang-17 compiler (make sure that the version is not older than 15, otherwise it will not compile):
 
     ```
-    brew install llvm
+    brew install llvm@17
     export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
     export CC=clang
     export CXX=clang++
@@ -37,7 +37,7 @@
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    cmake --config Release --target install
+    cmake --build . --config Release --target install
     ```
 
 6. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](GetStarted.md#how-to-build-lab-assignments). 

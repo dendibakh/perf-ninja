@@ -1,4 +1,5 @@
 #include "solution.hpp"
+#include <algorithm>
 #include <cassert>
 #include <type_traits>
 

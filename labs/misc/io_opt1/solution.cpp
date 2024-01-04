@@ -5,7 +5,7 @@
 
 uint32_t solution(const char *file_name) {
   std::fstream file_stream{file_name};
-  if (not file_stream.is_open())
+  if (!file_stream.is_open())
     throw std::runtime_error{"The file could not be opened"};
 
   // Initial value has all bits set to 1

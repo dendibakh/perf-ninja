@@ -14,7 +14,7 @@ Performance Ninja is supported on Linux, Windows, and Mac, and is run on all the
 
 Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://book.easyperf.net/perf_book) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
 
-Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ). Join our [discord channel](https://discord.gg/8h6gEzgMDY) to collaborate with others.
+Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
 
 Lab assignments in this project are implemented in C++. If you're more comfortable with Rust, perf-ninja was also ported to Rust [here](https://github.com/grahamking/perf-ninja-rs), thanks to @grahamking.
 
@@ -24,7 +24,8 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [Vectorization 1](labs/core_bound/vectorization_1)
   * [Vectorization 2](labs/core_bound/vectorization_2)
   * [Function Inlining](labs/core_bound/function_inlining_1)
-  * [Dependency Chains 1](labs/core_bound/dep_chains_1)  
+  * [Dependency Chains 1](labs/core_bound/dep_chains_1)
+  * [Dependency Chains 2](labs/core_bound/dep_chains_2)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
   * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
 * Memory Bound:
@@ -36,6 +37,7 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [False Sharing](labs/memory_bound/false_sharing_1)
   * [Huge Pages](labs/memory_bound/huge_pages_1)
 * Bad Speculation:
+  * [Branches To CMOVs](labs/bad_speculation/branches_to_cmov_1)
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
   * [Replacing Branches With Lookup Tables](labs/bad_speculation/lookup_tables_1)
   * [C++ Virtual Calls](labs/bad_speculation/virtual_call_mispredict)
