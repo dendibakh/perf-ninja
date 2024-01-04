@@ -70,12 +70,11 @@ public:
             }
 
             // Implementing the Rules of Life:
-            if (__builtin_unpredictable(aliveNeighbours > 3)) {
-              future[i][j] = 0;
+            if (__builtin_unpredictable(aliveNeighbours == 2)) {
+              future[i][j] = current[i][j];
             }
             else {
-              const int arr[] = { 0,0,current[i][j],1 };
-              future[i][j] = arr[aliveNeighbours & 3u];
+              future[i][j] = aliveNeighbours == 3;
             }
           }
         }
