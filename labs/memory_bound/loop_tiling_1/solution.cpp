@@ -3,7 +3,7 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  int blockSize = 8;
+  int blockSize = 16;
   for (int i = 0; i < size; i+=blockSize) {
     for (int j = 0; j < size; j+=blockSize) {
       for(int x=i; x<std::min(i+blockSize, size); ++x){
