@@ -5,6 +5,7 @@
 
 
 // Transpose for cache friendly transverse
+/*
 void transpose(const Matrix& a , Matrix& a_tr){
   for(int i=0; i<N; ++i){
     for(int j=0; j<N; ++j){
@@ -12,6 +13,8 @@ void transpose(const Matrix& a , Matrix& a_tr){
     }
   }
 }
+*/
+
 
 
 
@@ -39,17 +42,16 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
   
-  Matrix b_tr;
-  transpose(b, b_tr);
-  float temp;
+  //Matrix b_tr;
+  //transpose(b, b_tr);
+  //float temp;
 
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      temp = result[i][j];
-      for (int k = 0; k < N; k++) {
-        temp += a[i][k] * b_tr[j][k];
+    for (int k = 0; k < N; k++) {
+      //temp = result[i][j];
+      for (int j = 0; j < N; j++) {
+        result[i][j] += a[i][k] * b[k][j];
       }
-      result[i][j] = temp;
     }
   }
 }
