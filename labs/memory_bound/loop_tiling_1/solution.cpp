@@ -6,8 +6,8 @@ bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int blockSize = 8;
   for (int i = 0; i < size; i+=blockSize) {
     for (int j = 0; j < size; j+=blockSize) {
-      for(int x=i; x<i+blockSize; ++x){
-        for(int y=j; y<j+blockSize; ++y){
+      for(int x=i; x<std::min(i+blockSize, size); ++x){
+        for(int y=j; y<std::min(j+blockSize, size); ++y){
           out[x][y] = in[y][x];
         }
       }
