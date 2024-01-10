@@ -3,6 +3,19 @@
 #include <memory>
 #include <string_view>
 
+
+// Transpose for cache friendly transverse
+void transpose(const Matrix& a , Matrix& a_tr){
+  for(int i=0; i<N; ++i){
+    for(int j=0; j<N; ++j){
+      a_tr[i][j] = a[j][i];
+    }
+  }
+}
+
+
+
+
 // Make zero matrix
 void zero(Matrix &result) {
   for (int i = 0; i < N; i++) {
@@ -25,12 +38,18 @@ void identity(Matrix &result) {
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
+  
+  Matrix b_tr;
+  transpose(b, b_tr);
+  float temp;
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
+      temp = result[i][j];
       for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+        temp += a[i][k] * b_tr[j][k];
       }
+      result[i][j] = temp;
     }
   }
 }
