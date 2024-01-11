@@ -14,25 +14,16 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
   std::size_t nBuckets = hash_map->get_nBuckets();
   std::vector<int> v = hash_map->get_vector();
-  int look_ahead = 16;
+  int look_ahead = 64;
   auto size = lookups.size();
   int steps = 0;
 
   for (int i=0; i<size; ++i) {
-    
-    if(steps<look_ahead){
-      for(int k=0; k<look_ahead; ++k){
-        auto idx = lookups[i+k]%nBuckets;
-      __builtin_prefetch (&v[idx], 0, 1);
-      ++steps;
-      }
-    }
-    else{
-      steps=0;
-    }
 
     if (v[lookups[i]%nBuckets] != UNUSED)
       result += getSumOfDigits(lookups[i]);
+
+    __builtin_prefetch(&v[lookups[i + look_ahead]%nBuckets], 0, 1);
   }
 
   return result;
