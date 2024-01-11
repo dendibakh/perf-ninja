@@ -10,24 +10,22 @@ static int getSumOfDigits(int n) {
 }
 
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
-  static constexpr int UNUSED = std::numeric_limits<int>::max();
+  
   int result = 0;
-  std::size_t nBuckets = hash_map->get_nBuckets();
-  std::vector<int> v = hash_map->get_vector();
-  int look_ahead = 16;
+  int look_ahead = 2;
   auto size = lookups.size();
-  int steps = 0;
 
   for (int i=0; i<size-look_ahead; ++i) {
 
-    if (v[lookups[i]%nBuckets] != UNUSED)
+    if (hash_map->find(lookups[i])){
       result += getSumOfDigits(lookups[i]);
-
-    __builtin_prefetch(&v[lookups[i + look_ahead]%nBuckets], 0, 1);
+    }
+    hash_map->prefetch(lookups[i+look_ahead]);
+      
   }
 
   for(int i=size-look_ahead; i<size; ++i){
-    if (v[lookups[i]%nBuckets] != UNUSED)
+    if (hash_map->find(lookups[i]))
       result += getSumOfDigits(lookups[i]);
   }
 
