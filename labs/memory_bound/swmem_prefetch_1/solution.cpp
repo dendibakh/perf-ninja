@@ -12,7 +12,7 @@ static int getSumOfDigits(int n) {
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
   auto size = lookups.size();
-  int lookAhead = 16;
+  int lookAhead = 8;
   std::size_t nBuckets = hash_map->get_nBuckets();
   std::vector<int> v = hash_map->get_vector();
 
