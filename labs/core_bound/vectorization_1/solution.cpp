@@ -12,7 +12,9 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     for (size_t sequence_idx = 0; sequence_idx < sequences1.size();
          ++sequence_idx) {
         using score_t = int16_t;
-        using column_t = std::array<score_t, sequence_size_v + 1>;
+        constexpr size_t DiagSize = sequence_size_v + 3;
+        using diagonal_t = std::array<score_t, DiagSize>;
+        const int MatrixN = sequence_size_v + 1;
 
         sequence_t const &sequence1 = sequences1[sequence_idx];
         sequence_t const &sequence2 = sequences2[sequence_idx];
@@ -25,60 +27,57 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         score_t match{6};
         score_t mismatch{-4};
 
-        /*
-         * Setup the matrix.
-         * Note we can compute the entire matrix with just one column in memory,
-         * since we are only interested in the last value of the last column in the
-         * score matrix.
-         */
-        column_t score_column[2] = {};
-        column_t horizontal_gap_column{};
-        score_t last_vertical_gap{};
+        diagonal_t diagonal_score[3] = {};
+        diagonal_t diagonal_score_with_v_gap[3] = {};
+        diagonal_t diagonal_score_with_h_gap[3] = {};
+        const score_t Inf = 10000;
 
-        /*
-         * Initialise the first column of the matrix.
-         */
-        horizontal_gap_column[0] = gap_open;
-        last_vertical_gap = gap_open;
-
-        for (size_t i = 1; i < score_column[0].size(); ++i) {
-            score_column[0][i] = last_vertical_gap;
-            horizontal_gap_column[i] = last_vertical_gap + gap_open;
-            last_vertical_gap += gap_extension;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < DiagSize; j++) {
+                diagonal_score[i][j] = -Inf;
+                diagonal_score_with_v_gap[i][j] = -Inf;
+                diagonal_score_with_h_gap[i][j] = -Inf;
+            }
         }
 
-        /*
-         * Compute the main recursion to fill the matrix.
-         */
-        for (unsigned col = 1; col <= sequence2.size(); ++col) {
-            const int col_idx = col & 1;
-            const int prev_col_idx = col_idx ^ 1;
-            score_column[col_idx][0] = horizontal_gap_column[0];
-            last_vertical_gap = horizontal_gap_column[0] + gap_open;
-            horizontal_gap_column[0] += gap_extension;
+        diagonal_score[0][1] = 0;
+        diagonal_score[1][1] = diagonal_score[1][2] = gap_open;
+        diagonal_score_with_v_gap[1][1] = diagonal_score[1][1];
+        diagonal_score_with_v_gap[1][2] = diagonal_score[1][2] + gap_open;
 
-            for (unsigned row = 1; row <= sequence1.size(); ++row) {
-                score_column[col_idx][row] =
-                        score_column[prev_col_idx][row - 1] +
-                        (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
-            }
+        diagonal_score_with_h_gap[1][2] = diagonal_score[1][2];
+        diagonal_score_with_h_gap[1][1] = diagonal_score[1][1] + gap_open;
 
-            for (unsigned row = 1; row <= sequence1.size(); ++row) {
-                score_column[col_idx][row] = std::max( score_column[col_idx][row], horizontal_gap_column[row]);
-                horizontal_gap_column[row] += gap_extension;
-            }
+        for (int diag = 2; diag < MatrixN * 2 - 1; diag++) {
+            const int cnt = std::min(diag + 1, 2 * MatrixN - 1 - diag);
+            const int c_id = diag % 3;
+            const int p_id = (diag - 1 + 3) % 3;
+            const int pp_id = (diag - 2 + 3) % 3;
 
-            for (unsigned row = 1; row <= sequence1.size(); ++row) {
-                score_column[col_idx][row] = std::max( score_column[col_idx][row], last_vertical_gap);
-                last_vertical_gap += gap_extension;
-                const score_t x = score_column[col_idx][row] + gap_open;
-                last_vertical_gap = std::max(last_vertical_gap, x);
-                horizontal_gap_column[row] = std::max(horizontal_gap_column[row], x);
+            int start_i = std::max(diag - MatrixN + 1, 0) + 1;
+
+            for (int i = start_i; i < start_i + cnt; i++) {
+                int hi = i - 1;
+                int vi = i;
+                int di = i - 1;
+                int s1 = i - 1;
+                int s2 = diag - s1;
+
+                diagonal_score_with_h_gap[c_id][i] = std::max(diagonal_score_with_h_gap[p_id][hi] + gap_extension, diagonal_score[p_id][hi] + gap_open);
+                diagonal_score_with_v_gap[c_id][i] = std::max(diagonal_score_with_v_gap[p_id][vi] + gap_extension, diagonal_score[p_id][vi] + gap_open);
+
+                auto const new_gap_score= std::max(diagonal_score_with_v_gap[c_id][i], diagonal_score_with_h_gap[c_id][i]);
+                diagonal_score[c_id][i] = new_gap_score;
+
+                if (s1 * s2 != 0) {
+                    const score_t candidate = diagonal_score[pp_id][di] + (sequence1[s1 - 1] == sequence2[s2 - 1] ? match : mismatch);
+                    diagonal_score[c_id][i] = std::max(diagonal_score[c_id][i], candidate);
+                }
             }
         }
 
         // Report the best score.
-        result[sequence_idx] = score_column[sequence2.size() & 1].back();
+        result[sequence_idx] = diagonal_score[(MatrixN * 2 - 2) % 3][MatrixN];
     }
 
     return result;
