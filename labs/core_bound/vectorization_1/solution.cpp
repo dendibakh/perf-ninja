@@ -63,16 +63,23 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                 int s1 = i - 1;
                 int s2 = diag - s1;
 
-                diagonal_score_with_h_gap[c_id][i] = std::max(diagonal_score_with_h_gap[p_id][hi] + gap_extension, diagonal_score[p_id][hi] + gap_open);
-                diagonal_score_with_v_gap[c_id][i] = std::max(diagonal_score_with_v_gap[p_id][vi] + gap_extension, diagonal_score[p_id][vi] + gap_open);
+                diagonal_score_with_h_gap[c_id][i] = std::max(diagonal_score_with_h_gap[p_id][hi] + gap_extension,
+                                                              diagonal_score[p_id][hi] + gap_open);
+                diagonal_score_with_v_gap[c_id][i] = std::max(diagonal_score_with_v_gap[p_id][vi] + gap_extension,
+                                                              diagonal_score[p_id][vi] + gap_open);
 
-                auto const new_gap_score= std::max(diagonal_score_with_v_gap[c_id][i], diagonal_score_with_h_gap[c_id][i]);
+                auto const new_gap_score = std::max(diagonal_score_with_v_gap[c_id][i],
+                                                    diagonal_score_with_h_gap[c_id][i]);
                 diagonal_score[c_id][i] = new_gap_score;
+            }
 
-                if (s1 * s2 != 0) {
-                    const score_t candidate = diagonal_score[pp_id][di] + (sequence1[s1 - 1] == sequence2[s2 - 1] ? match : mismatch);
-                    diagonal_score[c_id][i] = std::max(diagonal_score[c_id][i], candidate);
-                }
+            const int offset = diag < MatrixN ? 1 : 0;
+            for (int i = start_i + offset; i < start_i + cnt - offset; i++) {
+                int di = i - 1;
+                int s1 = i - 1;
+                int s2 = diag - s1;
+                const score_t candidate = diagonal_score[pp_id][di] + (sequence1[s1 - 1] == sequence2[s2 - 1] ? match : mismatch);
+                diagonal_score[c_id][i] = std::max(diagonal_score[c_id][i], candidate);
             }
         }
 
