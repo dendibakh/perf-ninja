@@ -8,31 +8,39 @@ bool less(const S& a, const S& b) {
     return a.key1 < b.key1 || (a.key1 == b.key1 && a.key2 < b.key2);
 }
 
-template <typename ItT>
-void QuickSort(ItT beg, ItT end)
-{
-    if (end - beg < 2)
-        return;
-    ItT lft(beg);
-    ItT rgt(end-1);
-    auto pvt = *(lft + (rgt-lft)/2);
-    if(less(*lft, pvt))
-        while (less(*++lft, pvt));
-    if(less(pvt, *rgt))
-        while (less(pvt, *--rgt));
+[[gnu::always_inline]]
+bool eq(const S& a, const S& b) {
+    return a.key1 == b.key1 && a.key2 == b.key2;
+}
 
-    while (lft < rgt)
-    {
-        std::iter_swap(lft, rgt);
-        while (less(*++lft, pvt));
-        while (less(pvt, *--rgt));
-    }
-    rgt++;
-    QuickSort(beg, rgt);
-    QuickSort(rgt, end);
+[[gnu::always_inline]]
+bool more(const S& a, const S& b) {
+    return a.key1 > b.key1 || (a.key1 == b.key1 && a.key2 > b.key2);
+}
+
+template <typename RandomAccessIterator>
+void quicksort(RandomAccessIterator first, RandomAccessIterator last) {
+    if (first >= last) return;
+
+    auto partition = [first, last] {
+        auto pivot = *(last - 1);
+        auto i = first;
+        for (auto j = first; j < last - 1; ++j) {
+            if (less(*j, pivot)) {
+                std::iter_swap(i, j);
+                ++i;
+            }
+        }
+        std::iter_swap(i, last - 1);
+        return i;
+    };
+
+    auto pivot = partition();
+
+    quicksort(first, pivot);
+    quicksort(pivot + 1, last);
 }
 
 void solution(std::array<S, N> &arr) {
-    QuickSort(arr.begin(), arr.end());
-//    std::sort(arr.begin(), arr.end(), &less);
+    quicksort(arr.begin(), arr.end());
 }
