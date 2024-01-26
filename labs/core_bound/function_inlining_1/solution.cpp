@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <tuple>
 
+[[gnu::always_inline]]
 bool less(const S& a, const S& b) {
-    return std::make_tuple(a.key1, a.key2) < std::make_tuple(b.key1, b.key2);
+    return a.key1 < b.key1 || (a.key1 == b.key1 && a.key2 < b.key2);
 }
 
 void solution(std::array<S, N> &arr) {
