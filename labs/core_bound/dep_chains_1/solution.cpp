@@ -11,32 +11,61 @@ unsigned getSumOfDigits(unsigned n) {
   return sum;
 }
 
-// Task: lookup all the values from l2 in l1.
-// For every found value, find the sum of its digits.
-// Return the sum of all digits in every found number.
-// Both lists have no duplicates and elements placed in *random* order.
-// Do NOT sort any of the lists. Do NOT store elements in a hash_map/sets.
-
-// Hint: Traversing a linked list is a long data dependency chain:
-//       to get the node N+1 you need to retrieve the node N first.
-//       Think how you can execute multiple dependency chains in parallel.
-unsigned solution(List *l1, List *l2) {
-  unsigned retVal = 0;
-
-  List *head2 = l2;
-  // O(N^2) algorithm:
-  while (l1) {
-    unsigned v = l1->value;
-    l2 = head2;
-    while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        break;
+template <const size_t ParallelSearches>
+class parallel_search {
+  unsigned work_one(List *l, unsigned v) {
+    while (l) {
+      if (l->value == v) {
+        return getSumOfDigits(v);
       }
-      l2 = l2->next;
+      l = l->next;
     }
-    l1 = l1->next;
+    return 0;
   }
 
-  return retVal;
+  unsigned work_arr(List *l, const std::array<unsigned, ParallelSearches>& cur_chank) {
+    unsigned retVal = 0;
+    while (l) {
+      for (auto& v : cur_chank) {
+          if (l->value == v) {
+            retVal += getSumOfDigits(v);
+          }
+        }
+      l = l->next;
+    }
+    return retVal;
+  }
+
+  std::array<unsigned, ParallelSearches> get_chunk(List*& l) {
+    std::array<unsigned, ParallelSearches> res;
+    for (auto& v : res) {
+      v = l->value;
+      l = l->next;
+    }
+    return res;
+  }
+
+public:
+  unsigned operator() (List *l1, List *l2)
+  {
+    unsigned retVal = 0;
+    size_t l1_len = 0;
+    for (List * cur = l1; cur; cur = cur->next) {
+      ++l1_len;
+    }
+    const size_t chunks_count = l1_len / ParallelSearches;
+    for (size_t i = 0; i < chunks_count; ++i) {
+      auto cur_chank = get_chunk(l1);
+      retVal += work_arr(l2, cur_chank);
+    }
+    while (l1) {
+      retVal += work_one(l2, l1->value);
+      l1 = l1->next;
+    }
+    return retVal;
+  }
+};
+
+unsigned solution(List *l1, List *l2) {
+  return parallel_search<8>{}(l1, l2);
 }
