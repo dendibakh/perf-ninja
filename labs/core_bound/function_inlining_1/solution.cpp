@@ -1,27 +1,26 @@
 
 #include "solution.h"
 #include <algorithm>
-#include <stdlib.h>
 
-static int compare(const void *lhs, const void *rhs) {
-  auto &a = *reinterpret_cast<const S *>(lhs);
-  auto &b = *reinterpret_cast<const S *>(rhs);
-
-  if (a.key1 < b.key1)
-    return -1;
-
-  if (a.key1 > b.key1)
-    return 1;
-
-  if (a.key2 < b.key2)
-    return -1;
-
-  if (a.key2 > b.key2)
-    return 1;
-
-  return 0;
-}
+#ifdef STRUCT
+struct Comp {
+  bool operator() (const S& a, const S& b) const { 
+    return a.key1 < b.key1 ? true :
+       a.key1 > b.key1 ? false :
+       a.key2 < b.key2;
+  }
+};
+#endif
 
 void solution(std::array<S, N> &arr) {
-  qsort(arr.data(), arr.size(), sizeof(S), compare);
+#ifdef STRUCT
+  std::sort(arr.begin(), arr.end(), Comp());
+#else
+  auto lc = [](const S& a, const S& b){
+     return a.key1 < b.key1 ? true :
+       a.key1 > b.key1 ? false :
+       a.key2 < b.key2;
+  };
+  std::sort(arr.begin(), arr.end(), lc);
+#endif
 }
