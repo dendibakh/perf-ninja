@@ -74,7 +74,25 @@ size_t get_longest_line(const std::string &inputContents) {
 }
 
 unsigned solution(const std::string &inputContents) {
-  //return AVX::get_longest_line(inputContents);
-  return SSE::get_longest_line(inputContents);
+  return AVX::get_longest_line(inputContents);
+  //return SSE::get_longest_line(inputContents);
   //return get_longest_from_tail(inputContents, 0, 0, 0); //base
 }
+
+/*
+time comparison
+LinuxIntelAlderlake
+avx  31.6 us         31.6 us        44414
+sse  49.5 us         49.5 us        28163
+base 203 us          203 us         6864
+
+LinuxIntelCoffeelake
+avx  67.6 us         67.6 us        20723
+sse  90.3 us         90.3 us        15375
+base 297 us          297 us         4714
+  
+WinZen3
+avx  35.3 us         25.2 us        58260
+sse  94.8 us         61.5 us        19064
+base 344 us          218 us         6892
+*/
