@@ -44,7 +44,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
   column_t score_column{};
   column_t horizontal_gap_column{};
   scores_t last_vertical_gap{};
-
+  std::array<scores_t, std::tuple_size<sequence_t>::value> mathces;
   /*
     * Initialise the first column of the matrix.
     */
@@ -65,8 +65,11 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     * Compute the main recursion to fill the matrix.
     */
   for (unsigned col = 1; col <= ts2.size(); ++col) {
-    scores_t last_diagonal_score =
-        score_column[0]; // Cache last diagonal score to compute this cell.
+    for (size_t seq_num = 0; seq_num < sequence_count_v; ++seq_num) {
+      for (unsigned row = 1; row <= ts1.size(); ++row) {
+        mathces[row-1][seq_num] = score_column[row-1][seq_num] + (ts1[row - 1][seq_num] == ts2[col - 1][seq_num] ? match : mismatch);
+      }
+    }
     for (size_t seq_num = 0; seq_num < sequence_count_v; ++seq_num) {
       score_column[0][seq_num] = horizontal_gap_column[0][seq_num];
       last_vertical_gap[seq_num] = horizontal_gap_column[0][seq_num] + gap_open;
@@ -75,17 +78,14 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 
     for (unsigned row = 1; row <= ts1.size(); ++row) {
       // Compute next score from diagonal direction with match/mismatch.
-      scores_t best_cell_score = last_diagonal_score;
+      scores_t best_cell_score{};
       for (size_t seq_num = 0; seq_num < sequence_count_v; ++seq_num) {
-          best_cell_score[seq_num] += (ts1[row - 1][seq_num] == ts2[col - 1][seq_num] ? match : mismatch);
-      }
-      for (size_t seq_num = 0; seq_num < sequence_count_v; ++seq_num) {
+        best_cell_score[seq_num] = mathces[row - 1][seq_num];
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
         best_cell_score[seq_num] = std::max(best_cell_score[seq_num], last_vertical_gap[seq_num]);
         best_cell_score[seq_num] = std::max(best_cell_score[seq_num], horizontal_gap_column[row][seq_num]);
         // Cache next diagonal value and store optimum in score_column.
-        last_diagonal_score[seq_num] = score_column[row][seq_num];
         score_column[row][seq_num] = best_cell_score[seq_num];
         // Compute the next values for vertical and horizontal gap.
         best_cell_score[seq_num] += gap_open;
