@@ -94,8 +94,8 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
-  main_loop_sse(input, limit, pos, output, currentSum);
-  //main_loop_avx(input, limit, pos, output, currentSum);
+  //main_loop_sse(input, limit, pos, output, currentSum);
+  main_loop_avx(input, limit, pos, output, currentSum);
   main_loop_old(input, limit, pos, output, currentSum);
 
   // 3. special case, executed only if size <= 2*radius + 1
