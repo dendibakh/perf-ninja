@@ -3,8 +3,8 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  const int N = 8;
-  const auto Batch = size / N;
+    const auto Batch = 16;
+  const int N = size / 16;
   for (int ii = 0; ii < N; ii++) {
       for (int jj = 0; jj < N; jj++) {
           int di = Batch * ii;
