@@ -40,22 +40,29 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
     // 2. main loop.
     limit = size - radius;
-    const int N = 32;
+    const int N = 16;
     int pos_start = pos;
 
     for (; pos + N < limit; pos += N) {
-        for (int i = 0; i < 32; i++) {
-            output[pos + i] = input[pos + radius + i] - input[pos - radius - 1 + i];
-        }
-//        auto mask = _mm256_set1_epi32(-1);
+//        for (int i = 0; i < 32; i++) {
+//            output[pos + i] = input[pos + radius + i] - input[pos - radius - 1 + i];
+//            currentSum = output[pos + i];
+//        }
+        auto mask256 = _mm256_set1_epi32(-1);
+        auto mask128 = _mm_set1_epi32(-1);
 //        auto r_to_add = _mm256_maskload_epi32((int*)&input[pos + radius], mask);
 //        auto r_to_sub = _mm256_maskload_epi32((int*)&input[pos - radius - 1], mask);
 //        auto res = _mm256_sub_epi8(r_to_add, r_to_sub);
 //
 //        store_mm256i_as_16bit_zero_extended(res, &output[pos]);
-    }
+        auto r_add = _mm_maskload_epi32((int*)&input[pos + radius], mask128);
+        auto r_sub = _mm_maskload_epi32((int*)&input[pos - radius - 1], mask128);
+        auto r_add_ex = _mm256_cvtepu8_epi16(r_add);
+        auto r_sub_ex = _mm256_cvtepu8_epi16(r_sub);
 
-    pos++;
+        auto result = _mm256_sub_epi16(r_add_ex, r_sub_ex);
+        _mm256_maskstore_epi32((int*)&output[pos], mask256, result);
+    }
 
     for (; pos_start < pos; pos_start++) {
          currentSum += output[pos_start];
