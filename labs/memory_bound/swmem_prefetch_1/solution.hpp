@@ -20,6 +20,11 @@ public:
         return false;
     }
 
+    void prefetch(int val) const {
+        int bucket = val % N_Buckets;
+        __builtin_prefetch(&m_vector[bucket]);
+    }
+
     bool find(int val) const {
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
