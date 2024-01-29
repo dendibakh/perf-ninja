@@ -3,7 +3,7 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  const int N = 5;
+  const int N = 4;
   const auto Batch = size / N;
   for (int ii = 0; ii < N; ii++) {
       for (int jj = 0; jj < N; jj++) {
