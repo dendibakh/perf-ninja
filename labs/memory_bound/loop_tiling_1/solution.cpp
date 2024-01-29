@@ -9,8 +9,8 @@ bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
       for (int jj = 0; jj < N; jj++) {
           int di = Batch * ii;
           int dj = Batch * jj;
-          for (int i = di; i < std::min(di + Batch, size); i++) {
-              for (int j = dj; j < std::min(dj + Batch, size); j++) {
+          for (int i = di; i < (ii == N - 1 ? size : di + Batch); i++) {
+              for (int j = dj; j < (jj == N - 1 ? size : dj + Batch); j++) {
                   out[i][j] = in[j][i];
               }
           }
