@@ -35,7 +35,37 @@ public:
             std::cout << "\n";
         }
         std::cout << "\n";
-    }    
+    }
+
+#if 0
+    void apply_rules(int i, int j, int aliveNeighbours) {
+        if (aliveNeighbours == 0 || aliveNeighbours == 1) {
+            future[i][j] = 0;
+        } else if (aliveNeighbours == 2) {
+            future[i][j] = current[i][j];
+        } else if (aliveNeighbours == 3) {
+            future[i][j] = 1;
+        } else {
+            future[i][j] = 0;
+        }
+    }
+
+    void apply_rules(int i, int j, int aliveNeighbours) {
+        int res = 0;
+        if (__builtin_unpredictable(aliveNeighbours == 2)) {
+            res = current[i][j];
+        } 
+        if (__builtin_unpredictable(aliveNeighbours == 3)) { // __builtin_unpredictable doesn't work with "else if"
+            res = 1;
+        }
+        future[i][j] = res;
+    }
+#endif
+    void apply_rules(int i, int j, int aliveNeighbours) {
+        int res = current[i][j] * (aliveNeighbours == 2);
+        res += (aliveNeighbours == 3);
+        future[i][j] = res;
+    }
 
     // Simulate the next generation of life
     void simulateNext() {
@@ -63,24 +93,7 @@ public:
                 aliveNeighbours -= current[i][j];
 
                 // Implementing the Rules of Life:
-                switch(aliveNeighbours) {
-                    // 1. Cell is lonely and dies
-                    case 0:
-                    case 1:
-                        future[i][j] = 0;
-                        break;                   
-                    // 2. Remains the same
-                    case 2:
-                        future[i][j] = current[i][j];
-                        break;
-                    // 3. A new cell is born
-                    case 3:
-                        future[i][j] = 1;
-                        break;
-                    // 4. Cell dies due to over population
-                    default:
-                        future[i][j] = 0;
-                }
+                apply_rules(i, j, aliveNeighbours);
             }
         }
         std::swap(current, future);
