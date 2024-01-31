@@ -2,7 +2,7 @@
 #include <atomic>
 #include <cstring>
 #include <omp.h>
-#include <vector>
+#include <list>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
@@ -11,13 +11,13 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   struct Accumulator {
     std::atomic<uint32_t> value = 0;
   };
-  std::vector<Accumulator> accumulators(thread_count);
+  std::list<Accumulator> accumulators(thread_count);
 
 #pragma omp parallel num_threads(thread_count) default(none)                   \
     shared(accumulators, data)
   {
     int target_index = omp_get_thread_num();
-    auto &target = accumulators[target_index];
+    auto &target = *std::next(accumulators.begin(), target_index); //accumulators[target_index];
 
 #pragma omp for
     for (int i = 0; i < data.size(); i++) {
