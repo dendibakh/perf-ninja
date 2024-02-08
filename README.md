@@ -4,6 +4,10 @@
 
 # Performance Ninja Class
 
+[![YouTube](https://img.shields.io/youtube/channel/subscribers/UCGmEJdQ993cdCGdnLZDuOOQ)](https://youtube.com/@easyperf3992)
+[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/dendibakh)](https://twitter.com/dendibakh)
+![GitHub Repo stars](https://img.shields.io/github/stars/dendibakh/perf-ninja)
+
 This is an online course where you can learn to find and fix low-level performance issues, for example CPU cache misses and branch mispredictions. It's all about practice. So we offer you this course in a form of lab assignments and youtube videos. You will spend at least 90% of the time analyzing performance of the code and trying to improve it.
 
 [<img src="img/WelcomeVideo.png">](https://www.youtube.com/watch?v=2tzdkC6IDbo&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
