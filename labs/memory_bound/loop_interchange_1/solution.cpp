@@ -26,20 +26,10 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  Matrix transposed;
   for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < N; ++j) {
-      transposed[i][j] = b[j][i];
-    }
-  }
-
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      auto& cell_result = result[i][j];
-      auto* a_ptr = a[i].data();
-      auto* transposed_ptr = transposed[j].data();
-      for (int k = 0; k < N; k++, a_ptr++, transposed_ptr++) {
-        cell_result += *a_ptr * *transposed_ptr;
+    for (int k = 0; k < N; ++k) {
+      for (int j = 0; j < N; ++j) {
+        result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
@@ -48,20 +38,22 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
   // Temporary products
-  Matrix productCurrent;
-  Matrix productNext;
-  Matrix elementCurrent;
-  Matrix elementNext;
+  std::unique_ptr<Matrix> productCurrent(new Matrix());
+  std::unique_ptr<Matrix> productNext(new Matrix());
+
+  // Temporary elements = a^(2^integer)
+  std::unique_ptr<Matrix> elementCurrent(new Matrix());
+  std::unique_ptr<Matrix> elementNext(new Matrix());
 
   // Initial values
-  identity(productCurrent);
-  elementCurrent = input;
+  identity(*productCurrent);
+  *elementCurrent = input;
 
   // Use binary representation of k to be O(log(k))
   for (auto i = k; i > 0; i /= 2) {
     if (i % 2 != 0) {
       // Multiply the product by element
-      multiply(productNext, productCurrent, elementCurrent);
+      multiply(*productNext, *productCurrent, *elementCurrent);
       std::swap(productNext, productCurrent);
 
       // Exit early to skip next squaring
@@ -70,9 +62,9 @@ Matrix power(const Matrix &input, const uint32_t k) {
     }
 
     // Square an element
-    multiply(elementNext, elementCurrent, elementCurrent);
+    multiply(*elementNext, *elementCurrent, *elementCurrent);
     std::swap(elementNext, elementCurrent);
   }
 
-  return std::move(productCurrent);
+  return std::move(*productCurrent);
 }
