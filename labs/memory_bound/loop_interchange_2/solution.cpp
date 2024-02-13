@@ -2,6 +2,9 @@
 #include "solution.h"
 #include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <cassert>
+#include <array>
 #include <ios>
 
 // Applies Gaussian blur in independent vertical lines
@@ -10,6 +13,25 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int *kernel, const int radius,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
+
+  int* accum = new int[height * width];
+  memset(accum, 0, height * width * sizeof(int));
+  
+  for (int i = 0; i < radius + 1 + radius; i++) {
+    for (int r = radius, rshift = radius * width; r < height - radius; r++, rshift += width) {
+      const int input_rshift = (r - radius + i) * width;
+      for (int c = 0; c < width; c++) {
+        accum[rshift + c] += input[input_rshift + c] * kernel[i];
+      }
+    }
+  }
+
+  for (int r = radius, rshift = radius * width; r < height - radius; ++r, rshift += width) {
+    for (int c = 0; c < width; ++c) {
+      output[rshift + c] = static_cast<uint8_t>((accum[rshift + c] + rounding) >> shift);
+    }
+  }
+  delete []accum;
 
   for (int c = 0; c < width; c++) {
     // Top part of line, partial kernel
@@ -26,19 +48,6 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
 
       // Normalization
       int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
-    }
-
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
-
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
 
@@ -178,9 +187,9 @@ void Grayscale::save(const std::string &filename) {
   std::ofstream output(filename.data(),
                        std::ios_base::out | std::ios_base::binary);
   if (output.is_open()) {
-    output << "P5" << std::endl
-           << width << ' ' << height << std::endl
-           << "255" << std::endl;
+    output << "P5" << '\n'
+           << width << ' ' << height << '\n'
+           << "255" << '\n';
     if (data) {
       output.write(reinterpret_cast<const char *>(data.get()), size);
     }
