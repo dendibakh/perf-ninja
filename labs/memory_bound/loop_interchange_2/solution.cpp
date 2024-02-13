@@ -14,7 +14,7 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  int* accum = new int[height * width];
+  int16_t* accum = new int16_t[height * width];
   std::fill(accum, accum + height * width, 0);
   
   for (int i = 0; i < radius + 1 + radius; i++) {
