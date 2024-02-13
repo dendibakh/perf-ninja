@@ -14,24 +14,24 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  int16_t* accum = new int16_t[height * width];
-  std::fill(accum, accum + height * width, 0);
-  
-  for (int i = 0; i < radius + 1 + radius; i++) {
-    for (int r = radius, rshift = radius * width; r < height - radius; r++, rshift += width) {
+  int16_t accum[width];
+  for (int r = radius; r < height - radius; ++r)
+  {
+    std::fill(accum, accum + width, 0);
+    for (int i = 0; i < radius + 1 + radius; i++)
+    {
       const int input_rshift = (r - radius + i) * width;
-      for (int c = 0; c < width; c++) {
-        accum[rshift + c] += input[input_rshift + c] * kernel[i];
+      for (int c = 0; c < width; c++)
+      {
+        accum[c] += input[input_rshift + c] * kernel[i];
       }
     }
-  }
 
-  for (int r = radius, rshift = radius * width; r < height - radius; ++r, rshift += width) {
-    for (int c = 0; c < width; ++c) {
-      output[rshift + c] = static_cast<uint8_t>((accum[rshift + c] + rounding) >> shift);
+    for (int c = 0; c < width; c++)
+    {
+      output[r * width + c] = static_cast<uint8_t>((accum[c] + rounding) >> shift);
     }
   }
-  delete []accum;
 
   for (int c = 0; c < width; c++) {
     // Top part of line, partial kernel
