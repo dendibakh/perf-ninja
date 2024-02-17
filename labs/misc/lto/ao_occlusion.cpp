@@ -14,7 +14,7 @@ double mydrand48() {
   return distribution(generator);
 }
 
-void ambient_occlusion(vec *col, const Isect *isect)
+void ambient_occlusion(vec& col, const Isect& isect)
 {
     int    i, j;
     int    ntheta = NAO_SAMPLES;
@@ -23,12 +23,12 @@ void ambient_occlusion(vec *col, const Isect *isect)
 
     vec p;
 
-    p.x = isect->p.x + eps * isect->n.x;
-    p.y = isect->p.y + eps * isect->n.y;
-    p.z = isect->p.z + eps * isect->n.z;
+    p.x = isect.p.x + eps * isect.n.x;
+    p.y = isect.p.y + eps * isect.n.y;
+    p.z = isect.p.z + eps * isect.n.z;
 
     vec basis[3];
-    orthoBasis(basis, isect->n);
+    orthoBasis(basis, isect.n);
 
     double occlusion = 0.0;
 
@@ -41,7 +41,7 @@ void ambient_occlusion(vec *col, const Isect *isect)
             double y = sin(phi) * theta;
             double z = sqrt(1.0 - theta * theta);
 
-            // local -> global
+            // local . global
             double rx = x * basis[0].x + y * basis[1].x + z * basis[2].x;
             double ry = x * basis[0].y + y * basis[1].y + z * basis[2].y;
             double rz = x * basis[0].z + y * basis[1].z + z * basis[2].z;
@@ -57,10 +57,10 @@ void ambient_occlusion(vec *col, const Isect *isect)
             occIsect.t   = 1.0e+17;
             occIsect.hit = 0;
 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[0]); 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[1]); 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[2]); 
-            ray_plane_intersect (&occIsect, &ray, &plane); 
+            ray_sphere_intersect(occIsect, ray, spheres[0]); 
+            ray_sphere_intersect(occIsect, ray, spheres[1]); 
+            ray_sphere_intersect(occIsect, ray, spheres[2]); 
+            ray_plane_intersect (occIsect, ray, plane); 
 
             if (occIsect.hit) occlusion += 1.0;
             
@@ -69,7 +69,7 @@ void ambient_occlusion(vec *col, const Isect *isect)
 
     occlusion = (ntheta * nphi - occlusion) / (double)(ntheta * nphi);
 
-    col->x = occlusion;
-    col->y = occlusion;
-    col->z = occlusion;
+    col.x = occlusion;
+    col.y = occlusion;
+    col.z = occlusion;
 }

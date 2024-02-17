@@ -49,21 +49,21 @@ extern Sphere spheres[3];
 extern Plane  plane;
 
 // ao_helpers.c
-double vdot(vec v0, vec v1);
-void vcross(vec *c, vec v0, vec v1);
-void vnormalize(vec *c);
+double vdot(const vec& v0, const vec& v1); // <---- main
+void vcross(vec& c, const vec& v0, const vec& v1);
+void vnormalize(vec& c);
 unsigned char clamp(double f);
 void saveppm(const char *fname, int w, int h, unsigned char *img);
 
 // ao_intersect.c
-void ray_sphere_intersect(Isect *isect, const Ray *ray, const Sphere *sphere);
-void ray_plane_intersect(Isect *isect, const Ray *ray, const Plane *plane);
+void ray_sphere_intersect(Isect& isect, const Ray& ray, const Sphere& sphere);
+void ray_plane_intersect(Isect& isect, const Ray& ray, const Plane& plane);
 
 // ao_orthoBasis.c
-void orthoBasis(vec *basis, vec n);
+void orthoBasis(vec *basis, const vec& n);
 
 // ao_occlusion.c
-void ambient_occlusion(vec *col, const Isect *isect);
+void ambient_occlusion(vec& col, const Isect& isect);
 
 // ao_render.c
 void render(unsigned char *img, int w, int h, int nsubsamples);

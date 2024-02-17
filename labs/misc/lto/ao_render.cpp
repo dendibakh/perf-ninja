@@ -26,20 +26,20 @@ render(unsigned char *img, int w, int h, int nsubsamples)
                     ray.dir.x = px;
                     ray.dir.y = py;
                     ray.dir.z = -1.0;
-                    vnormalize(&(ray.dir));
+                    vnormalize(ray.dir);
 
                     Isect isect;
                     isect.t   = 1.0e+17;
                     isect.hit = 0;
 
-                    ray_sphere_intersect(&isect, &ray, &spheres[0]);
-                    ray_sphere_intersect(&isect, &ray, &spheres[1]);
-                    ray_sphere_intersect(&isect, &ray, &spheres[2]);
-                    ray_plane_intersect (&isect, &ray, &plane);
+                    ray_sphere_intersect(isect, ray, spheres[0]);
+                    ray_sphere_intersect(isect, ray, spheres[1]);
+                    ray_sphere_intersect(isect, ray, spheres[2]);
+                    ray_plane_intersect (isect, ray, plane);
 
                     if (isect.hit) {
                         vec col;
-                        ambient_occlusion(&col, &isect);
+                        ambient_occlusion(col, isect);
 
                         fimg[3 * (y * w + x) + 0] += col.x;
                         fimg[3 * (y * w + x) + 1] += col.y;
