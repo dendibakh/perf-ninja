@@ -10,5 +10,7 @@ void solution(std::array<S, N> &arr) {
   std::shuffle(arr.begin(), arr.end(), g);
 
   // 2. sort
+  // Merge Sort
   std::sort(arr.begin(), arr.end());
 }
+

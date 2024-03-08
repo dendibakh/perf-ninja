@@ -1,4 +1,4 @@
-#include "DataPaths.h"
+#include "DataPaths.h.in"
 #include <array>
 #include <cstdint>
 

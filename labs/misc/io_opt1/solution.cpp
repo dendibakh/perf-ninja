@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 uint32_t solution(const char *file_name) {
+  // printf("file_name: %s\n", file_name);
   std::fstream file_stream{file_name};
   if (!file_stream.is_open())
     throw std::runtime_error{"The file could not be opened"};
