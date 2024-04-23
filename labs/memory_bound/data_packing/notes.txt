@@ -1,0 +1,3 @@
+Questions:
+- Why does this optimisation no longer work with newer clang?
+- l2_lines_in is the counter to keep an eye on for data padding?
