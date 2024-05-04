@@ -30,6 +30,12 @@ int main(int argc, char **argv) {
   const std::string inputsDirName = argv[1];
   // feel free to comment out tests for debugging
   const std::vector<std::string> inputs = {
+      // My test files.
+      "empty.txt",
+      "one_char.txt",
+      "one_block.txt",
+
+      // Test files provided by Performance Ninja.
       "test1.txt",               // basic test
       "test2.txt",               // no end-of-line in the end
       "test3.txt",               // small number of characters

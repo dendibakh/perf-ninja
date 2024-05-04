@@ -6,15 +6,18 @@
 #include <iostream>
 
 #ifndef SOLUTION
-#  define SOLUTION 1
+#  define SOLUTION 2
 #endif
 
 
 #if SOLUTION == 0
+#  pragma message("Baseline.")
 #  include "solution_0.cpp"
 #elif SOLUTION == 1
+#  pragma message("My implementation.")
 #  include "solution_1.cpp"
 #elif SOLUTION == 2
+#  pragma message("Facit.")
 #  include "solution_2.cpp"
 #else
 #  pragma error("Unknown solution. Valid values are 0 through 2.")

@@ -29,6 +29,7 @@ int main() {
   MatrixOfDoubles out_golden;
 
   constexpr int N = 2001;
+  // constexpr int N = 3;
   in.resize(N, std::vector<double>(N, 0.0));
   out.resize(N, std::vector<double>(N, 0.0));
   out_golden.resize(N, std::vector<double>(N, 0.0));

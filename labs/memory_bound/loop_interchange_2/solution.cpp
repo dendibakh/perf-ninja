@@ -160,8 +160,6 @@ static void filterVertically(
 #elif SOLUTION == 2
 // Facit.
 
-// @todo Still just baseline, haven't looked at the facit yet.
-
 static void filterVertically(
   uint8_t *output, const uint8_t *input,
   const int width, const int height,

@@ -6,3 +6,5 @@ set(VALIDATE_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/golden.ppm")
 
 string(REGEX MATCH "^(.*)[\\/]labs[\\/].*$" repo "${CMAKE_CURRENT_SOURCE_DIR}")
 include(${CMAKE_MATCH_1}/tools/labs.cmake)
+target_compile_options(lab PRIVATE -flto)
+target_link_options(lab PRIVATE -flto)
