@@ -58,7 +58,7 @@ int main() {
 
   std::random_device r;
   std::mt19937_64 random_engine(r());
-  std::uniform_int_distribution<int> distrib(0, std::numeric_limits<uint32_t>::max());
+  std::uniform_int_distribution<uint32_t> distrib(0, std::numeric_limits<uint32_t>::max());
 
   auto seed = distrib(random_engine);
   randomParticleMotionOriginal(particlesCopy, seed);
