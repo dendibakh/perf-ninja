@@ -53,10 +53,10 @@ You are free to work on whatever platform you have at your disposal. However, we
 
 **Machine 1 - (Linux + Alderlake)**
 
-* 12th Gen Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, E-cores disabled, 18MB L3-cache
+* 12th Gen Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache
 * 16 GB RAM, DDR4 @ 3200 MT/s
 * 256GB NVMe PCIe M.2 SSD
-* 64-bit Ubuntu 22.04.1 LTS (Jammy Jellyfish), kernel version 6.2.0-33
+* Ubuntu 24.04 LTS, kernel version 6.8
 * Clang C++ compiler, version 17.0
 
 **Machine 2 - (Mac OS + M1)**
@@ -80,7 +80,7 @@ You are free to work on whatever platform you have at your disposal. However, we
 * Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache
 * 16 GB RAM, DDR4 @ 2400 MT/s
 * 256GB NVME INTEL SSDPEKKW256G8
-* 64-bit Ubuntu 20.04, kernel version 5.13.0-27
+* Ubuntu 20.04, kernel version 5.13
 * Clang C++ compiler, version 17.0
 
 Keep in mind that sometimes you may see different speedups on different platforms.
