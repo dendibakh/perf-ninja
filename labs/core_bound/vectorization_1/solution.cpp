@@ -3,19 +3,37 @@
 #include <cassert>
 #include <type_traits>
 
+using simd_score_t = std::array<int16_t, sequence_count_v>;
+using simd_sequence_t = std::array<simd_score_t, sequence_size_v>;
+
+simd_sequence_t transpose(std::vector<sequence_t> const &sequences) {
+    assert(sequences.size() == sequence_count_v);
+    simd_sequence_t simd_sequence{};
+
+    for (size_t i = 0; i < simd_sequence.size(); i++) {
+        for (size_t j = 0; j < sequences.size(); j++) {
+            simd_sequence[i][j] = sequences[j][i];
+        }
+    }
+    return simd_sequence;
+}
+
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2) {
   result_t result{};
 
+  auto trans_seq1 = transpose(sequences1);
+  auto trans_seq2 = transpose(sequences2);
+
   for (size_t sequence_idx = 0; sequence_idx < sequences1.size();
        ++sequence_idx) {
     using score_t = int16_t;
     using column_t = std::array<score_t, sequence_size_v + 1>;
 
-    sequence_t const &sequence1 = sequences1[sequence_idx];
-    sequence_t const &sequence2 = sequences2[sequence_idx];
+//    sequence_t const &sequence1 = sequences1[sequence_idx];
+//    sequence_t const &sequence2 = sequences2[sequence_idx];
 
     /*
      * Initialise score values.
@@ -50,18 +68,18 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     /*
      * Compute the main recursion to fill the matrix.
      */
-    for (unsigned col = 1; col <= sequence2.size(); ++col) {
+    for (unsigned col = 1; col <= sequence_size_v; ++col) {
       score_t last_diagonal_score =
           score_column[0]; // Cache last diagonal score to compute this cell.
       score_column[0] = horizontal_gap_column[0];
       last_vertical_gap = horizontal_gap_column[0] + gap_open;
       horizontal_gap_column[0] += gap_extension;
 
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
+      for (unsigned row = 1; row <= sequence_size_v; ++row) {
         // Compute next score from diagonal direction with match/mismatch.
         score_t best_cell_score =
             last_diagonal_score +
-            (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
+            (trans_seq1[row - 1][sequence_idx] == trans_seq2[col - 1][sequence_idx] ? match : mismatch);
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
         best_cell_score = std::max(best_cell_score, last_vertical_gap);
