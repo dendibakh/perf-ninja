@@ -13,11 +13,13 @@ public:
 private:    
     Grid current;
     Grid future;
+    std::vector<int> arr;
 
 public:
 
     void reset(const Grid& grid) {
         current = future = grid;
+        arr = std::vector<int>(20, 0);
     }
 
     int getPopulationCount() {
@@ -62,25 +64,30 @@ public:
                 // its neighbours as it was counted before
                 aliveNeighbours -= current[i][j];
 
-                // Implementing the Rules of Life:
-                switch(aliveNeighbours) {
-                    // 1. Cell is lonely and dies
-                    case 0:
-                    case 1:
-                        future[i][j] = 0;
-                        break;                   
-                    // 2. Remains the same
-                    case 2:
-                        future[i][j] = current[i][j];
-                        break;
-                    // 3. A new cell is born
-                    case 3:
-                        future[i][j] = 1;
-                        break;
-                    // 4. Cell dies due to over population
-                    default:
-                        future[i][j] = 0;
-                }
+                arr[2] = current[i][j];
+                arr[3] = 1;
+
+                future[i][j] = arr[aliveNeighbours];
+
+//                // Implementing the Rules of Life:
+//                switch(aliveNeighbours) {
+//                    // 1. Cell is lonely and dies
+//                    case 0:
+//                    case 1:
+//                        future[i][j] = 0;
+//                        break;
+//                    // 2. Remains the same
+//                    case 2:
+//                        future[i][j] = current[i][j];
+//                        break;
+//                    // 3. A new cell is born
+//                    case 3:
+//                        future[i][j] = 1;
+//                        break;
+//                    // 4. Cell dies due to over population
+//                    default:
+//                        future[i][j] = 0;
+//                }
             }
         }
         std::swap(current, future);
