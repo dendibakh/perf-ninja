@@ -3,6 +3,7 @@
 // You can still try to solve it to learn the concept, but the result is not guaranteed.
 
 #include <array>
+#include <cstdint>
 
 // Assume those constants never change
 constexpr int N = 10000;
@@ -11,10 +12,10 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
-  int i;
-  long long l;
-  short s;
-  double d;
+  int16_t i : 8;
+  int16_t s : 8;
+  int16_t l;
+  float d;
   bool b;
 
   bool operator<(const S &s) const { return this->i < s.i; }
