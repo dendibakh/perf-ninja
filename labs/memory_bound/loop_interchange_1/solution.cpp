@@ -1,5 +1,7 @@
 
 #include "solution.h"
+#include <cstdlib>
+#include <cstring>
 #include <memory>
 #include <string_view>
 
@@ -22,25 +24,39 @@ void identity(Matrix &result) {
   }
 }
 
-// Transpose a matrix
-Matrix transpose(const Matrix& a) {
-  Matrix t_a;
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      t_a[j][i] = a[i][j];
-    }
-  }
-  return t_a;
+typedef float vec __attribute__((vector_size(32)));
+
+vec *alloc(int n) {
+  vec *ptr = (vec *)std::aligned_alloc(32, 32 * n);
+  std::memset(ptr, 0, 32 * n);
+  return ptr;
 }
 
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
-  const auto t_a = transpose(a);
-  for (int k = 0; k < N; k++) {
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        result[i][j] += t_a[k][i] * b[k][j];
+  int nB = (N + 7) / 8; // number of vectors in a row/col
+
+  vec *va = alloc(N * nB);
+  vec *vb = alloc(N * nB);
+
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      va[i * nB + j / 8][j % 8] = a[i][j];
+      vb[i * nB + j / 8][j % 8] = b[j][i];
+    }
+  }
+
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < N; ++j) {
+      vec s{};
+
+      for (int k = 0; k < nB; k++) {
+        s += va[i * nB + k] * vb[j * nB + k];
+      }
+
+      for (int k = 0; k < 8; k++) {
+        result[i][j] += s[k];
       }
     }
   }
