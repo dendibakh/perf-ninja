@@ -22,14 +22,25 @@ void identity(Matrix &result) {
   }
 }
 
+// Transpose a matrix
+Matrix transpose(const Matrix& a) {
+  Matrix t_a;
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      t_a[j][i] = a[i][j];
+    }
+  }
+  return t_a;
+}
+
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
-
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+  const auto t_a = transpose(a);
+  for (int k = 0; k < N; k++) {
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j] += t_a[k][i] * b[k][j];
       }
     }
   }
