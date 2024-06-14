@@ -24,15 +24,15 @@ void identity(Matrix &result) {
   }
 }
 
-typedef float vec __attribute__((vector_size(32)));
+typedef float vec __attribute__((vector_size(64)));
 
 vec *alloc(int n) {
-  vec *ptr = (vec *)std::aligned_alloc(32, 32 * n);
-  std::memset(ptr, 0, 32 * n);
+  vec *ptr = (vec *)std::aligned_alloc(64, 64 * n);
+  std::memset(ptr, 0, 64 * n);
   return ptr;
 }
 
-int nB = (N + 7) / 8;
+int nB = (N + 15) / 16;
 vec *va = alloc(N * nB);
 vec *vb = alloc(N * nB);
 
@@ -42,8 +42,8 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      va[i * nB + j / 8][j % 8] = a[i][j];
-      vb[i * nB + j / 8][j % 8] = b[j][i];
+      va[i * nB + j / 16][j % 16] = a[i][j];
+      vb[i * nB + j / 16][j % 16] = b[j][i];
     }
   }
 
@@ -53,7 +53,7 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
       for (int k = 0; k < nB; ++k) {
         s += va[i * nB + k] * vb[j * nB + k];
       }
-      for (int k = 0; k < 8; k++) {
+      for (int k = 0; k < 16; k++) {
         result[i][j] += s[k];
       }
     }
