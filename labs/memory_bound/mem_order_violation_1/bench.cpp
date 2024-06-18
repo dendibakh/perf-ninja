@@ -3,7 +3,7 @@
 #include "solution.h"
 #include "DataPaths.h"
 
-constexpr const char *file_names[] = {bird, coins, pepper};
+constexpr const char *file_names[] = {bird, coins, pepper, pixabay};
 
 static void bench1(benchmark::State &state) {
   // Delete an output file
@@ -38,5 +38,6 @@ static void bench1(benchmark::State &state) {
 BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(0)->Name("bird");
 BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(1)->Name("coins");
 BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(2)->Name("pepper");
+BENCHMARK(bench1)->Unit(benchmark::kMillisecond)->Arg(3)->Name("pixabay");
 
 BENCHMARK_MAIN();
