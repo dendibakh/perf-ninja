@@ -1,0 +1,3 @@
+inline constexpr auto bird = "@BIRD_PATH@";
+inline constexpr auto coins = "@COINS_PATH@";
+inline constexpr auto pepper = "@PEPPER_PATH@";
