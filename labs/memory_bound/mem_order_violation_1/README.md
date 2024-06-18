@@ -11,6 +11,8 @@ The implementation of the histogram algortihm is very simple but it has one nast
 
 When updates of the same color in the histogram occur at relatively high rates, the processor may not have completed updating pixel `i` prior to beginning pixel `i+1`. In such cases, a processor predicts whether the value loaded for the `i+1` update will come from memory or from the `i`'s store. If from memory, the two updates can be performed in parallel, otherwise the processor must serialize the updates.
 
+Input images were taken from here: https://people.sc.fsu.edu/~jburkardt/data/pgmb/pgmb.html
+
 [^1]: https://en.wikipedia.org/wiki/Otsu%27s_method
 [^2]: https://en.wikipedia.org/wiki/Grayscale
 [^3]: https://en.wikipedia.org/wiki/Binary_image
