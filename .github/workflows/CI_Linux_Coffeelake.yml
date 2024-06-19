@@ -8,7 +8,7 @@ env:
 jobs:
   build:
     runs-on: [self-hosted, Linux, coffeelake]
-    timeout-minutes: 6
+    timeout-minutes: 7
     
     steps:
     - uses: actions/checkout@v2

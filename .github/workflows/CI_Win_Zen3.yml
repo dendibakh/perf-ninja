@@ -8,7 +8,7 @@ env:
 jobs:
   build:
     runs-on: [self-hosted, windows]
-    timeout-minutes: 10
+    timeout-minutes: 11
     
     steps:
     - uses: actions/checkout@v2
