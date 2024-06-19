@@ -16,6 +16,7 @@ cmake-build-debug/
 .DS_Store
 labs/misc/io_opt1/DataPaths.h
 labs/misc/io_opt1/data/
+labs/memory_bound/mem_order_violation_1/DataPaths.h
 
 build_solution
 build_baseline
