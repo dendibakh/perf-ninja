@@ -1,7 +1,7 @@
-
 #include <cstdint>
 #include <memory>
 #include <array>
+#include <string>
 
 // https://en.wikipedia.org/wiki/Grayscale
 struct GrayscaleImage {
