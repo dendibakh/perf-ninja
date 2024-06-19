@@ -86,6 +86,8 @@ bool GrayscaleImage::load(const std::string &filename, const int maxSize) {
       char c;
       input.unsetf(std::ios_base::skipws);
       input >> c;
+      if (c == '\r')
+        input >> c;
 
       if ((width > 0) && (width <= maxSize) && (height > 0) &&
           (height <= maxSize) && (amplitude >= 0) && (amplitude <= 255) &&

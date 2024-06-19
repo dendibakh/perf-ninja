@@ -6,16 +6,16 @@
 constexpr const char *file_names[] = {bird, coins, pepper, pixabay};
 
 static void bench1(benchmark::State &state) {
-  // Delete an output file
-  std::string output = "output.pgm";
-  std::remove(output.data());
-
   const char *input = file_names[state.range(0)];
   GrayscaleImage image;
   if (!image.load(input, kMaxImageDimension)) {
     state.SkipWithError("An IO problem");
     return;
   }
+
+  std::string output = state.name() + "-binary.pgm";
+  // Delete an output file
+  std::remove(output.data());
 
   // Only benchmark the histogram part
   std::array<uint32_t, 256> hist;
