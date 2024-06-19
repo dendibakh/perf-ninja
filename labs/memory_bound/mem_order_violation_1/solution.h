@@ -3,9 +3,6 @@
 #include <array>
 #include <string>
 
-
-
-
 // https://en.wikipedia.org/wiki/Grayscale
 struct GrayscaleImage {
   std::unique_ptr<uint8_t[]> data;
