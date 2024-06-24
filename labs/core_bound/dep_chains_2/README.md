@@ -5,3 +5,5 @@ This small program simulates the random particle movement. We have 1000 particle
 To validate the simulation (final positions of the particles), we use a deterministic random number generator (fake) that uses a global state and thus always generates the same sequence of numbers.
 
 There is one very nasty performance problem that doesn't allow us to run the simulation fast. Can you find a dependency chain in the code and fix it?
+
+Note: your solution is allowed to be not functionally equivalent to the original program if validation still passes. For example, if an RNG will generate a different sequence of random numbers than before - that's OK. Users would not be able to tell the difference since the motion of particles is random anyway.
