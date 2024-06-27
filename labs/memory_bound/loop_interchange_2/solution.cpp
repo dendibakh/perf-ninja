@@ -1,8 +1,11 @@
 
 #include "solution.h"
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <ios>
+#include <iostream>
+#include <vector>
 
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
@@ -11,51 +14,87 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  std::unique_ptr<int[]> temp = std::make_unique<int[]>(width * height);
-
-  for (int r = 0; r < height; r++) {
-    for (int t = 0; t < radius + 1 + radius; t++) {
-      int j = r + radius - t;
-      if (0 <= j && j < height) {
-        for (int c = 0; c < width; c++) {
-          temp[j * width + c] += kernel[t] * input[r * width + c];
-        }
+  for (int c = 0; c < width; c++) {
+    for (int r = 0; r < std::min(radius, height); r++) {
+      int dot = 0;
+      int sum = 0;
+      auto p = &kernel[radius - r];
+      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+        int weight = *p++;
+        dot += input[y * width + c] * weight;
+        sum += weight;
       }
+
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
 
-  for (int r = 0; r < std::min(radius, height); r++) {
-    int s = 0;
-    for (int t = radius - r; t < radius + 1 + radius; t++) {
-      s += kernel[t];
-    }
-    for (int c = 0; c < width; c++) {
-      auto &value = temp[r * width + c];
-      output[r * width + c] =
-          static_cast<int>(value / static_cast<float>(s) + 0.5f);
-    }
-  }
-
+  std::vector<int> dots(width, 0);
   for (int r = radius; r + radius < height; r++) {
+    std::fill(dots.begin(), dots.end(), 0);
+    for (int t = 0; t < radius + 1 + radius; t++) {
+      int j = r - radius + t;
+      for (int c = 0; c < width; c++) {
+        dots[c] += kernel[t] * input[j * width + c];
+      }
+    }
     for (int c = 0; c < width; c++) {
-      output[r * width + c] = (temp[r * width + c] + rounding) >> shift;
+      output[r * width + c] = (dots[c] + rounding) >> shift;
+    } 
+  }
+
+  for (int c = 0; c < width; c++) {
+    for (int r = std::max(radius, height - radius); r < height; r++) {
+      // Accumulation
+      int dot = 0;
+      int sum = 0;
+      auto p = kernel;
+      for (int y = r - radius; y < height; y++) {
+        int weight = *p++;
+        dot += input[y * width + c] * weight;
+        sum += weight;
+      }
+
+      // Normalization
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
 
-  for (int r = height - radius; r < height; r++) {
-    int s = 0;
-    for (int t = 0; t < radius + 1 + radius; t++) {
-      if (r - radius + t >= height) {
-        break;
-      }
-      s += kernel[t];
-    }
-    for (int c = 0; c < width; c++) {
-      auto &value = temp[r * width + c];
-      output[r * width + c] =
-          static_cast<int>(value / static_cast<float>(s) + 0.5f);
-    }
-  }
+  // for (int c = 0; c < width; c++) {
+  //   // Top part of line, partial kernel
+  //   for (int r = 0; r < std::min(radius, height); r++) {
+  //     // Accumulation
+  //     int dot = 0;
+  //     int sum = 0;
+  //     auto p = &kernel[radius - r];
+  //     for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+  //       int weight = *p++;
+  //       dot += input[y * width + c] * weight;
+  //       sum += weight;
+  //     }
+
+  //     // Normalization
+  //     int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+  //     output[r * width + c] = static_cast<uint8_t>(value);
+  //   }
+
+  //   // Middle part of computations with full kernel
+  //   for (int r = radius; r < height - radius; r++) {
+  //     // Accumulation
+  //     int dot = 0;
+  //     for (int i = 0; i < radius + 1 + radius; i++) {
+  //       dot += input[(r - radius + i) * width + c] * kernel[i];
+  //     }
+
+  //     // Fast shift instead of division
+  //     int value = (dot + rounding) >> shift;
+  //     output[r * width + c] = static_cast<uint8_t>(value);
+  //   }
+
+  //   // Bottom part of line, partial kernel
+  // }
 }
 
 // Applies Gaussian blur in independent horizontal lines
