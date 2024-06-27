@@ -14,10 +14,10 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
   std::unique_ptr<int[]> temp = std::make_unique<int[]>(width * height);
 
   for (int r = 0; r < height; r++) {
-    for (int c = 0; c < width; c++) {
-      for (int t = 0; t < radius + 1 + radius; t++) {
-        int j = r + radius - t;
-        if (0 <= j && j < height) {
+    for (int t = 0; t < radius + 1 + radius; t++) {
+      int j = r + radius - t;
+      if (0 <= j && j < height) {
+        for (int c = 0; c < width; c++) {
           temp[j * width + c] += kernel[t] * input[r * width + c];
         }
       }
@@ -30,18 +30,19 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       s += kernel[t];
     }
     for (int c = 0; c < width; c++) {
-      auto& value = temp[r * width + c];
-      output[r * width + c] = static_cast<int>(value / static_cast<float>(s) + 0.5f);
+      auto &value = temp[r * width + c];
+      output[r * width + c] =
+          static_cast<int>(value / static_cast<float>(s) + 0.5f);
     }
   }
 
   for (int r = radius; r + radius < height; r++) {
     for (int c = 0; c < width; c++) {
-      output[r * width + c] = (temp[r * width + c] + rounding ) >> shift;
+      output[r * width + c] = (temp[r * width + c] + rounding) >> shift;
     }
   }
 
-  for(int r = height - radius; r < height; r++) {
+  for (int r = height - radius; r < height; r++) {
     int s = 0;
     for (int t = 0; t < radius + 1 + radius; t++) {
       if (r - radius + t >= height) {
@@ -50,8 +51,9 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       s += kernel[t];
     }
     for (int c = 0; c < width; c++) {
-      auto& value = temp[r * width + c];
-      output[r * width + c] = static_cast<int>(value / static_cast<float>(s) + 0.5f);
+      auto &value = temp[r * width + c];
+      output[r * width + c] =
+          static_cast<int>(value / static_cast<float>(s) + 0.5f);
     }
   }
 }
