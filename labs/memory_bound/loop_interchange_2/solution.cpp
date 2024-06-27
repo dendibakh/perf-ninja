@@ -11,52 +11,47 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  for (int c = 0; c < width; c++) {
-    // Top part of line, partial kernel
-    for (int r = 0; r < std::min(radius, height); r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = &kernel[radius - r];
-      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
+  std::unique_ptr<int[]> temp = std::make_unique<int[]>(width * height);
 
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
+  for (int r = 0; r < height; r++) {
+    for (int c = 0; c < width; c++) {
+      for (int t = 0; t < radius + 1 + radius; t++) {
+        int j = r + radius - t;
+        if (0 <= j && j < height) {
+          temp[j * width + c] += kernel[t] * input[r * width + c];
+        }
+      }
     }
+  }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
-
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
-      output[r * width + c] = static_cast<uint8_t>(value);
+  for (int r = 0; r < std::min(radius, height); r++) {
+    int s = 0;
+    for (int t = radius - r; t < radius + 1 + radius; t++) {
+      s += kernel[t];
     }
+    for (int c = 0; c < width; c++) {
+      auto& value = temp[r * width + c];
+      output[r * width + c] = static_cast<int>(value / static_cast<float>(s) + 0.5f);
+    }
+  }
 
-    // Bottom part of line, partial kernel
-    for (int r = std::max(radius, height - radius); r < height; r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = kernel;
-      for (int y = r - radius; y < height; y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
+  for (int r = radius; r + radius < height; r++) {
+    for (int c = 0; c < width; c++) {
+      output[r * width + c] = (temp[r * width + c] + rounding ) >> shift;
+    }
+  }
+
+  for(int r = height - radius; r < height; r++) {
+    int s = 0;
+    for (int t = 0; t < radius + 1 + radius; t++) {
+      if (r - radius + t >= height) {
+        break;
       }
-
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
+      s += kernel[t];
+    }
+    for (int c = 0; c < width; c++) {
+      auto& value = temp[r * width + c];
+      output[r * width + c] = static_cast<int>(value / static_cast<float>(s) + 0.5f);
     }
   }
 }
