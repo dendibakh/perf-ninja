@@ -81,9 +81,31 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
     memcpy(&B[i * ny], &b[i], 4 * N);
   }
 
-  for (int i = 0; i < nx; i += kH) {
-    for (int j = 0; j < ny; j += kW) {
-      kernel(A, (vec*)B, (vec*)C, i, j, 0, N, ny);
+  // for (int i = 0; i < nx; i += kH) {
+  //   for (int j = 0; j < ny; j += kW) {
+  //     kernel(A, (vec*)B, (vec*)C, i, j, 0, N, ny);
+  //   }
+  // }
+
+  // cache blocking
+  constexpr int s3 = 64;
+  constexpr int s2 = 120;
+  constexpr int s1 = 240;
+
+  for (int i3 = 0; i3 < ny; i3 += s3) { // work with B[...][i3...i3+s3]
+    for (int i2 = 0; i2 < nx; i2 += s2) { // work with A[i2...i2+s2][...]
+
+      // calculate answer for C[i2...i2+s2][i3...i3+s3]
+      for (int i1 = 0; i1 < ny; i1 += s1) {  // instead of a scalar k, we work with a range (i1 -> i1 + s1)
+          // A[i2...i2+s2][i1...i1+s1] and B[i1...i1+s1][i3...i3+s3] // fit in L1 / L2 cache
+          // use kernel to calculate
+          for (int i = i2; i < std::min(i2 + s2, nx); i += kH) {
+            for (int j = i3; j < std::min(i3 + s3, ny); j += kW) {
+              kernel(A, (vec*)B, (vec*)C, i, j, i1, std::min(i1 + s1, N), ny);
+            }
+          }
+
+      }
     }
   }
 
