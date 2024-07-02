@@ -3,6 +3,7 @@
 #include <cstring>
 #include <omp.h>
 #include <vector>
+#include <iostream>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
@@ -10,7 +11,9 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // to `target` stays inside the loop.
   struct Accumulator {
     std::atomic<uint32_t> value = 0;
+    char padding[64 - sizeof(std::atomic<uint32_t>)];
   };
+
   std::vector<Accumulator> accumulators(thread_count);
 
 #pragma omp parallel num_threads(thread_count) default(none)                   \
