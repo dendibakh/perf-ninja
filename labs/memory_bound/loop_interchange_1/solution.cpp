@@ -4,6 +4,8 @@
 #include <cstring>
 #include <memory>
 #include <string_view>
+#include <cassert>
+#include <iostream>
 
 // Make zero matrix
 void zero(Matrix &result) {
@@ -24,40 +26,74 @@ void identity(Matrix &result) {
   }
 }
 
-typedef float vec __attribute__((vector_size(64)));
+
+constexpr int kH = 6, kW = 16;
+constexpr int kVecSize = 8;
+
+typedef float vec __attribute__((vector_size(kVecSize * 4)));
+
+// update kH*kW matrix C[x:x+kH][y:y+kW]
+// from A [x:x+kH][l:r] and B[l:r][y:y+kW]
+void kernel(float *a, vec *b, vec *c, int x, int y, int l, int r, int n) {
+  assert(kW % kVecSize == 0);
+  vec t[kH][kW / kVecSize]{};
+
+  // c[i] = a[i][k] * b[k][0] concat with a[i][j] * b[k][1]
+  for (int k = l; k < r; k++) {
+    for (int i = 0; i < kH; i++) {
+      // broadcast a[i][k]
+      vec bc = vec{} + a[(x + i) * n + k];
+      for (int j = 0; j < kW / kVecSize; j++) {
+        t[i][j] += bc * b[(k * n + y) / kVecSize + j];
+      }
+    }
+  }
+
+  for (int i = 0; i < kH; i++) {
+    for (int j = 0; j < kW / kVecSize; j++) {
+      c[((x + i) * n + y) / kVecSize + j] += t[i][j];
+    }
+  }
+}
 
 vec *alloc(int n) {
-  vec *ptr = (vec *)std::aligned_alloc(64, 64 * n);
-  std::memset(ptr, 0, 64 * n);
+  vec *ptr = (vec *)std::aligned_alloc(32, 32 * n);
+  std::memset(ptr, 0, 32 * n);
   return ptr;
 }
 
-int nB = (N + 15) / 16;
-vec *va = alloc(N * nB);
-vec *vb = alloc(N * nB);
+float* alloc_float(int n) {
+  assert(n % 8 == 0);
+  return (float *)std::aligned_alloc(32, n * 4);
+}
 
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
-  zero(result);
+  int nx = (N + kH - 1) / kH * kH;
+  int ny = (N + kW - 1) / kW * kW;
+
+  float* A = alloc_float(nx * ny);
+  float* B = alloc_float(nx * ny);
+  float* C = alloc_float(nx * ny);
 
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      va[i * nB + j / 16][j % 16] = a[i][j];
-      vb[i * nB + j / 16][j % 16] = b[j][i];
+    memcpy(&A[i * ny], &a[i], 4 * N);
+    memcpy(&B[i * ny], &b[i], 4 * N);
+  }
+
+  for (int i = 0; i < nx; i += kH) {
+    for (int j = 0; j < ny; j += kW) {
+      kernel(A, (vec*)B, (vec*)C, i, j, 0, N, ny);
     }
   }
 
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < N; ++j) {
-      vec s{};
-      for (int k = 0; k < nB; ++k) {
-        s += va[i * nB + k] * vb[j * nB + k];
-      }
-      for (int k = 0; k < 16; k++) {
-        result[i][j] += s[k];
-      }
-    }
+  for (int i = 0; i < N; i++) {
+    memcpy(&result[i], &C[i * ny], 4 * N);
   }
+
+  std::free(A);
+  std::free(B);
+  std::free(C); 
 }
 
 // Compute integer power of a given square matrix
