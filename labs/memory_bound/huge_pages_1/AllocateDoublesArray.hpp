@@ -74,7 +74,7 @@ inline auto getUserToken() {
   // Probe the buffer size reqired for PTOKEN_USER structure
   DWORD dwbuf_sz = 0;
   if (!GetTokenInformation(proc_token.get(), TokenUser, nullptr, 0,
-                              &dwbuf_sz) &&
+                           &dwbuf_sz) &&
       (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
     throw std::runtime_error{"GetTokenInformation failed"};
 
@@ -83,7 +83,7 @@ inline auto getUserToken() {
   PTOKEN_USER ptr = (PTOKEN_USER)malloc(dwbuf_sz);
   std::unique_ptr<TOKEN_USER, decltype(deleter)> user_token{ptr, deleter};
   if (!GetTokenInformation(proc_token.get(), TokenUser, user_token.get(),
-                              dwbuf_sz, &dwbuf_sz))
+                           dwbuf_sz, &dwbuf_sz))
     throw std::runtime_error{"GetTokenInformation failed"};
 
   return user_token;
@@ -114,11 +114,11 @@ inline bool enableProcPrivilege() {
   priv_token.Privileges->Attributes = SE_PRIVILEGE_ENABLED;
 
   if (!LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME,
-                               &priv_token.Privileges->Luid))
+                            &priv_token.Privileges->Luid))
     throw std::runtime_error{"LookupPrivilegeValue failed"};
 
-  if (!AdjustTokenPrivileges(proc_token.get(), FALSE, &priv_token, 0,
-                                nullptr, 0))
+  if (!AdjustTokenPrivileges(proc_token.get(), FALSE, &priv_token, 0, nullptr,
+                             0))
     throw std::runtime_error{"AdjustTokenPrivileges failed"};
 
   if (GetLastError() == ERROR_NOT_ALL_ASSIGNED)
@@ -153,14 +153,20 @@ inline bool setRequiredPrivileges() {
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
-  double *alloc = new double[size];
-  // remember to cast the pointer to double* if your allocator returns void*
+  void *ptr =
+      mmap(nullptr, size * sizeof(double), PROT_READ | PROT_WRITE | PROT_EXEC,
+           MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  // use huge page
+  madvise(ptr, size * sizeof(double), MADV_HUGEPAGE);
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  auto deleter = [size](double *ptr) {
+    void *raw = (void *)ptr;
+    munmap(ptr, size * sizeof(double));
+  };
 
-  return std::unique_ptr<double[], decltype(deleter)>(alloc,
+  return std::unique_ptr<double[], decltype(deleter)>((double *)ptr,
                                                       std::move(deleter));
 
   // The above is equivalent to:
