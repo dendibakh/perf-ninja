@@ -14,19 +14,6 @@ struct S {
   unsigned short l;
   float d;
 
-  // double d;
-  // short l;
-  // char i;
-  // char s;
-  // bool b;
-
-
-  // int i;
-  // long long l;
-  // short s;
-  // double d;
-  // bool b;
-
   bool operator<(const S &s) const { return this->i < s.i; }
 };
 

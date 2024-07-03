@@ -1,14 +1,9 @@
 
 #include "solution.h"
 #include <random>
-#include <iostream>
 
 S create_entry(int first_value, int second_value) {
-  S entry;
-
-  std::cout << "sizeof S: " << sizeof(S) << "\n";
-
-  
+  S entry;  
   
   entry.i = static_cast<unsigned char>(first_value);
   entry.s = static_cast<unsigned char>(second_value);
@@ -16,8 +11,6 @@ S create_entry(int first_value, int second_value) {
   entry.l = static_cast<unsigned short>(first_value * second_value);
   entry.d = static_cast<float>(first_value) / maxRandom;
  
-  
-
   return entry;
 }
 
