@@ -1,12 +1,12 @@
 
 #include "solution.h"
 #include <random>
-// #include <iostream>
+#include <iostream>
 
 S create_entry(int first_value, int second_value) {
   S entry;
 
-  // std::cout << "sizeof S: " << sizeof(S) << "\n";
+  std::cout << "sizeof S: " << sizeof(S) << "\n";
 
   
   
