@@ -27,8 +27,8 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
       }
     }
@@ -58,8 +58,9 @@ Matrix power(const Matrix &input, const uint32_t k) {
     zero(*elementNext);
 
     for (int ii = 0; ii < N; ++ii) {
-      for (int jj = 0; jj < N; ++jj) {
-        for (int kk = 0; kk < N; ++kk) {
+      for (int kk = 0; kk < N; ++kk) {
+        for (int jj = 0; jj < N; ++jj) {
+        
           auto t1 = (*elementCurrent)[ii][kk];
           auto t2 = (*elementCurrent)[kk][jj];
           (*elementNext)[ii][jj] += t1 * t2;
