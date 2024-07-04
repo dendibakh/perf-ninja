@@ -51,19 +51,49 @@ Matrix power(const Matrix &input, const uint32_t k) {
 
   // Use binary representation of k to be O(log(k))
   for (auto i = k; i > 0; i /= 2) {
-    if (i % 2 != 0) {
-      // Multiply the product by element
-      multiply(*productNext, *productCurrent, *elementCurrent);
-      std::swap(productNext, productCurrent);
 
-      // Exit early to skip next squaring
-      if (i == 1)
-        break;
+    if (i % 2 != 0) {
+      zero(*productNext);
+    }
+    zero(*elementNext);
+
+    for (int ii = 0; ii < N; ++ii) {
+      for (int jj = 0; jj < N; ++jj) {
+        for (int kk = 0; kk < N; ++kk) {
+          auto t1 = (*elementCurrent)[ii][kk];
+          auto t2 = (*elementCurrent)[kk][jj];
+          (*elementNext)[ii][jj] += t1 * t2;
+
+          if (i % 2 != 0) {
+            auto t3 = (*productCurrent)[ii][kk];
+            (*productNext)[ii][jj] += t3 * t2;
+          }
+        }
+      }
     }
 
-    // Square an element
-    multiply(*elementNext, *elementCurrent, *elementCurrent);
+    if (i % 2 != 0) {
+      std::swap(productNext, productCurrent);
+    }
+    if (i == 1)
+      break;
     std::swap(elementNext, elementCurrent);
+    
+
+
+    // if (i % 2 != 0) {
+    //   // Multiply the product by element
+    //   multiply(*productNext, *elementCurrent, *productCurrent);
+    //   std::swap(productNext, productCurrent);
+
+    //   // Exit early to skip next squaring
+    //   if (i == 1)
+    //     break;
+    // }
+
+    // // Square an element
+    // multiply(*elementNext, *elementCurrent, *elementCurrent);
+    // std::swap(elementNext, elementCurrent);
   }
 
   return std::move(*productCurrent);
