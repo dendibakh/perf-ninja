@@ -49,12 +49,13 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
 
 
   // Middle part of computations with full kernel
-  int dots[width];
+  
   for (int r = radius; r < height - radius; r++) {
+    int dots[width];
     // Accumulation
-    for (int kk = 0; kk < width; ++kk) {
-      dots[kk] = 0;
-    }
+    // for (int kk = 0; kk < width; ++kk) {
+    //   dots[kk] = 0;
+    // }
     for (int i = 0; i < radius + 1 + radius; i++) {
       for (int c = 0; c < width; c++) {
         dots[c] += input[(r - radius + i) * width + c] * kernel[i];
