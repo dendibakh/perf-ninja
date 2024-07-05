@@ -29,19 +29,6 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       output[r * width + c] = static_cast<uint8_t>(value);
     }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
-
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
-      output[r * width + c] = static_cast<uint8_t>(value);
-    }
-
     // Bottom part of line, partial kernel
     for (int r = std::max(radius, height - radius); r < height; r++) {
       // Accumulation
@@ -59,6 +46,28 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
+
+
+  // Middle part of computations with full kernel
+  int dots[width];
+  for (int r = radius; r < height - radius; r++) {
+    // Accumulation
+    for (int kk = 0; kk < width; ++kk) {
+      dots[kk] = 0;
+    }
+    for (int i = 0; i < radius + 1 + radius; i++) {
+      for (int c = 0; c < width; c++) {
+        dots[c] += input[(r - radius + i) * width + c] * kernel[i];
+      }
+    }
+
+    for (int kk = 0; kk < width; ++kk) {
+      int value = (dots[kk] + rounding) >> shift;
+      output[r * width + kk] = static_cast<uint8_t>(value);
+    }
+
+  }
+
 }
 
 // Applies Gaussian blur in independent horizontal lines
