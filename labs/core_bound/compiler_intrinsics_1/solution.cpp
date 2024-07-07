@@ -23,6 +23,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   // 2. main loop.
   limit = size - radius;
   for (; pos < limit; ++pos) {
+    __builtin_prefetch(&input[pos + 3 * radius]);
     currentSum -= input[pos - radius - 1];
     currentSum += input[pos + radius];
     output[pos] = currentSum;
