@@ -13,15 +13,16 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
   int val = lookups[0];
-  int size = lookups.size();
   hash_map->prefetch(val);
-  for (int i = 1; i < size; ++i) {
-    int new_val = lookups[1];
+  for (int i = 1; i < lookups.size(); ++i) {
+    int new_val = lookups[i];
     hash_map->prefetch(new_val);
     if (hash_map->find(val))
       result += getSumOfDigits(val);
     val = new_val;
   }
+  if (hash_map->find(val))
+    result += getSumOfDigits(val);
 
   return result;
 }

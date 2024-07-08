@@ -13,7 +13,6 @@ void init(hash_map_t *hash_map, std::vector<int> &lookups) {
     hash_map->prefetch(new_val);
     hash_map->insert(val);
     val = new_val;
-    
   }
 
   for (int i = 0; i < NUMBER_OF_LOOKUPS; i++) {
