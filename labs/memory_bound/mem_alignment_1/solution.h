@@ -35,7 +35,7 @@ using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
 // ******************************************
 // hint: use AlignedVector instead of std::vector 
 //       to align the beginning of a matrix
-using Matrix = std::vector<float>;
+using Matrix = AlignedVector<float>;
 // ******************************************
 
 static bool isCacheLineAligned(const Matrix& m) {
