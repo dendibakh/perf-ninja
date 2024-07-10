@@ -41,6 +41,7 @@ Lab assignments in this project are implemented in C++. If you're more comfortab
   * [False Sharing](labs/memory_bound/false_sharing_1)
   * [Huge Pages](labs/memory_bound/huge_pages_1)
   * [Memory Order Violation](labs/memory_bound/mem_order_violation_1)
+  * [Memory Alignment](labs/memory_bound/mem_alignment_1)
 * Bad Speculation:
   * [Branches To CMOVs](labs/bad_speculation/branches_to_cmov_1)
   * [Conditional Store](labs/bad_speculation/conditional_store_1)
