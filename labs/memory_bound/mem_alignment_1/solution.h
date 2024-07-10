@@ -24,14 +24,13 @@ public:
 template<typename T> 
 using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
 
-//#define SOLUTION
-
-// hint: use AlignedVector to align the beginning of a matrix
-#ifdef SOLUTION
-using Matrix = AlignedVector<float>;
-#else
+// ******************************************
+// Change this place
+// ******************************************
+// hint: use AlignedVector instead of std::vector 
+//       to align the beginning of a matrix
 using Matrix = std::vector<float>;
-#endif
+// ******************************************
 
 static bool isCacheLineAligned(const Matrix& m) {
   uint64_t ptr = (uint64_t)m.data();
