@@ -2,6 +2,14 @@
 #include "solution.h"
 #include <random>
 
+int roundUpToNextMultiple(int N) {
+  int elementsInCacheLine = CACHELINE_SIZE / sizeof(float);
+  int K = elementsInCacheLine - 1;
+  //auto ret = (N + K) & ~K;
+  //std::cout << N << " " << K << " " << ret << "\n";
+  return (N + K) & ~K;
+}
+
 // ******************************************
 // Change this function
 // ******************************************
@@ -9,7 +17,7 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) {  
-  return N;
+  return roundUpToNextMultiple(N);
 }
 // ******************************************
 
