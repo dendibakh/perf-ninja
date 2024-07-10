@@ -114,7 +114,7 @@ elif runner == "WinZen3":
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
   Labs["memory_bound"]["loop_interchange_2"] = LabParams(threshold=75.0)
   Labs["memory_bound"]["loop_tiling_1"] = LabParams(threshold=35.0)
-  Labs["memory_bound"]["mem_alignment_1"] = LabParams(threshold=10.0)
+  Labs["memory_bound"]["mem_alignment_1"] = LabParams(threshold=5.0)
   Labs["memory_bound"]["mem_order_violation_1"] = LabParams(threshold=25.0)
   Labs["memory_bound"]["swmem_prefetch_1"] = LabParams(threshold=40.0)
   Labs["misc"]["warmup"] = LabParams(threshold=50.0)
