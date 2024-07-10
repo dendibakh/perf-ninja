@@ -3,6 +3,7 @@
 
 #if defined(__APPLE__) && defined(__MACH__)
   // In Apple processors (such as M1, M2 and later), L2 cache operates on 128B cache lines.
+  #define ON_MACOS
   #define CACHELINE_SIZE 128
 #else
   #define CACHELINE_SIZE 64
