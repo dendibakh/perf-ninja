@@ -1,6 +1,8 @@
-# Data packing
+**NOTE: this lab is currently broken.**
+**After migrating to a new compiler version the speedup is no longer measurable consistently.**
+**You can still try to solve it to learn the concept, but the result is not guaranteed.**
 
-### NOTE: after migrating from clang12 to clang14 the speedup is no longer measurable.
+# Data packing
 
 This is a lab about data packing.
 
