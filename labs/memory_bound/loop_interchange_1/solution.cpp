@@ -1,8 +1,8 @@
 
 #include "solution.h"
 #include <memory>
+#include <iostream>
 #include <string_view>
-
 
 // Make identity matrix
 void identity(Matrix &result) {
@@ -17,10 +17,15 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int i = 0; i < N; i++) {
-    for (int k = 0; k < N; k++) {
-      for (int j = 0; j < N; j++) {
+  //constexpr int NUnrolled = N >> 1;
+  //Loop unrolling?
+  int i{}, k{}, j{};
+
+  for (; i < N; i++) {
+    for (k = 0; k < N; k++) {
+      for (j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
+        //result[i][j+1] += a[i][k] * b[k][j+1];
       }
     }
   }
@@ -41,14 +46,14 @@ Matrix power(const Matrix &input, const uint32_t k) {
   *elementCurrent = input;
 
   // Use binary representation of k to be O(log(k))
-  for (auto i = k; i > 0; i /= 2) {
+  for (auto i = k; i > 0; i >>= 1) {
     if (i & 1) {
       // Multiply the product by element
       multiply(*productNext, *productCurrent, *elementCurrent);
       std::swap(productNext, productCurrent);
 
       // Exit early to skip next squaring
-      if (i == 1)
+      if (!(i ^ 1))
         break;
     }
 
