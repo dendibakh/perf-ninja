@@ -6,8 +6,6 @@
 #include <cmath>
 #include <ios>
 
-// static constexpr int buckets_num = 4;
-
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
