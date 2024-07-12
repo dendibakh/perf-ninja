@@ -17,18 +17,19 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  //constexpr int NUnrolled = N >> 1;
-  //Loop unrolling?
   int i{}, k{}, j{};
 
-  for (; i < N; i++) {
+  //TODO: Probably SIMD is worth, but I'm not familiar with it yet. Come back here
+
+  for (; i < N; i+=2) {
     for (k = 0; k < N; k++) {
       for (j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
-        //result[i][j+1] += a[i][k] * b[k][j+1];
+        result[i+1][j] += a[i+1][k] * b[k][j];
       }
     }
   }
+  
 }
 
 // Compute integer power of a given square matrix
