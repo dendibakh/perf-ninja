@@ -6,14 +6,29 @@
 #include <cmath>
 #include <ios>
 
+static constexpr int buckets_num = 32;
+
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+  // std::cout << image.size << "\t" << image.height << "\t" << image.width << "\n";
   std::array<uint32_t, 256> hist;
+  std::array<std::array<uint32_t, 256>, buckets_num> hist_buckets;
   hist.fill(0);
+  for (auto &bucket : hist_buckets) {
+    bucket.fill(0);
+  }
   for (int i = 0; i < image.width * image.height; ++i)
-    hist[image.data[i]]++;
+    // hist[image.data[i]]++;
+    hist_buckets[i % buckets_num][image.data[i]]++;
+  
+  for (auto &bucket : hist_buckets) {
+    for (int i = 0; i < 256; ++i) {
+      hist[i] += bucket[i];
+    }
+  }
+
   return hist;
 }
 // ******************************************
