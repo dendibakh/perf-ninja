@@ -6,30 +6,36 @@
 #include <cmath>
 #include <ios>
 
-static constexpr int buckets_num = 32;
+// static constexpr int buckets_num = 4;
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
-  // std::cout << image.size << "\t" << image.height << "\t" << image.width << "\n";
-  std::array<uint32_t, 256> hist;
-  std::array<std::array<uint32_t, 256>, buckets_num> hist_buckets;
-  hist.fill(0);
-  for (auto &bucket : hist_buckets) {
-    bucket.fill(0);
-  }
-  for (int i = 0; i < image.width * image.height; ++i)
-    // hist[image.data[i]]++;
-    hist_buckets[i % buckets_num][image.data[i]]++;
-  
-  for (auto &bucket : hist_buckets) {
-    for (int i = 0; i < 256; ++i) {
-      hist[i] += bucket[i];
-    }
+  std::array<uint32_t, 256> hist1;
+  std::array<uint32_t, 256> hist2;
+  std::array<uint32_t, 256> hist3;
+  std::array<uint32_t, 256> hist4;
+  hist1.fill(0);
+  hist2.fill(0);
+  hist3.fill(0);
+  hist4.fill(0);
+
+  int i = 0;
+  for (; i + 3 < image.width * image.height; i += 4) {
+    hist1[image.data[i]]++;
+    hist2[image.data[i+1]]++;
+    hist3[image.data[i+2]]++;
+    hist4[image.data[i+3]]++;
   }
 
-  return hist;
+  for (; i < image.width * image.height; ++i)
+    hist1[image.data[i]]++;
+  
+  for (int i = 0; i < 256; ++i)
+    hist1[i] += (hist2[i] + hist3[i] + hist4[i]);
+
+  return hist1;
 }
 // ******************************************
 
