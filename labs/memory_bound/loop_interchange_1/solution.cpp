@@ -1,23 +1,25 @@
 
 #include "solution.h"
 #include <memory>
+#include <cstring>
 #include <string_view>
 
 // Make zero matrix
 void zero(Matrix &result) {
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      result[i][j] = 0;
-    }
-  }
+  memset(&result, 0, sizeof(result));
+
+  // for (int i = 0; i < N; i++) {
+  //   for (int j = 0; j < N; j++) {
+  //     result[i][j] = 0;
+  //   }
+  // }
 }
 
 // Make identity matrix
 void identity(Matrix &result) {
+  memset(&result, 0, sizeof(result));
+
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      result[i][j] = 0;
-    }
     result[i][i] = 1;
   }
 }
