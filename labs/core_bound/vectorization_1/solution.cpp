@@ -3,10 +3,26 @@
 #include <cassert>
 #include <type_traits>
 
+std::array<result_t, sequence_size_v> transpose(std::vector<sequence_t> const &sequences) {
+  assert(sequences.size() == sequence_count_v);
+  assert(sequences[0].size() == sequence_size_v);
+
+  std::array<result_t, sequence_size_v> result{};
+  for (int i = 0; i < sequence_size_v; ++i)
+    for (int j = 0; j < sequence_count_v; ++j)
+      result[i][j] = sequences[j][i];
+
+  return result;
+
+}
+
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2) {
+  auto seq1T = transpose(sequences1);
+  auto seq2T = transpose(sequences2);
+
   using score_t = int16_t;
   using column_t = std::array<score_t, sequence_size_v + 1>;
   
@@ -48,7 +64,7 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 
       for (int idx = 0; idx < sequence_count_v; ++idx) {
         score_t best_cell_score = all_last_diagonal_score[idx] +
-          (sequences1[idx][seq1_col] == sequences2[idx][seq2_col] ? match : mismatch);
+          (seq1T[seq1_col][idx] == seq2T[seq2_col][idx] ? match : mismatch);
         
         best_cell_score = std::max(best_cell_score, all_last_vertical_gap[idx]);
         best_cell_score = std::max(best_cell_score, all_horizontal_gap_column[idx][seq1_col+1]);
