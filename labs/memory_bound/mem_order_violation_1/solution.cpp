@@ -1,25 +1,38 @@
 
 #include "solution.h"
 #include <algorithm>
-#include <fstream>
-#include <stdint.h>
 #include <cmath>
+#include <fstream>
 #include <ios>
+#include <stdint.h>
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
-std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
   std::array<uint32_t, 256> hist;
   hist.fill(0);
-  for (int i = 0; i < image.width * image.height; ++i)
-    hist[image.data[i]]++;
+
+  static constexpr int kN = 2;
+  static constexpr int kMask = (1 << kN) - 1;
+  std::array<uint32_t, 1 << kN> hist_temp[256];
+  for (int i = 0; i < 256; i++) {
+    hist_temp[i].fill(0);
+  }
+  for (int i = 0; i < image.width * image.height; ++i) {
+    hist_temp[image.data[i]][i & kMask]++;
+  }
+  for (int i = 0; i < 256; i++) {
+    for (int j = 0; j < 1 << kN; j++) {
+      hist[i] += hist_temp[j][i];
+    }
+  }
   return hist;
 }
 // ******************************************
 
 // Calculate Otsu's Threshold
-int calcOtsuThreshold(const std::array<uint32_t, 256>& hist, int totalPixels) {
+int calcOtsuThreshold(const std::array<uint32_t, 256> &hist, int totalPixels) {
   // normalize histogram
   std::array<double, 256> normHist;
   for (int i = 0; i < 256; ++i)
@@ -42,7 +55,8 @@ int calcOtsuThreshold(const std::array<uint32_t, 256>& hist, int totalPixels) {
       mean2 += i * normHist[i];
     }
 
-    if (weight1 == 0 || weight2 == 0) continue;
+    if (weight1 == 0 || weight2 == 0)
+      continue;
 
     mean1 /= weight1;
     mean2 /= weight2;
@@ -59,7 +73,7 @@ int calcOtsuThreshold(const std::array<uint32_t, 256>& hist, int totalPixels) {
 }
 
 // Function to apply the threshold to create a binary image
-void applyOtsuThreshold(GrayscaleImage& image) {
+void applyOtsuThreshold(GrayscaleImage &image) {
   // Compute the histogram
   std::array<uint32_t, 256> hist = computeHistogram(image);
   auto totalPixels = image.height * image.width;
@@ -70,7 +84,7 @@ void applyOtsuThreshold(GrayscaleImage& image) {
 }
 
 // Loads GrayscaleImage image. Format is
-// https://people.sc.fsu.edu/~jburkardt/data/pgmb/pgmb.html 
+// https://people.sc.fsu.edu/~jburkardt/data/pgmb/pgmb.html
 bool GrayscaleImage::load(const std::string &filename, const int maxSize) {
   data.reset();
 
