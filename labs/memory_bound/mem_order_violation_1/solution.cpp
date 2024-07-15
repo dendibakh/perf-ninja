@@ -25,27 +25,20 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
 #define UPDATE(x) UPDATE_##x(0)
 
   static constexpr int kN = 4;
-  uint32_t hist_temp_1[256 * (1 << kN)]{0};
-  uint32_t hist_temp_2[256 * (1 << kN)]{0};
-  auto execute = [&image](uint32_t *hist_temp, int l, int r) {
-    for (int i = l; i < r; i += (1 << kN)) {
-      UPDATE(16);
-    }
-  };
-  int sz = image.width * image.height;
-  if (sz > 1000000) {
-    auto thread_1 = std::thread(execute, hist_temp_1, 0, sz / 2);
-    auto thread_2 = std::thread(execute, hist_temp_2, sz / 2, sz);
+  uint32_t hist_temp[256 * (1 << kN)]{0};
 
-    thread_1.join();
-    thread_2.join();
-  } else {
-    execute(hist_temp_1, 0, sz);
+  int i = 0;
+  for (; i + (1 << kN) < image.size; i += (1 << kN)) {
+    UPDATE(16);
+  }
+
+  for (; i < image.size; ++i) {
+    hist[image.data[i]]++;
   }
 
   for (int i = 0; i < 256; i++) {
     for (int j = 0; j < 1 << kN; j++) {
-      hist[i] += hist_temp_1[j * 256 + i] + hist_temp_2[j * 256 + i];
+      hist[i] += hist_temp[j * 256 + i];
     }
   }
   return hist;
