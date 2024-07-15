@@ -35,6 +35,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     column_t horizontal_gap_column{};
     score_t last_vertical_gap{};
 
+    column_t tmp{};
+
     /*
      * Initialise the first column of the matrix.
      */
@@ -58,10 +60,15 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
       horizontal_gap_column[0] += gap_extension;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
+        tmp[row] = (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
+      }
+
+      for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Compute next score from diagonal direction with match/mismatch.
         score_t best_cell_score =
-            last_diagonal_score +
-            (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
+            last_diagonal_score + tmp[row];
+            // last_diagonal_score +
+            // (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
         best_cell_score = std::max(best_cell_score, last_vertical_gap);
