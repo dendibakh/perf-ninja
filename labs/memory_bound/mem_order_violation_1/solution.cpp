@@ -24,7 +24,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
   }
   for (int i = 0; i < 256; i++) {
     for (int j = 0; j < 1 << kN; j++) {
-      hist[i] += hist_temp[j][i];
+      hist[i] += hist_temp[i][j];
     }
   }
   return hist;
