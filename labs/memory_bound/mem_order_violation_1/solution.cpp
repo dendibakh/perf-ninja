@@ -13,7 +13,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
   std::array<uint32_t, 256> hist;
   hist.fill(0);
 
-  static constexpr int kN = 2;
+  static constexpr int kN = 1;
   static constexpr int kMask = (1 << kN) - 1;
   std::array<uint32_t, 1 << kN> hist_temp[256];
   for (int i = 0; i < 256; i++) {
