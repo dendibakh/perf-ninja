@@ -13,33 +13,23 @@
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
   std::array<uint32_t, 256> hist;
   hist.fill(0);
-  std::array<uint32_t, 256> hist_2;
-  hist_2.fill(0);
-  std::array<uint32_t, 256> hist_3;
-  hist_3.fill(0);
-  std::array<uint32_t, 256> hist_4;
-  hist_4.fill(0);
 
-  // #define UPDATE_HIST(index) hist_temp[256 * (index) + image.data[i +
-  // (index)]]++;
-  // // Helper macros to create a chain of updates
-  // #define UPDATE_1(i) UPDATE_HIST(i)
-  // #define UPDATE_2(i) UPDATE_1(i) UPDATE_1(i + 1)
-  // #define UPDATE_4(i) UPDATE_2(i) UPDATE_2(i + 2)
-  // #define UPDATE_8(i) UPDATE_4(i) UPDATE_4(i + 4)
-  // #define UPDATE_16(i) UPDATE_8(i) UPDATE_8(i + 8)
-  // #define UPDATE_32(i) UPDATE_16(i) UPDATE_16(i + 16)
-  // #define UPDATE(x) UPDATE_##x(0)
+#define UPDATE_HIST(index) hist_temp[256 * (index) + image.data[i + (index)]]++;
+// Helper macros to create a chain of updates
+#define UPDATE_1(i) UPDATE_HIST(i)
+#define UPDATE_2(i) UPDATE_1(i) UPDATE_1(i + 1)
+#define UPDATE_4(i) UPDATE_2(i) UPDATE_2(i + 2)
+#define UPDATE_8(i) UPDATE_4(i) UPDATE_4(i + 4)
+#define UPDATE_16(i) UPDATE_8(i) UPDATE_8(i + 8)
+#define UPDATE_32(i) UPDATE_16(i) UPDATE_16(i + 16)
+#define UPDATE(x) UPDATE_##x(0)
 
-  static constexpr int kN = 2;
-  //   uint32_t hist_temp[256 * (1 << kN)]{0};
+  static constexpr int kN = 4;
+  uint32_t hist_temp[256 * (1 << kN)]{0};
 
   int i = 0;
   for (; i + (1 << kN) < image.size; i += (1 << kN)) {
-    hist[image.data[i]]++;
-    hist_2[image.data[i + 1]]++;
-    hist_3[image.data[i + 2]]++;
-    hist_4[image.data[i + 3]]++;
+    UPDATE(16);
   }
 
   for (; i < image.size; ++i) {
@@ -48,7 +38,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
 
   for (int i = 0; i < 256; i++) {
     for (int j = 0; j < 1 << kN; j++) {
-      hist[i] += hist_2[i] + hist_3[i] + hist_4[i];
+      hist[i] += hist_temp[j * 256 + i];
     }
   }
   return hist;
