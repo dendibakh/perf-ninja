@@ -22,12 +22,14 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
 #define UPDATE_8(i) UPDATE_4(i) UPDATE_4(i + 4)
 #define UPDATE_16(i) UPDATE_8(i) UPDATE_8(i + 8)
 #define UPDATE_32(i) UPDATE_16(i) UPDATE_16(i + 16)
+#define UPDATE(x) UPDATE_##x(0)
 
-  static constexpr int kN = 5;
+  static constexpr int kN = 4;
   uint32_t hist_temp[256 * (1 << kN)]{0};
   for (int i = 0; i < image.width * image.height; i += (1 << kN)) {
-    UPDATE_32(0)
+    UPDATE(16);
   }
+
   for (int i = 0; i < 256; i++) {
     for (int j = 0; j < 1 << kN; j++) {
       hist[i] += hist_temp[j * 256 + i];
