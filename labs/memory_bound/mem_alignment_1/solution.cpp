@@ -8,8 +8,9 @@
 // This function allows you to change the number of columns in a matrix. 
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
+static constexpr int kAlign = 64;
 int n_columns(int N) {  
-  return N;
+  return (int)((N + kAlign - 1) / kAlign) * kAlign;
 }
 // ******************************************
 

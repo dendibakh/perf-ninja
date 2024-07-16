@@ -2,6 +2,7 @@
 #include "benchmark/benchmark.h"
 #include "solution.h"
 #include <memory>
+#include <cassert>
 
 template <class ...Args>
 static void bench1(benchmark::State &state, Args&&... args) {
@@ -12,6 +13,9 @@ static void bench1(benchmark::State &state, Args&&... args) {
   Matrix a1; a1.resize(N * K);  initRandom(a1, N, K);
   Matrix b1; b1.resize(N * K);  initRandom(b1, N, K);
   Matrix c1; c1.resize(N * K);  initZero  (c1, N, K);
+  assert(isCacheLineAligned(a1));
+  assert(isCacheLineAligned(b1));
+  assert(isCacheLineAligned(c1));
 
   for (auto _ : state) {
     if (N < 100) {
