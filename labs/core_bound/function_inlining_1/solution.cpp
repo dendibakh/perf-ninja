@@ -47,5 +47,8 @@ void quick_sort(std::array<S, N> &arr, int start, int end) {
 
 void solution(std::array<S, N> &arr) {
   // qsort(arr.data(), arr.size(), sizeof(S), compare);
-  quick_sort(arr, 0, arr.size()-1);
+  // quick_sort(arr, 0, arr.size()-1);
+  std::sort(arr.begin(), arr.end(), [](S& left, S& right) {
+    return left.key1 < right.key1 || (left.key1 == right.key1 && left.key2 < right.key2);
+  });
 }
