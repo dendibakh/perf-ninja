@@ -43,6 +43,8 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   static constexpr int kBatch = 16;
   bool debug = true;
   // if (debug) std::cout << currentSum << " " << (int)input[pos - radius - 1] << " " << (int)input[pos + radius] << "\n";
+
+  __m128i current = _mm_set1_epi16(currentSum);
   for (; pos + radius + kBatch < limit; pos += kBatch) {
     __m128i add = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input.data() + pos + radius));
     __m128i sub = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input.data() + pos - radius - 1));
@@ -75,12 +77,10 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // if (debug) print_8(vec_high);
 
     // if(debug) print_8(vec_low);
+    vec_low = _mm_add_epi16(vec_low, current);
     int16_t broadcast_value = _mm_extract_epi16(vec_low, 7);
-    __m128i csum_boardcast = _mm_set1_epi16(currentSum);
     __m128i low_bc = _mm_set1_epi16(broadcast_value);
     // if (debug) print_8(low_bc);
-    vec_low= _mm_add_epi16(vec_low, csum_boardcast);
-    vec_high = _mm_add_epi16(vec_high, csum_boardcast);
     vec_high = _mm_add_epi16(vec_high, low_bc);
 
     // if (debug) print_8(vec_low);
@@ -93,8 +93,8 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     //   output[pos + i] += currentSum;
     //   // if (debug) std::cout << output[pos + i] << "\n";
     // }
-    currentSum = output[pos + kBatch - 1];
-
+    currentSum = _mm_extract_epi16(vec_high, 7);
+    current = _mm_set1_epi16(currentSum);
     // debug = false;
   }
 
