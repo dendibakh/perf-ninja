@@ -3,9 +3,9 @@
 #include <cmath>
 #include <iostream>
 
-static void original_matmul(float* __restrict__ A, 
-                            float* __restrict__ B,
-                            float* __restrict__ C, int N) {
+static void original_matmul(float* RESTRICT A, 
+                            float* RESTRICT B,
+                            float* RESTRICT C, int N) {
   for (int i = 0; i < N; ++i)
     for (int k = 0; k < N; ++k)
       for (int j = 0; j < N; ++j)
