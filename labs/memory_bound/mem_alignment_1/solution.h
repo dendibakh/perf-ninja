@@ -9,6 +9,12 @@
   #define CACHELINE_SIZE 64
 #endif
 
+#if defined(_MSC_VER)
+  #define RESTRICT __restrict
+#else
+  #define RESTRICT __restrict__
+#endif
+
 template <typename T>
 class CacheLineAlignedAllocator {
 public:
@@ -41,9 +47,9 @@ int n_columns(int N);
 void initRandom(Matrix &matrix, int N, int K);
 void initZero(Matrix &matrix, int N, int K);
 void copyFromMatrix(const Matrix &from, Matrix &to, int N, int K);
-void interchanged_matmul(float* __restrict__ A, 
-                         float* __restrict__ B,
-                         float* __restrict__ C, int N, int K);
-void blocked_matmul     (float* __restrict__ A, 
-                         float* __restrict__ B,
-                         float* __restrict__ C, int N, int K);
+void interchanged_matmul(float* RESTRICT A, 
+                         float* RESTRICT B,
+                         float* RESTRICT C, int N, int K);
+void blocked_matmul     (float* RESTRICT A, 
+                         float* RESTRICT B,
+                         float* RESTRICT C, int N, int K);

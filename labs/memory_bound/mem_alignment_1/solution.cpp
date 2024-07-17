@@ -40,9 +40,9 @@ void copyFromMatrix(const Matrix &from, Matrix &to, int N, int K) {
 }
 
 // A simple GEMM. Use only for small matrices (up to 100 x 100)
-void interchanged_matmul(float* __restrict__ A, 
-                         float* __restrict__ B,
-                         float* __restrict__ C, int N, int K) {
+void interchanged_matmul(float* RESTRICT A, 
+                         float* RESTRICT B,
+                         float* RESTRICT C, int N, int K) {
   for (int i = 0; i < N; ++i)
     for (int k = 0; k < N; ++k)
       for (int j = 0; j < N; ++j)
@@ -50,9 +50,9 @@ void interchanged_matmul(float* __restrict__ A,
 }
 
 // Here is a blocked version for larger matrix sizes (e.g. 512 x 512 and beyond).
-void blocked_matmul(float* __restrict__ A, 
-                    float* __restrict__ B,
-                    float* __restrict__ C, int N, int K) {
+void blocked_matmul(float* RESTRICT A, 
+                    float* RESTRICT B,
+                    float* RESTRICT C, int N, int K) {
   constexpr int blockSize = 64;
   for (int ii = 0; ii < N; ii += blockSize)
     for (int kk = 0; kk < N; kk += blockSize)
