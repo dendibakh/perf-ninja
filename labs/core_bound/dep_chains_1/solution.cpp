@@ -28,33 +28,40 @@ unsigned solution(List *l1, List *l2) {
   // O(N^2) algorithm:
   while (l1) 
   {
-    bool vFound{};
-    bool v2Found{};
-    
+    // bool vFound{};
+    // bool v2Found{};
+    // bool v3Found{};
+    // bool v4Found{};
+
     unsigned v = l1->value;
     unsigned v2 = l1->next ? l1->next->value : 0;
+    unsigned v3 = l1->next && l1->next->next ? l1->next->next->value : 0;
+    //unsigned v4 = v3 !=0 ? l1->next->next->next->value : 0;
 
     l2 = head2;
     while (l2) 
     {
-      if (!vFound && l2->value == v) 
+      if(l2->value == v) 
       {
         retVal += getSumOfDigits(v);
-        vFound = true;
+        //vFound = true;
       }
-      if(!v2Found && l2->value == v2)
+      if(l2->value == v2)
       {
         retVal += getSumOfDigits(v2);
-        v2Found = true;
+        //v2Found = true;
       }
-
-      if(vFound & v2Found) break;
+      if(l2->value == v3)
+      {
+        retVal += getSumOfDigits(v3);
+        //v2Found = true;
+      }
 
       l2 = l2->next;
     }
 
-    if(!l1->next) return retVal;
-    l1 = l1->next->next;
+    if(!l1->next || !l1->next->next) return retVal;
+    l1 = l1->next->next->next;
   }
 
   return retVal;
