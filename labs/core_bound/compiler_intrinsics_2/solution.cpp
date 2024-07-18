@@ -22,9 +22,9 @@ unsigned solution(const std::string &inputContents) {
 
   static constexpr int kBatch = 16;
 
-  auto newline_broadcast = _mm_set1_epi8('\n');
 
   int i = 0;
+  auto newline_broadcast = _mm_set1_epi8('\n');
   for (; i + kBatch - 1 < N; i += kBatch) {
     auto x = _mm_loadu_si128((__m128i*)(inputContents.data() + i));
     auto mask = _mm_cmpeq_epi8(x, newline_broadcast);
