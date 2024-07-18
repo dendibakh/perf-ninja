@@ -7,8 +7,8 @@
 constexpr size_t N = 10000;
 
 struct S {
-  uint32_t key1;
-  uint32_t key2;
+  uint16_t key1;
+  uint16_t key2;
 };
 
 void init(std::array<S, N> &arr);
