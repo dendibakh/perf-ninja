@@ -3,24 +3,10 @@
 #include <algorithm>
 #include <stdlib.h>
 
-void solution(std::array<S, N> &arr) {
-  qsort(arr.data(), arr.size(), sizeof(S), [](const void *lhs, const void *rhs)
+void solution(std::array<S, N> &arr)
+{
+  std::sort(arr.begin(), arr.end(), [](const S& a, const S& b)
   {
-    auto &a = *reinterpret_cast<const S *>(lhs);
-    auto &b = *reinterpret_cast<const S *>(rhs);
-
-    if (a.key1 < b.key1)
-      return -1;
-
-    if (a.key1 > b.key1)
-      return 1;
-
-    if (a.key2 < b.key2)
-      return -1;
-
-    if (a.key2 > b.key2)
-      return 1;
-
-    return 0;
+    return a.key1 < b.key1 || (a.key1 == b.key1 && a.key2 < b.key2);
   });
 }
