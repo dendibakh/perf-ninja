@@ -42,7 +42,7 @@ unsigned solution(List *l1, List *l2) {
         retVal += getSumOfDigits(v);
         vFound = true;
       }
-      if(v2Found && l2->value == v2)
+      if(!v2Found && l2->value == v2)
       {
         retVal += getSumOfDigits(v2);
         v2Found = true;
