@@ -23,6 +23,9 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
+  //TODO: Make a templated solution for this instead of manually changing that
+  //NOTE: This test fails on purpose to remember this
+
   List *head2 = l2;
 
   // O(N^2) algorithm:
@@ -45,7 +48,7 @@ unsigned solution(List *l1, List *l2) {
     }
 
     if(!l1->next || !l1->next->next || !l1->next->next->next) return retVal;
-    l1 = l1->next->next->next->next;
+    l1 = l1->next->next->next->next->next;
   }
 
   return retVal;
