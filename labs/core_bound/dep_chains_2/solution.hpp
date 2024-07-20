@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdint>
 #include <array>
-#include <immintrin.h>
+// #include <immintrin.h>
 
 // The number of motion simulation steps.
 constexpr uint32_t STEPS = 10000;
@@ -46,26 +46,26 @@ static float cosine(float x) {
     return sine(x + (PI_F / 2));
 }
 
-static __m256 abs(__m256 x) {
-  static const __m256 abs_mask = _mm256_castsi256_ps(_mm256_set1_epi32(0x7FFFFFFF));
-  return _mm256_and_ps(x, abs_mask);
-}
+// static __m256 abs(__m256 x) {
+//   static const __m256 abs_mask = _mm256_castsi256_ps(_mm256_set1_epi32(0x7FFFFFFF));
+//   return _mm256_and_ps(x, abs_mask);
+// }
 
-static __m256 sine(__m256 x) {
-  static const __m256 B = _mm256_set1_ps(4.0 / PI_F);
-  static const __m256 C = _mm256_set1_ps(-4.0 / (PI_F * PI_F));
-  const __m256 abs_x = abs(x); 
-  __m256 y = _mm256_mul_ps(B, x);
-  __m256 z = _mm256_mul_ps(C, x);
-  z = _mm256_mul_ps(z, abs_x);
-  return _mm256_add_ps(y, z);
-}
+// static __m256 sine(__m256 x) {
+//   static const __m256 B = _mm256_set1_ps(4.0 / PI_F);
+//   static const __m256 C = _mm256_set1_ps(-4.0 / (PI_F * PI_F));
+//   const __m256 abs_x = abs(x); 
+//   __m256 y = _mm256_mul_ps(B, x);
+//   __m256 z = _mm256_mul_ps(C, x);
+//   z = _mm256_mul_ps(z, abs_x);
+//   return _mm256_add_ps(y, z);
+// }
 
-static __m256 cosine(__m256 x) {
-  static const __m256 B = _mm256_set1_ps(PI_F / 2);
-  x = _mm256_add_ps(x, B);
-  return sine(x);
-}
+// static __m256 cosine(__m256 x) {
+//   static const __m256 B = _mm256_set1_ps(PI_F / 2);
+//   x = _mm256_add_ps(x, B);
+//   return sine(x);
+// }
 
 // A constant to convert from degrees to radians.
 // It maps the random number from [0;UINT32_MAX) to [0;2*pi).
@@ -105,7 +105,7 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
     pv[i] = particles[i].velocity;
   }
 
-  static const __m256 degree_to_radian_bc = _mm256_set1_ps(DEGREE_TO_RADIAN);
+  // static const __m256 degree_to_radian_bc = _mm256_set1_ps(DEGREE_TO_RADIAN);
   for (int i = 0; i < STEPS; i++) {
     int t = 0;
     for (int j = 0; j < N; j++) {
