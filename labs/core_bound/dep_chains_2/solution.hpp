@@ -71,7 +71,8 @@ static float cosine(float x) {
 // It maps the random number from [0;UINT32_MAX) to [0;2*pi).
 // We do calculations in double precision then convert to float.
 constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
-static constexpr int kBatch = 256 / 32;
+static constexpr int kBatch = 4;
+static constexpr int kMask = (1 << kBatch) - 1;
 // Simulate the motion of the particles.
 // For every particle, we generate a random angle and move the particle
 // in the corresponding direction.
@@ -79,7 +80,7 @@ template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
 
   std::vector<RNG> rngs;
-  for (int i = 0; i < kBatch; i++) {
+  for (int i = 0; i < (1 << kBatch); i++) {
     rngs.emplace_back(seed);
   }
 
@@ -109,7 +110,7 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
   for (int i = 0; i < STEPS; i++) {
     int t = 0;
     for (int j = 0; j < N; j++) {
-      degree_angles[j] = rngs[j % kBatch].gen();
+      degree_angles[j] = rngs[j & kMask].gen();
     }
     // for (; t + kBatch - 1 < N; t += kBatch) {
     //   __m256i r_angle = _mm256_loadu_si256((__m256i*)(degree_angles + t));
