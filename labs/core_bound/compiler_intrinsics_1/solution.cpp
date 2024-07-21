@@ -33,20 +33,25 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // 2. main loop.
     limit = size - radius;
 
-    const int unroll = 8;
+    const int unroll = 16;
     for (; pos + unroll - 1 < limit; pos += unroll) {
 
         uint16_t add[unroll]{};
 
         for (int i = 0; i < unroll; ++i) add[i] = input[i + pos + radius] - input[i + pos - radius - 1];
 
-        // gives too high value
-        __m128i addreg = _mm_loadu_si128((__m128i *) add);
-        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 2));
-        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 4));
-        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 8));
-        _mm_storeu_si128((__m128i *) add, addreg);
+        __m256i addreg = _mm256_loadu_si256((__m256i *) add);
+        addreg = _mm256_add_epi16(addreg, _mm256_slli_si256(addreg, 2));
+        addreg = _mm256_add_epi16(addreg, _mm256_slli_si256(addreg, 4));
+        addreg = _mm256_add_epi16(addreg, _mm256_slli_si256(addreg, 8));
+        __m256i from_left = _mm256_set1_epi16(_mm256_extract_epi16(addreg, 7));
 
+        uint16_t mask[16]{};
+        memset(mask + 8, -1, 16);
+        from_left = _mm256_and_si256(from_left, _mm256_load_si256((__m256i *)mask));
+        addreg = _mm256_add_epi16(addreg, from_left);
+        _mm256_storeu_si256((__m256i *) add, addreg);
+        
         uint16_t vals[unroll];
         for (int i = 0; i < unroll; ++i) {
             vals[i] = currentSum + add[i];
