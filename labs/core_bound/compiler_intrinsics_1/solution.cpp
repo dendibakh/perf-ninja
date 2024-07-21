@@ -49,7 +49,11 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // 2. main loop.
     limit = size - radius;
 
+#ifdef __x86_64__
     const int unroll = 16;
+#else
+    const int unroll = 8;
+#endif
     for (; pos + unroll - 1 < limit; pos += unroll) {
 
         uint16_t add[unroll]{};
