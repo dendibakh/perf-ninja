@@ -16,41 +16,10 @@
 #include <array>
 #include <iostream>
 
-void test() {
-    uint16_t add[8];
-    std::iota(add, add + 8, 0);
-#ifdef __x86_64__
-    __m128i addreg = _mm_loadu_si128((__m128i *) add);
-    addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 2));
-    addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 4));
-    addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 8));
-    _mm_storeu_si128((__m128i *) add, addreg);
-#else
-    uint16x8_t result = vld1q_u16(add);
-    result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 1));
-    vst1q_u16(add, result);
-    for (int i: add)
-        std::cerr << i << ' ';
-    std::cerr << '\n';
-    result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 2));
-    vst1q_u16(add, result);
-    for (int i: add)
-        std::cerr << i << ' ';
-    std::cerr << '\n';
-    result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 4));
-    vst1q_u16(add, result);
-    for (int i: add)
-        std::cerr << i << ' ';
-    std::cerr << '\n';
-#endif
-    for (int i: add)
-        std::cerr << i << ' ';
-    std::cerr << '\n';
-}
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
-                        test();
+
     int pos = 0;
     int currentSum = 0;
     int size = static_cast<int>(input.size());
@@ -111,9 +80,9 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         // for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
 
         uint16x8_t result = vld1q_u16(add);
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 1));
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 2));
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 4));
+        result = vaddq_u16(result, vextq_u16(result, result, 1));
+        result = vaddq_u16(result, vextq_u16(result, result, 2));
+        result = vaddq_u16(result, vextq_u16(result, result, 4));
         vst1q_u16(add, result);
 #endif
 
