@@ -73,16 +73,13 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         addreg = _mm256_add_epi16(addreg, from_left);
         _mm256_storeu_si256((__m256i *) add, addreg);
 #else
-        uint16x8_t result = vcombine_u16(vld1_u16(add), vld1_u16(add + 8));
-        result = vaddq_u16(result, vextq_u16 (result, result, 1));
-        result = vaddq_u16(result, vextq_u16 (result, result, 2));
-        result = vaddq_u16(result, vextq_u16 (result, result, 4));
+        uint16x8_t result = vld1q_u16(add);
+        result = vaddq_u16(result, vextq_u16(result, result, 1));
+        result = vaddq_u16(result, vextq_u16(result, result, 2));
+        result = vaddq_u16(result, vextq_u16(result, result, 4));
 
         // Store the result back to memory
-        uint16x4_t lo = vget_low_u16(result);
-        uint16x4_t hi = vget_high_u16(result);
-        vst1_u16(add, lo);
-        vst1_u16(add + 8, hi);
+        vst1q_u16(add, result);
 #endif
 
         uint16_t vals[unroll];
