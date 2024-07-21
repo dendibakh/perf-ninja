@@ -1,16 +1,4 @@
-
-#include <cstdint>
-#include <vector>
-
-using InputVector = std::vector<uint8_t>;
-using OutputVector = std::vector<uint16_t>;
-constexpr uint8_t radius = 13; // assume diameter (2 * radius + 1) to be less
-                               // than 256 so results fits in uint16_t
-
-void init(InputVector &data);
-void zero(OutputVector &data, std::size_t size);
-void imageSmoothing(const InputVector &inA, uint8_t radius,
-                    OutputVector &outResult);
+#include "solution.h"
 
 #include <algorithm>
 #include <atomic>
@@ -74,13 +62,13 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         _mm256_storeu_si256((__m256i *) add, addreg);
 #else
         // basically want it to do this:
-        // for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
+        for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
 
-        uint16x8_t result = vld1q_u16(add);
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 1));
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 2));
-        result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 4));
-        vst1q_u16(add, result);
+            // uint16x8_t result = vld1q_u16(add);
+            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 1));
+            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 2));
+            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 4));
+            // vst1q_u16(add, result);
 #endif
 
         uint16_t vals[unroll];
