@@ -1,6 +1,15 @@
 
 #include "solution.h"
+#include <algorithm>
+#include <atomic>
+#include <cstring>
 #include <memory>
+
+#include <immintrin.h>
+#include <xmmintrin.h>
+
+#include <array>
+#include <iostream>
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -24,24 +33,19 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // 2. main loop.
     limit = size - radius;
 
-    const int unroll = 1024;
+    const int unroll = 8;
     for (; pos + unroll - 1 < limit; pos += unroll) {
 
-        uint16_t add[unroll];
+        uint16_t add[unroll]{};
 
         for (int i = 0; i < unroll; ++i) add[i] = input[i + pos + radius] - input[i + pos - radius - 1];
-#if 1
-        for (int l = 0; (1 << l) < unroll; l++) {
-#pragma ivdep
-            for (int i = unroll; i-- > (1 << l);) {
-                add[i] = add[i] + add[i - (1 << l)];
-            }
-        }
-#else
-        for (int i = 1; i < unroll; ++i) {
-            add[i] += add[i - 1];
-        }
-#endif
+
+        // gives too high value
+        __m128i addreg = _mm_loadu_si128((__m128i *) add);
+        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 2));
+        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 4));
+        addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 8));
+        _mm_storeu_si128((__m128i *) add, addreg);
 
         uint16_t vals[unroll];
         for (int i = 0; i < unroll; ++i) {
