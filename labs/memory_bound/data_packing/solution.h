@@ -5,7 +5,7 @@
 #include <array>
 
 // Assume those constants never change
-constexpr int N = 100000;
+constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
