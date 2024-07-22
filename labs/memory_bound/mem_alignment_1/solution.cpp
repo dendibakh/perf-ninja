@@ -10,10 +10,7 @@
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) {
     N -= 1;
-    N |= N >> 1;
-    N |= N >> 2;
-    N |= N >> 4;
-    N |= N >> 8;
+    N |= (1 << 6) - 1;
     N += 1;
     return N;
 }
