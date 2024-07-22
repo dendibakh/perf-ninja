@@ -32,11 +32,11 @@ static void bench1(benchmark::State &state, Args&&... args) {
 // matrices with sizes of powers of two, e.g. 64, 128, etc.
 // That's why we don't see speedups on macOS for such matrices.
 
-BENCHMARK_CAPTURE(bench1, _63,  63)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _63,  63)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #ifndef ON_MACOS
-BENCHMARK_CAPTURE(bench1, _64,  64)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _64,  64)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #endif
-BENCHMARK_CAPTURE(bench1, _65,  65)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _65,  65)->MinTime(2)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _71,  71)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _72,  72)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _73,  73)->Unit(benchmark::kMicrosecond);
@@ -45,22 +45,22 @@ BENCHMARK_CAPTURE(bench1, _65,  65)->MinTime(0.5)->Unit(benchmark::kMicrosecond)
 //BENCHMARK_CAPTURE(bench1, _81,  81)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _127, 127)->Unit(benchmark::kMicrosecond);
 #ifndef ON_MACOS
-BENCHMARK_CAPTURE(bench1, _128, 128)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _128, 128)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #endif
 //BENCHMARK_CAPTURE(bench1, _129, 129)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _255, 255)->Unit(benchmark::kMicrosecond);
 #ifndef ON_MACOS
-BENCHMARK_CAPTURE(bench1, _256, 256)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _256, 256)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #endif
 //BENCHMARK_CAPTURE(bench1, _257, 257)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(bench1, _511, 511)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _511, 511)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #ifndef ON_MACOS
-BENCHMARK_CAPTURE(bench1, _512, 512)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _512, 512)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #endif
-BENCHMARK_CAPTURE(bench1, _513, 513)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _513, 513)->MinTime(2)->Unit(benchmark::kMicrosecond);
 //BENCHMARK_CAPTURE(bench1, _1023, 1023)->Unit(benchmark::kMicrosecond);
 #ifndef ON_MACOS
-BENCHMARK_CAPTURE(bench1, _1024, 1024)->MinTime(0.5)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _1024, 1024)->MinTime(2)->Unit(benchmark::kMicrosecond);
 #endif
 //BENCHMARK_CAPTURE(bench1, _1025, 1025)->Unit(benchmark::kMicrosecond);
 
