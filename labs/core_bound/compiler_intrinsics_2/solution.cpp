@@ -5,8 +5,6 @@
 #ifdef __x86_64__
 #include <immintrin.h>
 #include <xmmintrin.h>
-#else
-#include <arm_neon.h>
 #endif
 
 #include <iostream>
@@ -22,9 +20,18 @@ unsigned solution(const std::string &inputContents) {
     unsigned ans = 0;
     for (; i + 31 < n;) {
 
+#ifdef __x86_64__
         __m256i vals = _mm256_loadu_si256((__m256i *) &p[i]);
         __m256i is_newline = _mm256_cmpeq_epi8(vals, _mm256_set1_epi8('\n'));
         unsigned msk = _mm256_movemask_epi8(is_newline);
+#else
+        char vals[32];
+        memcpy(vals, i + p , 32);
+
+        unsigned msk = 0;
+        for (int j = 0; j < 32; ++j)
+            msk |= (vals[j] == '\n') << j;
+#endif
         if (msk == 0) {
             len += 32;
             i += 32;
