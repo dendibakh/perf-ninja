@@ -19,7 +19,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
     hist.fill(0);
 
     const int lim = image.width * image.height;
-    
+
 #if 1
     const int unroll = 32;
     for (int i = 0; i + unroll - 1 < lim; i += unroll) {
@@ -30,8 +30,8 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
         for (int j = 0; j < unroll; ++j)
             rev[j] = buf[unroll - 1 - j];
 
-        __m256i b = _mm256_load_si256((__m256i *) buf);
-        __m256i r = _mm256_load_si256((__m256i *) buf);
+        __m256i b = _mm256_loadu_si256((__m256i *) buf);
+        __m256i r = _mm256_loadu_si256((__m256i *) rev);
 
         auto any_eq = _mm256_testz_si256(b, r);
 
