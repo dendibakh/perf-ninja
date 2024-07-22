@@ -36,9 +36,10 @@ unsigned solution(const std::string &inputContents) {
             len += 32;
             i += 32;
         } else {
-            const unsigned leading_zeroes = __builtin_ctz(msk);
-            len &= -(leading_zeroes != 0);
-            ans = std::max(ans, len + leading_zeroes);
+            int leading_zeroes = __builtin_ctz(msk);
+            len = leading_zeroes ? len : 0;
+            len += leading_zeroes;
+            ans = __builtin_unpredictable(len > ans) ? len : ans;
             len = 0;
             i += 1 + leading_zeroes;
         }
