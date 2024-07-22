@@ -7,61 +7,35 @@
 #include <fstream>
 #include <ios>
 
-#include <immintrin.h>
-#include <xmmintrin.h>
-
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
-    std::array<uint32_t, 256> hist;
-    hist.fill(0);
 
     const int lim = image.width * image.height;
 
-#if 1
-    const int unroll = 32;
+    const int unroll = 8;
+    std::array<uint32_t, 256> hists[unroll]{};
     for (int i = 0; i + unroll - 1 < lim; i += unroll) {
         uint8_t buf[unroll];
         memcpy(buf, &image.data[i], unroll);
 
-        uint8_t rev[unroll];
         for (int j = 0; j < unroll; ++j)
-            rev[j] = buf[unroll - 1 - j];
+            hists[j][buf[j]]++;
+    }
 
-        __m256i b = _mm256_loadu_si256((__m256i *) buf);
-        __m256i r = _mm256_loadu_si256((__m256i *) rev);
-
-        auto any_eq = _mm256_testz_si256(b, r);
-
-        if (__builtin_expect(any_eq, 0)) {
-            for (int j = 0; j * 2 < unroll; ++j) {
-                if (buf[j] == rev[j]) {
-                    hist[buf[j]] += 2;
-                } else {
-                    hist[buf[j]]++;
-                    hist[rev[j]]++;
-                }
-            }
-        } else {
-            for (int j = 0; j * 2 < unroll; ++j) {
-                hist[buf[j]]++;
-                hist[rev[j]]++;
-            }
+    for (int j = 1; j < unroll; ++j) {
+        for (int k = 0; k < 256; ++k) {
+            hists[0][k] += hists[j][k];
         }
     }
 
     for (int i = lim - lim % unroll; i < lim; ++i) {
-        hist[image.data[i]]++;
+        hists[0][image.data[i]]++;
     }
-#else
-    for (int i = 0; i < lim; ++i) {
-        hist[image.data[i]]++;
-    }
-#endif
 
-    return hist;
+    return hists[0];
 }
 // ******************************************
 
