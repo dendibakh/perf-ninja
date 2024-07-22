@@ -47,7 +47,7 @@ void test() {
     std::iota(arr, arr + 16, 1);
     uint16x8_t tmp = vld1q_u16(arr);
     print_i16_vals(tmp);
-    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 1));
+    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 7));
     std::cout << '\n';
 }
 #endif
@@ -114,11 +114,11 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         // basically want it to do this:
         for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
 
-            // uint16x8_t result = vld1q_u16(add);
-            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 1));
-            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 2));
-            // result = vaddq_u16(result, vextq_u16(result, vdupq_n_s16(0), 4));
-            // vst1q_u16(add, result);
+        uint16x8_t result = vld1q_u16(add);
+        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 1));
+        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 2));
+        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 4));
+        vst1q_u16(add, result);
 #endif
 
         uint16_t vals[unroll];
