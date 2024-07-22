@@ -114,11 +114,11 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         // basically want it to do this:
         for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
 
-        uint16x8_t result = vld1q_u16(add);
-        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 1));
-        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 2));
-        result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 4));
-        vst1q_u16(add, result);
+        // uint16x8_t result = vld1q_u16(add);
+        // result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 1));
+        // result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 2));
+        // result = vaddq_u16(result, vextq_u16(vdupq_n_s16(0), result, 8 - 4));
+        // vst1q_u16(add, result);
 #endif
 
         uint16_t vals[unroll];
