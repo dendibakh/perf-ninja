@@ -9,7 +9,7 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) {
-    const int align = CACHELINE_SIZE / sizeof(float);
+    const int align = CACHELINE_SIZE;
     int remainder = N % align;
     N += (N - remainder) % align;
     return N;
