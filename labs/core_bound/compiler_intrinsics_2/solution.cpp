@@ -26,7 +26,7 @@ unsigned solution(const std::string &inputContents) {
         unsigned msk = _mm256_movemask_epi8(is_newline);
 #else
         char vals[32];
-        memcpy(vals, i + p , 32);
+        memcpy(vals, i + p, 32);
 
         unsigned msk = 0;
         for (int j = 0; j < 32; ++j)
@@ -36,22 +36,11 @@ unsigned solution(const std::string &inputContents) {
             len += 32;
             i += 32;
         } else {
-            // const unsigned leading_zeroes = __builtin_clz(msk);
-            // // char *buf = (char *) &vals;
-            // // for (int j = 0; j < 32; ++j)
-            // //     std::cout << buf[j];
-            // // std::cout << '\n';
-            // // std::cout << leading_zeroes << '\n';
-            // // std::cout << std::string(buf, leading_zeroes) << '\n';
-            // ans = std::max(ans, len + leading_zeroes);
-            // len = 0;
-            // i += 1 + leading_zeroes;
-            for (int j = 0; j < 32; ++j) {
-                len++;
-                len &= -(p[i] != '\n');
-                ans = std::max(ans, len);
-                ++i;
-            }
+            const unsigned leading_zeroes = __builtin_ctz(msk);
+            len &= -(leading_zeroes != 0);
+            ans = std::max(ans, len + leading_zeroes);
+            len = 0;
+            i += 1 + leading_zeroes;
         }
     }
     for (; i < n; ++i) {
