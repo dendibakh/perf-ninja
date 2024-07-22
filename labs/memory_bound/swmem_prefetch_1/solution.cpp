@@ -17,7 +17,8 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
     const int prefetch_dist = 8;
     for (; i + prefetch_dist < lookups.size(); ++i) {
         hash_map->prefetch(lookups[i + prefetch_dist]);
-        result += hash_map->find(lookups[i]) * getSumOfDigits(lookups[i]);
+        if (hash_map->find(lookups[i]))
+            result += getSumOfDigits(lookups[i]);
     }
     for (; i < lookups.size(); ++i) {
         if (hash_map->find(lookups[i]))
