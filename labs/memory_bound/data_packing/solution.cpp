@@ -15,5 +15,5 @@ void solution(std::array<S, N> &arr) {
   std::shuffle(arr.begin(), arr.end(), g);
 
   // 2. sort
-  radix_sort(arr.begin(), arr.end());
+  radix_sort(arr.begin(), arr.end(), [](const S& x) { return x.i; });
 }
