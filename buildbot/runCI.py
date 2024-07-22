@@ -147,7 +147,7 @@ elif runner == "MacosM1":
   Labs["misc"]["pgo"] = LabParams(threshold=10.0)
   # FIXME: Labs["misc"]["io_opt1"] = LabParams(threshold=70.0)
   Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
-  # FIXME: Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
+  Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   # FIXME: Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=40.0)

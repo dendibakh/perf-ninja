@@ -16,49 +16,6 @@
 #include <array>
 #include <iostream>
 #include <numeric>
-#ifdef __x86_64__
-void print_i16_vals(__m128i x) {
-    int16_t arr[8];
-    _mm_storeu_si128((__m128i_u *) arr, x);
-    for (auto i: arr)
-        std::cout << i << ' ';
-    std::cout << '\n';
-}
-void test() {
-    int16_t arr[16];
-    std::iota(arr, arr + 16, 1);
-    __m128i tmp = _mm_loadu_si128((__m128i_u *) arr);
-    print_i16_vals(tmp);
-    print_i16_vals(_mm_slli_si128(tmp, 2));
-    std::cout << '\n';
-}
-#else
-void print_i16_vals(uint16x8_t x) {
-    uint16_t arr[8];
-    vst1q_u16(arr, x);
-    for (auto i: arr)
-        std::cout << i << ' ';
-    std::cout << '\n';
-}
-void test() {
-    static int idx = 0;
-    if (idx++) return;
-    uint16_t arr[8];
-    std::iota(arr, arr + 8, 1);
-    uint16x8_t tmp = vld1q_u16(arr);
-    print_i16_vals(tmp);
-    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 7));
-    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 6));
-    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 4));
-    tmp = vaddq_u16(tmp, vextq_u16(vdupq_n_s16(0), tmp, 8 - 1));
-    print_i16_vals(tmp);
-    tmp = vaddq_u16(tmp, vextq_u16(vdupq_n_s16(0), tmp, 8 - 2));
-    print_i16_vals(tmp);
-    tmp = vaddq_u16(tmp, vextq_u16(vdupq_n_s16(0), tmp, 8 - 4));
-    print_i16_vals(tmp);
-    std::cout << '\n';
-}
-#endif
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -118,7 +75,6 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
         _mm_storeu_si128((__m128i *) add, addreg);
 #endif
 #else
-        // test();
         // basically want it to do this:
         // for (int i = 1; i < unroll; ++i) add[i] += add[i - 1];
 
