@@ -9,7 +9,7 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) { 
-    const int align = 1 << 6;
+    const int align = 64 / sizeof(float);
     int remainder = N % align;
     if (remainder) N += align - remainder;
     return N;
