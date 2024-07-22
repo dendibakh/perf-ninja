@@ -15,12 +15,20 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
     hist.fill(0);
     int i = 0;
     const int limit = image.width * image.height;
-    const int unroll = 2048;
-    for (; i + unroll - 1 < limit; i += unroll) {
-        uint8_t vals[unroll];
-        std::memcpy(vals, &image.data[i], sizeof(vals));
+    // const int unroll = 2048;
+    // for (; i + unroll - 1 < limit; i += unroll) {
+    //     uint8_t vals[unroll];
+    //     std::memcpy(vals, &image.data[i], sizeof(vals));
 
-        for (auto i: vals) hist[i]++;
+    //     for (auto i: vals) hist[i]++;
+    // }
+
+    const int unroll = 2;
+    for (; i + unroll - 1 < limit; i += unroll) {
+        uint8_t a = image.data[i];
+        uint8_t b = image.data[i];
+        hist[a] += 1 + (a == b);
+        if (a != b) hist[b]++;
     }
 
     for (; i < limit; ++i) {
