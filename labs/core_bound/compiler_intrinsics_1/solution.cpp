@@ -41,11 +41,13 @@ void print_i16_vals(uint16x8_t x) {
     std::cout << '\n';
 }
 void test() {
+    static int idx = 0;
+    if (idx++) return;
     uint16_t arr[16];
     std::iota(arr, arr + 16, 1);
     uint16x8_t tmp = vld1q_u16(arr);
     print_i16_vals(tmp);
-    print_i16_vals(vextq_u16(tmp, vdupq_n_s16(0), 1));
+    print_i16_vals(vextq_u16(vdupq_n_s16(0), tmp, 1));
     std::cout << '\n';
 }
 #endif
