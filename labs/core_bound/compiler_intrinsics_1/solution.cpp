@@ -34,14 +34,14 @@ void test() {
 }
 #else
 void print_i16_vals(uint16x8_t x) {
-    int16_t arr[8];
-    vst1q_u16((uint16x8_t *) arr, x);
+    uint16_t arr[8];
+    vst1q_u16(arr, x);
     for (auto i: arr)
         std::cout << i << ' ';
     std::cout << '\n';
 }
 void test() {
-    int16_t arr[16];
+    uint16_t arr[16];
     std::iota(arr, arr + 16, 1);
     uint16x8_t tmp = vld1q_u16(arr);
     print_i16_vals(tmp);
