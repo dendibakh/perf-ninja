@@ -8,10 +8,10 @@
 // This function allows you to change the number of columns in a matrix.
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
-int n_columns(int N) { 
-    const int align = 64 / sizeof(float);
+int n_columns(int N) {
+    const int align = 1 << 8;
     int remainder = N % align;
-    if (remainder) N += align - remainder;
+    N += (N - remainder) % align;
     return N;
 }
 // ******************************************
