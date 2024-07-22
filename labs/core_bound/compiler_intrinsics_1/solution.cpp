@@ -1,10 +1,7 @@
 #include "solution.h"
 
 #include <algorithm>
-#include <atomic>
 #include <cstring>
-#include <memory>
-#include <numeric>
 
 #ifdef __x86_64__
 #include <immintrin.h>
