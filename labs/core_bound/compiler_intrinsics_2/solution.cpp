@@ -18,25 +18,28 @@ unsigned solution(const std::string &inputContents) {
 
     unsigned len = 0;
     unsigned ans = 0;
-    for (; i + 31 < n;) {
+    for (; i + 63 < n;) {
 
 #ifdef __x86_64__
-        __m256i vals = _mm256_loadu_si256((__m256i *) &p[i]);
-        __m256i is_newline = _mm256_cmpeq_epi8(vals, _mm256_set1_epi8('\n'));
-        unsigned msk = _mm256_movemask_epi8(is_newline);
-#else
-        char vals[32];
-        memcpy(vals, i + p, 32);
+        __m256i v1 = _mm256_loadu_si256((__m256i *) &p[i]);
+        __m256i v2 = _mm256_loadu_si256((__m256i *) &p[i]);
+        __m256i n1 = _mm256_cmpeq_epi8(v1, _mm256_set1_epi8('\n'));
+        __m256i n2 = _mm256_cmpeq_epi8(v2, _mm256_set1_epi8('\n'));
 
-        unsigned msk = 0;
-        for (int j = 0; j < 32; ++j)
-            msk |= (vals[j] == '\n') << j;
+        uint64_t msk = (uint64_t)_mm256_movemask_epi8(n1) << 32 | _mm256_movemask_epi8(n2);
+#else
+        char vals[64];
+        memcpy(vals, i + p, 64);
+
+        uint64_t msk = 0;
+        for (int j = 0; j < 64; ++j)
+            msk |= uint64_t(vals[j] == '\n') << j;
 #endif
-        if (msk == 0) {
-            len += 32;
-            i += 32;
+        if (!msk) {
+            len += 64;
+            i += 64;
         } else {
-            int leading_zeroes = __builtin_ctz(msk);
+            int leading_zeroes = __builtin_ctzll(msk);
             len = leading_zeroes ? len : 0;
             len += leading_zeroes;
             ans = __builtin_unpredictable(len > ans) ? len : ans;
