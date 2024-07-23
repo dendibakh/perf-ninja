@@ -47,7 +47,7 @@ uint32_t solution(const char *file_name) {
     uint32_t crc = 0xff'ff'ff'ff;
 
     // Update the CRC32 value character by character
-    char c;
+    int c;
     while ((c = gc()) != EOF) {
 
         update_crc32(crc, static_cast<uint8_t>(c));
