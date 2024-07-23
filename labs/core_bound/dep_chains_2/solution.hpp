@@ -57,7 +57,7 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 // in the corresponding direction.
 template<class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-    const int unroll = 8;
+    const int unroll = 64;
     alignas(RNG) char backing[sizeof(RNG) * unroll];
 
     RNG *rngs = (RNG *) &backing;
