@@ -7,8 +7,9 @@
 #include <xmmintrin.h>
 #endif
 
-#include <iostream>
+#include <bitset>
 #include <cstdint>
+#include <iostream>
 
 unsigned solution(const std::string &inputContents) {
 
@@ -26,10 +27,10 @@ unsigned solution(const std::string &inputContents) {
         __m256i v2 = _mm256_loadu_si256((__m256i *) &p[i + 32]);
         __m256i n1 = _mm256_cmpeq_epi8(v1, _mm256_set1_epi8('\n'));
         __m256i n2 = _mm256_cmpeq_epi8(v2, _mm256_set1_epi8('\n'));
-
         uint64_t m1 = _mm256_movemask_epi8(n1);
         uint64_t m2 = _mm256_movemask_epi8(n2);
         uint64_t msk = m1 | (m2 << 32);
+
 #else
         char vals[64];
         memcpy(vals, i + p, 64);
@@ -42,12 +43,21 @@ unsigned solution(const std::string &inputContents) {
             len += 64;
             i += 64;
         } else {
-            int leading_zeroes = __builtin_ctzll(msk);
+            unsigned leading_zeroes = __builtin_ctzll(msk);
             len = leading_zeroes ? len : 0;
             len += leading_zeroes;
-            ans = __builtin_unpredictable(len > ans) ? len : ans;
-            len = 0;
-            i += 1 + leading_zeroes;
+            ans = std::max(ans, len);
+            uint64_t new_msk = msk >> 1 + leading_zeroes;
+            if (new_msk) {
+                unsigned new_leading_zeroes = __builtin_ctzll(new_msk);
+                ans = std::max(ans, new_leading_zeroes);
+                len = 0;
+                i += leading_zeroes + new_leading_zeroes + 2;
+            } else {
+                unsigned new_leading_zeroes = 64 - (leading_zeroes + 1);
+                len = new_leading_zeroes;
+                i += 64;
+            }
         }
     }
     for (; i < n; ++i) {
