@@ -66,7 +66,7 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
     for (int i = 0; i < STEPS; i++) {
         int j = 0;
         for (; j + unroll <= particles.size(); j += unroll) {
-            for (volatile int k = 0; k < unroll; ++k) {
+            for (int k = 0; k < unroll; ++k) {
                 Particle &p = particles[j + k];
                 uint32_t angle = rngs[k].gen();
                 float angle_rad = angle * DEGREE_TO_RADIAN;
