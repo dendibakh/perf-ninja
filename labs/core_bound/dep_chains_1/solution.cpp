@@ -1,6 +1,7 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
+#include <cstdint>
 
 const auto digsums = []() {
     std::array<uint8_t, 100> res{};
