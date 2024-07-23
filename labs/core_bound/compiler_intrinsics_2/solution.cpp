@@ -1,19 +1,38 @@
 #include "solution.hpp"
 
-#include <cstring>
-
 #ifdef __x86_64__
 #include <immintrin.h>
 #include <xmmintrin.h>
+#else
+#include <arm_neon.h>
+// https://stackoverflow.com/questions/11870910/sse-mm-movemask-epi8-equivalent-method-for-arm-neon
+int vmovmaskq_u8(uint8x16_t input) {
+    uint16x8_t high_bits = vreinterpretq_u16_u8(vshrq_n_u8(input, 7));
+
+    // Merge the even lanes together with vsra. The '??' bytes are garbage.
+    // vsri could also be used, but it is slightly slower on aarch64.
+    // 0x??03 ??02 ??00 ??01
+    uint32x4_t paired16 = vreinterpretq_u32_u16(
+            vsraq_n_u16(high_bits, high_bits, 7));
+    // Repeat with wider lanes.
+    // 0x??????0B ??????04
+    uint64x2_t paired32 = vreinterpretq_u64_u32(
+            vsraq_n_u32(paired16, paired16, 14));
+    // 0x??????????????4B
+    uint8x16_t paired64 = vreinterpretq_u8_u64(
+            vsraq_n_u64(paired32, paired32, 28));
+    // Extract the low 8 bits from each lane and join.
+    // 0x4B
+    return vgetq_lane_u8(paired64, 0) | ((int) vgetq_lane_u8(paired64, 8) << 8);
+}
 #endif
 
 #include <bitset>
 #include <cstdint>
 #include <iostream>
-
 unsigned solution(const std::string &inputContents) {
 
-    const char *p = inputContents.c_str();
+    const unsigned char *p = (unsigned char *) inputContents.c_str();
     const int n = inputContents.length();
     int i = 0;
 
@@ -32,12 +51,24 @@ unsigned solution(const std::string &inputContents) {
         uint64_t msk = m1 | (m2 << 32);
 
 #else
-        char vals[64];
-        memcpy(vals, i + p, 64);
+        uint8x16_t v1_low = vld1q_u8(&p[i + 0]);
+        uint8x16_t v1_high = vld1q_u8(&p[i + 16]);
+        uint8x16_t v2_low = vld1q_u8(&p[i + 32]);
+        uint8x16_t v2_high = vld1q_u8(&p[i + 48]);
 
-        uint64_t msk = 0;
-        for (int j = 0; j < 64; ++j)
-            msk |= uint64_t(vals[j] == '\n') << j;
+        // Compare each byte with '\n'
+        uint8x16_t newline_vec = vdupq_n_u8('\n');
+        uint8x16_t n1_low = vceqq_u8(v1_low, newline_vec);
+        uint8x16_t n1_high = vceqq_u8(v1_high, newline_vec);
+        uint8x16_t n2_low = vceqq_u8(v2_low, newline_vec);
+        uint8x16_t n2_high = vceqq_u8(v2_high, newline_vec);
+
+        // Convert the comparison results to bitmask
+        uint64_t m1 = vmovmaskq_u8(n1_low) << 16 | vmovmaskq_u8(n1_high);
+        uint64_t m2 = vmovmaskq_u8(n2_low) << 16 | vmovmaskq_u8(n2_high);
+
+        // Combine the masks
+        uint64_t msk = m1 | (m2 << 32);
 #endif
         if (!msk) {
             len += 64;
@@ -47,7 +78,7 @@ unsigned solution(const std::string &inputContents) {
             len = leading_zeroes ? len : 0;
             len += leading_zeroes;
             ans = std::max(ans, len);
-            uint64_t new_msk = msk >> 1 + leading_zeroes;
+            uint64_t new_msk = msk >> (1 + leading_zeroes);
             if (new_msk) {
                 unsigned new_leading_zeroes = __builtin_ctzll(new_msk);
                 ans = std::max(ans, new_leading_zeroes);
