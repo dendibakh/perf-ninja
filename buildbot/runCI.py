@@ -100,7 +100,7 @@ elif runner == "LinuxIntelCoffeelake":
   Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
-  # (It seems it doesn't help Coffelake) Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=10.0)
+  Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=10.0)
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=75.0)
   Labs["core_bound"]["vectorization_2"] = LabParams(threshold=85.0)
   Labs["bad_speculation"]["branches_to_cmov_1"] = LabParams(threshold=60.0)
