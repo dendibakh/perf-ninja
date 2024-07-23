@@ -29,7 +29,7 @@ int gc() {
     } else {
         if (_gc_data::last_read) return EOF;
         _gc_data::buf[0] = 0, _gc_data::bc = 0;
-        _gc_data::be = fread_unlocked(_gc_data::buf, 1, sizeof(_gc_data::buf), fd);
+        _gc_data::be = fread(_gc_data::buf, 1, sizeof(_gc_data::buf), fd);
         if (unlikely(feof(fd))) {
             _gc_data::last_read = true;
             _gc_data::buf[_gc_data::be] = EOF;
