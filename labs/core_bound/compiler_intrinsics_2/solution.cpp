@@ -75,15 +75,23 @@ unsigned solution(const std::string &inputContents) {
             len = leading_zeroes ? len : 0;
             len += leading_zeroes;
             ans = std::max(ans, len);
+            // move out the current line we're on
             uint64_t new_msk = msk >> (1 + leading_zeroes);
+
             if (new_msk) {
+                // if there's another line in this chunk, find its end
                 unsigned new_leading_zeroes = __builtin_ctzll(new_msk);
                 ans = std::max(ans, new_leading_zeroes);
                 len = 0;
+                // we're in a situation such as msk = 0b10010 and new_msk = 0b100
+                //                                          ^ leading_zeroes   ^^ new_leading_zeroes
+                //                                      ^^^^^ leading_zeroes + new_leading_zeroes + 2
                 i += leading_zeroes + new_leading_zeroes + 2;
             } else {
+                // number of zeroes to the left of the singular newline
                 unsigned new_leading_zeroes = 64 - (leading_zeroes + 1);
                 len = new_leading_zeroes;
+                // there's only one newline in this chunk, so we're done processing it
                 i += 64;
             }
         }
