@@ -65,7 +65,6 @@ unsigned solution(const std::string &inputContents) {
         uint64_t m1 = vmovmaskq_u8(n1_low) | vmovmaskq_u8(n1_high) << 16;
         uint64_t m2 = vmovmaskq_u8(n2_low) | vmovmaskq_u8(n2_high) << 16;
 
-        // Combine the masks
         uint64_t msk = m1 | (m2 << 32);
 #endif
         if (!msk) {
