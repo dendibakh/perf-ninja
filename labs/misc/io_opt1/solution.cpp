@@ -3,12 +3,6 @@
 #include <fstream>
 #include <stdexcept>
 FILE *fd;
-[[maybe_unused]] constexpr bool assume(bool x) {
-#if defined(__clang__) || defined(__GNUC__)
-    if (!x) __builtin_unreachable();
-#endif
-    return x;
-}
 constexpr bool likely(bool x) {
 #if defined(__clang__) || defined(__GNUC__)
     return __builtin_expect(x, 1);
@@ -17,24 +11,21 @@ constexpr bool likely(bool x) {
 #endif
 }
 constexpr bool unlikely(bool x) { return !likely(!x); }
-namespace _gc_data {
 char buf[1 << 16]{};
 size_t bc = 0, be = 0;
 bool last_read = false;
-} // namespace _gc_data
-[[maybe_unused]] void un_gc() { --_gc_data::bc; }
 int gc() {
-    if (likely(_gc_data::bc < _gc_data::be)) {
-        return _gc_data::buf[_gc_data::bc++];
+    if (likely(bc < be)) {
+        return buf[bc++];
     } else {
-        if (_gc_data::last_read) return EOF;
-        _gc_data::buf[0] = 0, _gc_data::bc = 0;
-        _gc_data::be = fread(_gc_data::buf, 1, sizeof(_gc_data::buf), fd);
+        if (last_read) return EOF;
+        buf[0] = 0, bc = 0;
+        be = fread(buf, 1, sizeof(buf), fd);
         if (unlikely(feof(fd))) {
-            _gc_data::last_read = true;
-            _gc_data::buf[_gc_data::be] = EOF;
+            last_read = true;
+            buf[be] = EOF;
         }
-        return _gc_data::buf[_gc_data::bc++];
+        return buf[bc++];
     }
 }
 
