@@ -27,7 +27,7 @@ unsigned solution(List *l1, List *l2) {
     List *head2 = l2;
     // O(N^2) algorithm:
 
-    const int unroll = 128;
+    const int unroll = 32;
 
     while (l1) {
         int vals[unroll];
