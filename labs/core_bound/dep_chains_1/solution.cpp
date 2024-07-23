@@ -2,11 +2,17 @@
 #include <array>
 #include <iostream>
 
+const auto digsums = []() {
+    std::array<uint8_t, 100> res{};
+    for (int i = 0; i < 100; ++i) res[i] = i % 10 + i / 10 % 10;
+    return res;
+}();
+
 unsigned getSumOfDigits(unsigned n) {
     unsigned sum = 0;
     while (n != 0) {
-        sum = sum + n % 10;
-        n = n / 10;
+        sum += digsums[n % 100]; 
+        n /= 100;
     }
     return sum;
 }
