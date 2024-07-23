@@ -8,6 +8,7 @@
 #endif
 
 #include <iostream>
+#include <cstdint>
 
 unsigned solution(const std::string &inputContents) {
 
