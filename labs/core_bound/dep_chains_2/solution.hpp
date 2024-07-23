@@ -59,6 +59,7 @@ template<class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
     const int unroll = 32;
     alignas(RNG) char backing[sizeof(RNG) * unroll];
+    
     RNG *rngs = (RNG *) &backing;
     for (int k = 0; k < unroll; ++k) rngs[k] = RNG(seed *= 7640183);
 
