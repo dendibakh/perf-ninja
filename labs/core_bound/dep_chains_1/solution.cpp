@@ -27,7 +27,7 @@ unsigned solution(List *l1, List *l2) {
     List *head2 = l2;
     // O(N^2) algorithm:
 
-    const int unroll = 32;
+    const int unroll = 16;
 
     while (l1) {
         int vals[unroll];
@@ -36,16 +36,14 @@ unsigned solution(List *l1, List *l2) {
         for (int i = 0; i < unroll && l1; ++i, l1 = l1->next)
             vals[num_seen++] = l1->value;
 
+        while (num_seen < unroll) vals[num_seen++] = vals[0];
 
-        for (l2 = head2; l2 && num_seen > 0; l2 = l2->next) {
-            for (int i = 0; i < num_seen;) {
-                if (vals[i] == l2->value) {
-                    retVal += getSumOfDigits(vals[i]);
-                    std::swap(vals[i], vals[--num_seen]);
-                } else {
-                    ++i;
-                }
-            }
+
+        for (l2 = head2; l2; l2 = l2->next) {
+            bool found = false;
+            for (auto e: vals)
+                found |= e == l2->value;
+            if (found) retVal += getSumOfDigits(l2->value);
         }
     }
 
