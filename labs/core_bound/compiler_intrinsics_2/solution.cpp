@@ -56,16 +56,14 @@ unsigned solution(const std::string &inputContents) {
         uint8x16_t v2_low = vld1q_u8(&p[i + 32]);
         uint8x16_t v2_high = vld1q_u8(&p[i + 48]);
 
-        // Compare each byte with '\n'
         uint8x16_t newline_vec = vdupq_n_u8('\n');
         uint8x16_t n1_low = vceqq_u8(v1_low, newline_vec);
         uint8x16_t n1_high = vceqq_u8(v1_high, newline_vec);
         uint8x16_t n2_low = vceqq_u8(v2_low, newline_vec);
         uint8x16_t n2_high = vceqq_u8(v2_high, newline_vec);
 
-        // Convert the comparison results to bitmask
-        uint64_t m1 = vmovmaskq_u8(n1_low) << 16 | vmovmaskq_u8(n1_high);
-        uint64_t m2 = vmovmaskq_u8(n2_low) << 16 | vmovmaskq_u8(n2_high);
+        uint64_t m1 = vmovmaskq_u8(n1_low) | vmovmaskq_u8(n1_high) << 16;
+        uint64_t m2 = vmovmaskq_u8(n2_low) | vmovmaskq_u8(n2_high) << 16;
 
         // Combine the masks
         uint64_t msk = m1 | (m2 << 32);
