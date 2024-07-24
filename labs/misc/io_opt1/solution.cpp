@@ -3,8 +3,10 @@
 #include <fstream>
 #include <stdexcept>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define fread_unlocked _fread_nolock
+#elif defined(__APPLE__)
+#define fread_unlocked fread
 #endif
 
 char buf[1 << 20]{};
