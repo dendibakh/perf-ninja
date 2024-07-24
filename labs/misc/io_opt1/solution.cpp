@@ -9,13 +9,8 @@
 #define fread_unlocked fread
 #endif
 
-#if defined(__APPLE__)
-char buf[1 << 28]{};
-#else
-char buf[1 << 20]{};
-#endif
-
 uint32_t solution(const char *file_name) {
+    char buf[1 << 14]{};
     FILE *fd = fopen(file_name, "r");
     if (fd == nullptr) {
         throw std::runtime_error{"The file could not be opened"};
