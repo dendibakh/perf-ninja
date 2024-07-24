@@ -9,7 +9,7 @@
 #define fread_unlocked fread
 #endif
 
-char buf[1 << 20]{};
+char buf[1 << 24]{};
 uint32_t solution(const char *file_name) {
     FILE *fd = fopen(file_name, "r");
     if (fd == nullptr) {
