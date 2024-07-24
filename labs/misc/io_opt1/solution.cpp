@@ -3,13 +3,12 @@
 #include <fstream>
 #include <stdexcept>
 
-#if ON_WINDOwS
-#define fread_unlocked _fread_nolock
-#elif ON_MACOS
-#define fread_unlocked fread
+#ifdef __APPLE__
+char buf[1 << 28]{};
+#else
+char buf[1 << 20]{};
 #endif
 
-char buf[1 << 24]{};
 uint32_t solution(const char *file_name) {
     FILE *fd = fopen(file_name, "r");
     if (fd == nullptr) {
