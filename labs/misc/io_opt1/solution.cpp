@@ -3,7 +3,13 @@
 #include <fstream>
 #include <stdexcept>
 
-#ifdef __APPLE__
+#if defined(_WIN32)
+#define fread_unlocked _fread_nolock
+#elif defined(__APPLE__)
+#define fread_unlocked fread
+#endif
+
+#if defined(__APPLE__)
 char buf[1 << 28]{};
 #else
 char buf[1 << 20]{};
