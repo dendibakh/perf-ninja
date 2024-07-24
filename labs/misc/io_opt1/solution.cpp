@@ -10,11 +10,9 @@
 #endif
 
 uint32_t solution(const char *file_name) {
-    char buf[1 << 14]{};
+    char buf[1 << 20]{};
     FILE *fd = fopen(file_name, "r");
-    if (fd == nullptr) {
-        throw std::runtime_error{"The file could not be opened"};
-    }
+
     // Initial value has all bits set to 1
     uint32_t crc = 0xff'ff'ff'ff;
 
