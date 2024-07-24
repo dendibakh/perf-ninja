@@ -7,8 +7,7 @@ std::size_t select(std::array<S, N> &output, const std::array<S, N> &input,
   std::size_t count = 0;
   for (const auto item : input) {
     bool cond = (lower <= item.first) && (item.first <= upper);
-    S temp[2] = {{}, item};
-    output[count] = std::move(temp[cond]);
+    output[count] = item;
     count = count + cond;
   }
   return count;
