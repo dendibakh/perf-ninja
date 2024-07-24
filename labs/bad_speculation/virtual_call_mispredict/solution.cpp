@@ -6,15 +6,29 @@ void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
     std::uniform_int_distribution<std::uint32_t> distribution(0, 2);
 
+    InstanceArray A;
+    InstanceArray B;
+    InstanceArray C;
+
     for (std::size_t i = 0; i < N; i++) {
         int value = distribution(generator);
         if (value == 0) {
-            array.push_back(std::make_unique<ClassA>());
+            A.push_back(std::make_unique<ClassA>());
         } else if (value == 1) {
-            array.push_back(std::make_unique<ClassB>());
+            B.push_back(std::make_unique<ClassB>());
         } else {
-            array.push_back(std::make_unique<ClassC>());
+            C.push_back(std::make_unique<ClassC>());
         }
+    }
+
+    for (auto&& v : A) {
+        array.emplace_back(std::move(v));
+    }
+    for (auto&& v : B) {
+        array.emplace_back(std::move(v));
+    }
+    for (auto&& v : C) {
+        array.emplace_back(std::move(v));
     }
 }
 
