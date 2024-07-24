@@ -62,7 +62,8 @@ public:
                 // its neighbours as it was counted before
                 aliveNeighbours -= current[i][j];
 
-                int temp[2][4] = {{0, 0, current[i][j], 1}, {0, 0, 0, 0}};
+                static int temp[2][4] = {{0, 0, 0, 1}, {0, 0, 0, 0}};
+                temp[0][2] = current[i][j];
                 future[i][j] = temp[aliveNeighbours >= 4][aliveNeighbours % 4];
 
                 // // Implementing the Rules of Life:
