@@ -10,7 +10,7 @@
 #endif
 
 uint32_t solution(const char *file_name) {
-    int buf_size = file_name[0] == 'S' ? 1 << 13 : 1 << 20;
+    int buf_size = file_name[0] == 'S' ? 1 << 13 : 1 << 22;
     char buf[buf_size];
 
     FILE *fd = fopen(file_name, "r");
@@ -22,7 +22,7 @@ uint32_t solution(const char *file_name) {
     while (true) {
         size_t read = fread_unlocked(buf, 1, buf_size, fd);
         for (int i = 0; i < read; ++i)
-            update_crc32(crc, static_cast<uint8_t>(buf[i]));
+            update_crc32(crc, buf[i]);
         if (read < buf_size) break;
     }
 
