@@ -3,13 +3,13 @@
 #include <fstream>
 #include <stdexcept>
 
-#if defined(_WIN32)
-#define fread_unlocked _fread_nolock
-#elif defined(__APPLE__)
-#define fread_unlocked fread
-#endif
+// #if ON_WINDOwS
+// #define fread_unlocked _fread_nolock
+// #elif ON_MACOS
+// #define fread_unlocked fread
+// #endif
 
-char buf[1 << 24]{};
+// char buf[1 << 24]{};
 uint32_t solution(const char *file_name) {
     FILE *fd = fopen(file_name, "r");
     if (fd == nullptr) {
@@ -19,10 +19,12 @@ uint32_t solution(const char *file_name) {
     uint32_t crc = 0xff'ff'ff'ff;
 
     // Update the CRC32 value character by character
-    while (!feof(fd)) {
-        size_t read = fread_unlocked(buf, 1, sizeof(buf), fd);
-        for (int i = 0; i < read; ++i)
-            update_crc32(crc, static_cast<uint8_t>(buf[i]));
+    int c;
+    while ((c = fgetc(fd)) != EOF) {
+        // size_t read = fread_unlocked(buf, 1, sizeof(buf), fd);
+        // for (int i = 0; i < read; ++i)
+        //     update_crc32(crc, static_cast<uint8_t>(buf[i]));
+        update_crc32(crc, static_cast<uint8_t>(c));
     }
 
     // Invert the bits
