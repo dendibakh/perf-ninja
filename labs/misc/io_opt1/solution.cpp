@@ -11,7 +11,7 @@
 
 uint32_t solution(const char *file_name) {
     int buf_size = file_name[0] == 'S' ? 1 << 13 : 1 << 20;
-    char buf[buf_size]{};
+    char buf[buf_size];
 
     FILE *fd = fopen(file_name, "r");
 
