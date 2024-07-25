@@ -20,8 +20,12 @@ void originalGenerateObjects(InstanceArray& array) {
 }
 
 void originalInvoke(InstanceArray& array, std::size_t& data) {
-    for (const auto& item: array) {
-        item->handle(data);
+    for (const auto& item: array) 
+    {
+        std::visit([&data]( auto&& arg)
+        {
+            arg->handle(data);
+        }, item);
     }
 }
 
