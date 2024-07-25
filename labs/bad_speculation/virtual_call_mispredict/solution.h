@@ -9,24 +9,13 @@ template<typename T>    constexpr uint8_t getIncrement() { return 1; };
 template<>              constexpr uint8_t getIncrement<class ClassB>() { return 2; }
 template<>              constexpr uint8_t getIncrement<class ClassC>() { return 3; } 
 
-
 struct BaseClass {
-    uint8_t increment{};
-
     void handle(std::size_t& data) const { data += getIncrement<decltype(this)>(); };
 };
 
-struct ClassA : public BaseClass {
-    ClassA() { increment = 1; }
-};
-
-struct ClassB : public BaseClass {
-    ClassB() { increment = 2; }
-};
-
-struct ClassC : public BaseClass {
-    ClassC() { increment = 3; }
-};
+struct ClassA : public BaseClass {};
+struct ClassB : public BaseClass {};
+struct ClassC : public BaseClass {};
 
 using InstanceArray = std::vector<std::unique_ptr<BaseClass>>;
 
