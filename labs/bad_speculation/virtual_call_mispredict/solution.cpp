@@ -1,7 +1,6 @@
 #include "solution.h"
 
 #include <random>
-#include <variant>
 
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
@@ -21,11 +20,7 @@ void generateObjects(InstanceArray& array) {
 
 // Invoke the `handle` method on all instances in `output`
 void invoke(InstanceArray& array, std::size_t& data) {
-    for (const auto& item: array) 
-    {
-        std::visit([&data]( auto&& arg)
-        {
-            arg->handle(data);
-        }, item);
+    for (const auto& item: array) {
+        item->handle(data);
     }
 }
