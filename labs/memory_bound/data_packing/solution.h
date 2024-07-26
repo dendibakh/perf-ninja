@@ -12,18 +12,13 @@ constexpr int maxRandom = 100;
 // FIXME: this data structure can be reduced in size
 struct S {
   float d;
-  long long l:14;
-  int i:6;
-  short s:6;
+  long long l:16;
+  int i:8;
+  short s:8;
   bool b:1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
-
-//template <int X>
-//class XD;
-
-//XD<sizeof(S)> xx;
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
