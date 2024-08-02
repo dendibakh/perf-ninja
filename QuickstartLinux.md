@@ -29,6 +29,10 @@
     ```
     sudo cpupower frequency-set --governor performance
     ```
+    To revert, either restart or use the following command:
+    ```
+    sudo cpupower frequency-set -g ondemand
+    ```
 
 7. (Optional) Install [ninja](https://github.com/ninja-build).
     

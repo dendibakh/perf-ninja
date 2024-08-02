@@ -1,0 +1,27 @@
+## Release build
+cmake -E make_directory build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --config Release --parallel 8
+cmake --build . --target validateLab
+cmake --build . --target benchmarkLab
+
+## Debug build
+cmake -E make_directory build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .. -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g"
+cmake --build . --config Debug --parallel 8
+cmake --build . --target validateLab
+cmake --build . --target benchmarkLab
+
+## Warmup notes
+Make changes to solution.h, solution.cpp, typically
+Sometimes need to add files, modify CMakeLists.txt
+
+## Performance monitor (consider also Intel visual profiler)
+perf record ./lab
+
+
+
+
+
