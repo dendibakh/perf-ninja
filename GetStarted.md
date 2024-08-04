@@ -25,7 +25,7 @@ Every lab can be built and run using the following commands:
 ```
 cmake -E make_directory build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ../
 cmake --build . --config Release --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
@@ -36,7 +36,7 @@ When you push changes to your private branch, it will automatically trigger a CI
 
 To match assembly code back to the source in the profile, build your binaries with the debug information:
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" -G Ninja ../
 ```
 
 Lab assignments are built on top of the Google Benchmark library, which by default performs a variable number of benchmark iterations. That makes it hard to compare the performance profiles of two runs since they will not do the same amount of work. You can see the same wall time even though the number of iterations is different. To fix the number of iterations, you can make the following changes:
