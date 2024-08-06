@@ -9,15 +9,15 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) {  
-#ifdef SOLUTION
+// #ifdef SOLUTION
   const size_t row_byte_size = N * sizeof(float);
   if (row_byte_size % CACHELINE_SIZE == 0) {
     return N;
   }
   return (row_byte_size + CACHELINE_SIZE - row_byte_size % CACHELINE_SIZE) / sizeof(float);
-#else
-  return N;
-#endif
+// #else
+//   return N;
+// #endif
 }
 // ******************************************
 
