@@ -86,6 +86,12 @@ int smokeTest() {
 
 int testSize(int N) {
   const int K = n_columns(N);
+  bool ok = K >= N;
+  ok = ok && (K * sizeof(float) < CACHELINE_SIZE || K * sizeof(float) % CACHELINE_SIZE == 0);
+  if (!ok) {
+    std::cerr << "Wrong column number, N = " << N  << ", K = " << K << std::endl;
+    return 2;
+  }
 
   Matrix a1; a1.resize(N * N);  initRandom    (a1, N, N);
   Matrix b1; b1.resize(N * N);  initRandom    (b1, N, N);
