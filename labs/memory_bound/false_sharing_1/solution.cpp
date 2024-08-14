@@ -36,7 +36,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
       target.value += item % 13;
     }
 #ifdef SOLUTION
-  accumulators[target_index] = target;
+  accumulators[target_index].value = target.value.load();
 #endif
   }
 
