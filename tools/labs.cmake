@@ -154,3 +154,5 @@ else()
   set_target_properties(validateLab PROPERTIES FOLDER CI)
   set_target_properties(benchmarkLab PROPERTIES FOLDER CI)
 endif()
+
+add_compile_definitions(SOLUTION)
