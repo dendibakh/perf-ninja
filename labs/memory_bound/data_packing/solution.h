@@ -9,16 +9,31 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-// FIXME: this data structure can be reduced in size
-struct S {
+
+struct S_orig {
   int i;
   long long l;
   short s;
   double d;
   bool b;
 
+  bool operator<(const S_orig &s) const { return this->i < s.i; }
+};
+
+struct S {
+  float d; // 4
+  unsigned l:16; // 2
+  unsigned i:8; // 1
+  unsigned s:7;
+  unsigned b:1; // 1
+
   bool operator<(const S &s) const { return this->i < s.i; }
 };
+
+// template<int T>
+// class Temp;
+// Temp<sizeof(S)> tem;
+// perf stat --topdown -a taskset -c 0 ./lab
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
