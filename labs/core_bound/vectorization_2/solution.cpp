@@ -2,7 +2,7 @@
 #include <limits>
 
 uint16_t checksum(const Blob &blob) {
-    constexpr int unroll = 32;
+    constexpr int unroll = 64;
 	uint16_t accs[unroll]{};
 	std::size_t i = 0; 
 	for (; i + unroll - 1 < blob.size(); i += unroll) {
