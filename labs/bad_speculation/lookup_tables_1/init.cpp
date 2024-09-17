@@ -3,7 +3,8 @@
 #include <random>
 
 void init(std::vector<int> &values) {
-  std::default_random_engine generator;
+  std::random_device r;
+  std::default_random_engine generator(r());
   // generate random integer in the closed interval [0,150]
   // the chance of selecting the default bucket is ~33%
   std::uniform_int_distribution<int> distribution(0, 150);
