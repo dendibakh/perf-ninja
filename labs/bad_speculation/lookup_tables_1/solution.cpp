@@ -9,7 +9,7 @@ static std::size_t mapToBucket(std::size_t v) {
   else if (v < 71)  return 4; //   18
   else if (v < 83)  return 5; //   12
   else if (v < 100) return 6; //   17
-  return -1;  // let it crash
+  return DEFAULT_BUCKET;
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
