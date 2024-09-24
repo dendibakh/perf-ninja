@@ -3,6 +3,7 @@
 // You can still try to solve it to learn the concept, but the result is not guaranteed.
 
 #include <array>
+#include <cstdint>
 
 // Assume those constants never change
 constexpr int N = 10000;
