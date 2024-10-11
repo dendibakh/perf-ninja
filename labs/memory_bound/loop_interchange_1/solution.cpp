@@ -28,9 +28,13 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
+      float accu = 0;
+
       for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+        accu += a[i][k] * b[j][k];
       }
+
+      result[i][j] = accu;
     }
   }
 }
