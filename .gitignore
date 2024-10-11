@@ -23,3 +23,4 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+/.direnv
