@@ -3,19 +3,21 @@
 // You can still try to solve it to learn the concept, but the result is not guaranteed.
 
 #include <array>
+#include <cstdint>
 
 // Assume those constants never change
 constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-// FIXME: this data structure can be reduced in size
+// Smaller does not mean better :-)
+// If the size of the structure is divisible by 16, the compiler will use VMOVUPS instructions. Otherwise, it will have to use slower MOVs.
 struct S {
-  int i;
-  long long l;
-  short s;
-  double d;
-  bool b;
+  float d;
+  std::int64_t l; // [0; 9801]; 2 bytes are enough but this will be slower
+  std::int8_t i;  // [0; 99]
+  std::int8_t s;  // [0; 99]
+  std::int_fast8_t b; // [0; 1]; can pack into a bit field, but this does not really makes sense
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };

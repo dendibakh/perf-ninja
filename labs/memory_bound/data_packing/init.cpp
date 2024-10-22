@@ -4,14 +4,15 @@
 
 #include "solution.h"
 #include <random>
+#include <cstdint>
 
 S create_entry(int first_value, int second_value) {
   S entry;
 
-  entry.i = first_value;
-  entry.s = static_cast<short>(second_value);
+  entry.i = static_cast<std::int8_t>(first_value);
+  entry.s = static_cast<std::int8_t>(second_value);
   entry.l = static_cast<long long>(first_value * second_value);
-  entry.d = static_cast<double>(first_value) / maxRandom;
+  entry.d = static_cast<float>(first_value) / maxRandom;
   entry.b = first_value < second_value;
 
   return entry;
