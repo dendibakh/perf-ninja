@@ -14,10 +14,14 @@ constexpr int maxRandom = 100;
 // If the size of the structure is divisible by 16, the compiler will use VMOVUPS instructions. Otherwise, it will have to use slower MOVs.
 struct S {
   float d;
-  std::int64_t l; // [0; 9801]; 2 bytes are enough but this will be slower
-  std::int8_t i;  // [0; 99]
-  std::int8_t s;  // [0; 99]
-  std::int_fast8_t b; // [0; 1]; can pack into a bit field, but this does not really makes sense
+  unsigned int l : 14;
+  unsigned int i : 7;
+  unsigned int s : 7;
+  unsigned int b : 1;
+  // std::int64_t l; // [0; 9801]; 2 bytes are enough but this will be slower
+  // std::int8_t i;  // [0; 99]
+  // std::int8_t s;  // [0; 99]
+  // std::int_fast8_t b; // [0; 1]; can pack into a bit field, but this does not really makes sense
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
