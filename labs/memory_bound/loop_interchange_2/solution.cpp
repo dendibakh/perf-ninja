@@ -16,21 +16,22 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     dots[c] = 0;
   }
 
-  for (int r = 0; r < std::min(radius, height); r++) {
-    int sum = 0;
-    for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-      int weight = kernel[radius - r + y];
-      sum += weight;
-      for (int c = 0; c < width; c++) {
-        dots[c] += input[y * width + c] * weight;
+  for (int c = 0; c < width; c++) {
+    // Top part of line, partial kernel
+    for (int r = 0; r < std::min(radius, height); r++) {
+      // Accumulation
+      int dot = 0;
+      int sum = 0;
+      auto p = &kernel[radius - r];
+      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+        int weight = *p++;
+        dot += input[y * width + c] * weight;
+        sum += weight;
       }
-    }
 
-    int pos = r * width;
-    for (int c = 0; c < width; c++) {
-      auto value = static_cast<uint8_t>(dots[c] / static_cast<float>(sum) + 0.5f);
-      output[pos + c] = value;
-      dots[c] = 0;
+      // Normalization
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
 
@@ -47,22 +48,22 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     }
   }
 
-  for (int r = std::max(radius, height - radius); r < height; r++) {
-    int sum = 0;
-    for (int y = r - radius; y < height; y++) {
-      int weight = kernel[radius - r + y];
-      sum += weight;
-      int offset = y * width;
-      for (int c = 0; c < width; c++) {
-        dots[c] += input[offset + c] * weight;
+  for (int c = 0; c < width; c++) {
+    // Bottom part of line, partial kernel
+    for (int r = std::max(radius, height - radius); r < height; r++) {
+      // Accumulation
+      int dot = 0;
+      int sum = 0;
+      auto p = kernel;
+      for (int y = r - radius; y < height; y++) {
+        int weight = *p++;
+        dot += input[y * width + c] * weight;
+        sum += weight;
       }
-    }
 
-    int pos = r * width;
-    for (int c = 0; c < width; c++) {
-      auto value = static_cast<uint8_t>(dots[c] / static_cast<float>(sum) + 0.5f);
-      output[pos + c] = value;
-      dots[c] = 0;
+      // Normalization
+      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
 }
