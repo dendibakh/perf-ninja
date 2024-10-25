@@ -27,10 +27,10 @@ static void originalSolution(std::array<S, N> &arr) {
 }
 
 int main() {
-  std::array<S, N> arr;
+  std::array<S, N> arr{};
   init(arr);
 
-  auto expected = arr;
+  std::array<S, N> expected = arr;
   solution(arr);
   originalSolution(expected);
 
