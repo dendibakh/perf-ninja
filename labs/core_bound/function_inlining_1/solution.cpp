@@ -3,24 +3,12 @@
 #include <algorithm>
 #include <stdlib.h>
 
-#define SOLUTION
+// #define SOLUTION
 
 // __attribute__ ((always_inline))
 static bool compare_ref(S const & a, S const & b)
 {
-  if (a.key1 < b.key1)
-    return true;
-
-  if (a.key1 > b.key1)
-    return false;
-
-  if (a.key2 < b.key2)
-    return true;
-
-  if (a.key2 > b.key2)
-    return false;
-
-  return false;
+  return (a.key1 < b.key1 || (a.key1 == b.key1 && a.key2 < b.key2));
 }
 
 static int compare(const void *lhs, const void *rhs) {
@@ -44,7 +32,10 @@ static int compare(const void *lhs, const void *rhs) {
 
 void solution(std::array<S, N> &arr) {
 #ifdef SOLUTION
-  std::sort(arr.begin(), arr.end(), compare_ref);
+  // std::sort(arr.begin(), arr.end(), compare_ref);
+  std::sort(arr.begin(), arr.end(), [](auto const &a, auto const & b) {
+     return (a.key1 < b.key1 || (a.key1 == b.key1 && a.key2 < b.key2));
+  });
 #else
   qsort(arr.data(), arr.size(), sizeof(S), compare);
 #endif
