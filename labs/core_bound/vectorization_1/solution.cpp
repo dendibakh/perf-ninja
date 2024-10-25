@@ -168,7 +168,9 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 }  // end namespace simd
 
 
-
+#ifndef SOLUTION
+#define SOLUTION
+#endif
 
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2)
