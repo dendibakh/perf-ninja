@@ -4,6 +4,7 @@
 
 #include "solution.h"
 #include <random>
+#include <iostream>
 
 S create_entry(int first_value, int second_value) {
   S entry;
