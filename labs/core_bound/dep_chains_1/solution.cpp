@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unordered_set>
 
-// #define SOLUTION
+#define SOLUTION
 
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
