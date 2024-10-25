@@ -17,7 +17,7 @@ unsigned solution_improved(List *l1, List *l2) {
   unsigned retVal = 0;
 
   List *head2{l2};
-  constexpr int capacity{16};
+  constexpr int capacity{256};
   std::array<unsigned,capacity> cached{};
   int cache_len{0};
 
@@ -29,13 +29,16 @@ unsigned solution_improved(List *l1, List *l2) {
     }
 
     l2 = head2;
+    // int found{0};
     while (l2) {
       for (int i = 0; i < cache_len; i++) {
         if (cached[i] == l2->value) {
           retVal += getSumOfDigits(cached[i]);
+          // if (++found == cache_len) break;
           std::swap(cached[i--], cached[(cache_len--)-1]);
         }
       }
+      if (!cache_len) break;
       l2 = l2->next;
     }
 
