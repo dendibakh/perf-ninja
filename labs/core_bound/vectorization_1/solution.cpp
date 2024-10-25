@@ -173,6 +173,9 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
                            std::vector<sequence_t> const &sequences2)
 {
-  // return compute_alignment_base(sequences1, sequences2);
+#ifdef SOLUTION
   return simd::compute_alignment(sequences1, sequences2);
+#else
+  return compute_alignment_base(sequences1, sequences2);
+#endif
 }
