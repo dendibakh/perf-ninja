@@ -2,6 +2,8 @@
 #include <array>
 #include <iostream>
 
+#define SOLUTION
+
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
   while (n != 0) {
@@ -11,16 +13,37 @@ unsigned getSumOfDigits(unsigned n) {
   return sum;
 }
 
-// Task: lookup all the values from l2 in l1.
-// For every found value, find the sum of its digits.
-// Return the sum of all digits in every found number.
-// Both lists have no duplicates and elements placed in *random* order.
-// Do NOT sort any of the lists. Do NOT store elements in a hash_map/sets.
+unsigned solution_improved(List *l1, List *l2) {
+  unsigned retVal = 0;
 
-// Hint: Traversing a linked list is a long data dependency chain:
-//       to get the node N+1 you need to retrieve the node N first.
-//       Think how you can execute multiple dependency chains in parallel.
-unsigned solution(List *l1, List *l2) {
+  List *head2{l2};
+  constexpr int capacity{16};
+  std::array<unsigned,capacity> cached{};
+  int cache_len{0};
+
+  while (l1) {
+    cache_len = 0;
+    for (int i = 0; l1 && i < capacity; i++) {
+      cached[cache_len++] = l1->value;
+      l1 = l1->next;
+    }
+
+    l2 = head2;
+    while (l2) {
+      for (int i = 0; i < cache_len; i++) {
+        if (cached[i] == l2->value) {
+          retVal += getSumOfDigits(cached[i]);
+          std::swap(cached[i--], cached[(cache_len--)-1]);
+        }
+      }
+      l2 = l2->next;
+    }
+
+  }
+  return retVal;
+}
+
+unsigned solution_baseline(List *l1, List *l2) {
   unsigned retVal = 0;
 
   List *head2 = l2;
@@ -39,4 +62,12 @@ unsigned solution(List *l1, List *l2) {
   }
 
   return retVal;
+}
+
+unsigned solution(List *l1, List *l2) {
+#ifdef SOLUTION
+  return solution_improved(l1, l2);
+#else
+  return solution_baseline(l1, l2);
+#endif
 }
