@@ -10,10 +10,19 @@ uint16_t checksum(const Blob &blob) {
   for (auto value : blob) {
     acc += value;
   }
-  constexpr uint32_t div = UINT16_MAX + 1;
-  while (acc > UINT16_MAX) {
-    acc = acc % div + acc / div;
-  }
+  constexpr uint32_t full_mask = ~(uint32_t{0});
+  constexpr uint32_t low_mask = full_mask >> 16;
+
+  // overflow 1
+  uint32_t low = acc & low_mask;
+  uint32_t high = acc >> 16;
+  acc = high + low;
+
+  // overflow 2
+  low = acc & low_mask;
+  high = acc >> 16;
+  acc = high + low;
+
   return int16_t(acc);
 }
 
