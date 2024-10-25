@@ -17,7 +17,7 @@ unsigned solution_improved(List *l1, List *l2) {
   unsigned retVal = 0;
 
   List *head2{l2};
-  constexpr int capacity{256};
+  constexpr int capacity{512};
   std::array<unsigned,capacity> cached{};
   int cache_len{0};
 
