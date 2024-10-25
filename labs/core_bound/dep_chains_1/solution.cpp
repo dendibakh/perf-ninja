@@ -1,8 +1,9 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
+#include <unordered_set>
 
-#define SOLUTION
+// #define SOLUTION
 
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
@@ -14,36 +15,48 @@ unsigned getSumOfDigits(unsigned n) {
 }
 
 unsigned solution_improved(List *l1, List *l2) {
+  std::unordered_set<unsigned> cache;
+  while (l2) {
+    cache.insert(l2->value);
+    l2 = l2->next;
+  }
   unsigned retVal = 0;
-
-  List *head2{l2};
-  constexpr int capacity{512};
-  std::array<unsigned,capacity> cached{};
-  int cache_len{0};
-
   while (l1) {
-    cache_len = 0;
-    for (int i = 0; l1 && i < capacity; i++) {
-      cached[cache_len++] = l1->value;
-      l1 = l1->next;
+    if (cache.count(l1->value)) {
+      retVal += getSumOfDigits(l1->value);
     }
-
-    l2 = head2;
-    // int found{0};
-    while (l2) {
-      for (int i = 0; i < cache_len; i++) {
-        if (cached[i] == l2->value) {
-          retVal += getSumOfDigits(cached[i]);
-          // if (++found == cache_len) break;
-          std::swap(cached[i--], cached[(cache_len--)-1]);
-        }
-      }
-      if (!cache_len) break;
-      l2 = l2->next;
-    }
-
+    l1 = l1->next;
   }
   return retVal;
+
+  // unsigned retVal = 0;
+
+  // List *head2{l2};
+  // constexpr int capacity{4048};
+  // std::array<unsigned,capacity> cached{};
+  // int cache_len{0};
+
+  // while (l1) {
+  //   cache_len = 0;
+  //   for (int i = 0; l1 && i < capacity; i++) {
+  //     cached[cache_len++] = l1->value;
+  //     l1 = l1->next;
+  //   }
+
+  //   l2 = head2;
+  //   while (l2) {
+  //     for (int i = 0; i < cache_len; i++) {
+  //       if (cached[i] == l2->value) {
+  //         retVal += getSumOfDigits(cached[i]);
+  //         std::swap(cached[i--], cached[(cache_len--)-1]);
+  //       }
+  //     }
+  //     if (!cache_len) break;
+  //     l2 = l2->next;
+  //   }
+
+  // }
+  // return retVal;
 }
 
 unsigned solution_baseline(List *l1, List *l2) {
