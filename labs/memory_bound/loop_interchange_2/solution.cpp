@@ -10,52 +10,68 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int *kernel, const int radius,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
+  constexpr int MAX_WIDTH = 32 * 1024; // Honestly a bit unclear what max dim is
 
-  for (int c = 0; c < width; c++) {
-    // Top part of line, partial kernel
-    for (int r = 0; r < std::min(radius, height); r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = &kernel[radius - r];
-      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
+  static int accumulator[MAX_WIDTH]; // Reuse for all functions
+
+  // Top part of line, partial kernel
+  for (int r = 0; r < std::min(radius, height); r++) {
+    // Set everythong to 0 first
+    memset(accumulator, 0, sizeof(int) * width);
+
+    // Perform accumulation
+    int sum = 0;
+    for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+      int weight = kernel[radius-r+y];
+      sum += weight;
+      for (int c = 0; c < width; c++) {
+        accumulator[c] += input[y * width + c] * weight;
       }
-
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
     }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
-
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
+    // Perform division
+    for (int c = 0; c < width; c++) {
+      int value = static_cast<int>(accumulator[c] / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
-    // Bottom part of line, partial kernel
-    for (int r = std::max(radius, height - radius); r < height; r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = kernel;
-      for (int y = r - radius; y < height; y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
+  // Middle part of computations with full kernel
+  for (int r = radius; r < height - radius; r++) {
+    // Set everythong to 0 first
+    memset(accumulator, 0, sizeof(int) * width);
+
+    // Perform accumulation
+    for (int i = 0; i < radius + 1 + radius; i++) {
+      for (int c = 0; c < width; c++) {
+        accumulator[c] += input[(r - radius + i) * width + c] * kernel[i];
       }
+    }
 
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+    // Fast shift instead of division
+    for (int c = 0; c < width; c++) {
+      int value = (accumulator[c] + rounding) >> shift;
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+
+  for (int r = std::max(radius, height - radius); r < height; r++) {
+    // Set everythong to 0 first
+    memset(accumulator, 0, sizeof(int) * width);
+
+    // Perform accumulation
+    int sum = 0;
+    for (int y = r - radius; y < height; y++) {
+      int weight = kernel[y-(r-radius)];
+      sum += weight;
+      for (int c = 0; c < width; c++) {
+        accumulator[c] += input[y * width + c] * weight;
+      }
+    }
+
+    // Perform division
+    for (int c = 0; c < width; c++) {
+      int value = static_cast<int>(accumulator[c] / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
