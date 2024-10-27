@@ -18,8 +18,11 @@ constexpr std::array<std::size_t, 151> bucket_map {
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
-  for (auto v : values) {
-    retBuckets[bucket_map[v]]++;
+  
+  #pragma unroll
+  for (std::size_t i = 0; i < values.size(); i++) {
+    retBuckets[bucket_map[values[i]]]++;
   }
+  
   return retBuckets;
 }
