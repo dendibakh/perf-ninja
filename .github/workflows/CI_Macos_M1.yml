@@ -25,6 +25,5 @@ jobs:
       shell: bash
 
     - name: Benchmark
-      shell: bash
       working-directory: ${{github.workspace}}
       run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner MacosM1
