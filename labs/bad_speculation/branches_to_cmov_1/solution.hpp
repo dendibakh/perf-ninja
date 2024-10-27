@@ -22,9 +22,12 @@ public:
 
     int getPopulationCount() {
         int populationCount = 0;
-        for (auto& row: current)
-            for (auto& item: row)
-                populationCount += item;
+        for (auto& row: current) {
+            #pragma unroll
+            for (std::size_t i = 0; i < row.size(); i++) {
+                populationCount += row[i];
+            }
+        }
         return populationCount;
     }
 
@@ -43,46 +46,44 @@ public:
         int M = current.size();
         int N = current[0].size();
         
-        // Loop through every cell
-        for(int i = 0; i < M; i++) {
-            for(int j = 0; j < N; j++) {
-                int aliveNeighbours = 0;      
-                // finding the number of neighbours that are alive                  
-                for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
-                    for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-                        if((i + p < 0) ||                   // if row offset less than UPPER boundary
-                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                           (j + q < 0) ||                   // if column offset less than LEFT boundary
-                           (j + q > N - 1))                 // if column offset more than RIGHT boundary
-                            continue;
-                        aliveNeighbours += current[i + p][j + q];
-                    }
-                }
-                // The cell needs to be subtracted from
-                // its neighbours as it was counted before
-                aliveNeighbours -= current[i][j];
-
-                // Implementing the Rules of Life:
-                switch(aliveNeighbours) {
-                    // 1. Cell is lonely and dies
-                    case 0:
-                    case 1:
-                        future[i][j] = 0;
-                        break;                   
-                    // 2. Remains the same
-                    case 2:
-                        future[i][j] = current[i][j];
-                        break;
-                    // 3. A new cell is born
-                    case 3:
-                        future[i][j] = 1;
-                        break;
-                    // 4. Cell dies due to over population
-                    default:
-                        future[i][j] = 0;
+        auto step_fn = [&](int i, int j, int pmin, int pmax, int qmin, int qmax) {
+            int aliveNeighbours = 0;      
+            // finding the number of neighbours that are alive                  
+            for(int p = pmin; p <= pmax; p++) {              // row-offet (-1,0,1)
+                for(int q = qmin; q <= qmax; q++) {          // col-offset (-1,0,1)
+                    aliveNeighbours += current[i + p][j + q];
                 }
             }
+            // The cell needs to be subtracted from
+            // its neighbours as it was counted before
+            aliveNeighbours -= current[i][j];
+
+            // Implementing the Rules of Life:
+            future[i][j] = int(aliveNeighbours == 2) * current[i][j]+ aliveNeighbours == 3;
+        };
+
+        // Loop through every cell
+        for(int i = 1; i < M - 1; i++) {
+            for(int j = 1; j < N - 1; j++) {
+                step_fn(i, j, -1, 1, -1, 1);
+            }
         }
+
+        for (int i = 1; i < M - 1; i++) {
+            step_fn(i, 0, -1, 1, 0, 1);
+            step_fn(i, N - 1, -1, 1, -1, 0);
+        }
+
+        for (int j = 1; j < N - 1; j++) {
+            step_fn(0, j, 0, 1, -1, 1);
+            step_fn(M - 1, j, -1, 0, -1, 1);
+        }
+
+        step_fn(0, 0, 0, 1, 0, 1);
+        step_fn(0, N - 1, 0, 1, -1, 0);
+        step_fn(M - 1, 0, -1, 0, 0, 1);
+        step_fn(M - 1, N - 1, -1, 0, -1, 0);
+
         std::swap(current, future);
     }
 };
