@@ -20,6 +20,7 @@ jobs:
         echo "export PATH=/opt/homebrew/opt/llvm/bin:\$PATH" >> $GITHUB_ENV
         echo "export CC=clang" >> $GITHUB_ENV
         echo "export CXX=clang++" >> $GITHUB_ENV
+        echo "export SHELL=/usr/bash" >> $GITHUB_ENV
         echo "PATH: $PATH"
         echo "SHELL: $SHELL"
       shell: bash
@@ -27,3 +28,4 @@ jobs:
     - name: Benchmark
       working-directory: ${{github.workspace}}
       run: python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner MacosM1
+      shell: bash
