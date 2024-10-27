@@ -15,8 +15,11 @@ static std::size_t mapToBucket(std::size_t v) {
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
   std::array<std::size_t, 151> bucket_map;
-  for (int i = 0; i < 151; ++i) {
+  for (int i = 0; i < 100; ++i) {
     bucket_map[i] = mapToBucket(i);
+  }
+  for (int i = 100; i <= 150; ++i) {
+    bucket_map[i] = DEFAULT_BUCKET;
   }
   for (auto v : values) {
     retBuckets[bucket_map[v]]++;
