@@ -1,6 +1,6 @@
 #include "solution.hpp"
 
-int bucket_map[151] = {
+constexpr std::array<std::size_t, 151> bucket_map {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0-12
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 13-28
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // 29-40
@@ -16,14 +16,10 @@ int bucket_map[151] = {
   7
 };
 
-static std::size_t mapToBucket(std::size_t v) {
-  return bucket_map[v];
-}
-
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
   for (auto v : values) {
-    retBuckets[mapToBucket(v)]++;
+    retBuckets[bucket_map[v]]++;
   }
   return retBuckets;
 }
