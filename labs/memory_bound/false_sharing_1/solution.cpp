@@ -9,7 +9,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
   struct Accumulator {
-    std::atomic<uint32_t> value = 0;
+    alignas(64) std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
 
