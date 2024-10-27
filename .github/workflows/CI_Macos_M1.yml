@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 0
 
     - name: SetPATH
-      run: echo "export PATH=\$PATH:/opt/homebrew/opt/llvm/bin" >> $GITHUB_ENV
+      run: echo "export PATH=/opt/homebrew/opt/llvm/bin:\$PATH" >> $GITHUB_ENV
 
     - name: Benchmark
       shell: bash
