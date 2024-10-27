@@ -1,12 +1,13 @@
 #include "solution.h"
 
 #include <random>
+#include <array>
 
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
     std::uniform_int_distribution<std::uint32_t> distribution(0, 2);
 
-    std::array<int, 3> counter{};
+    std::array<int, 3> counter{0};
     for (size_t i = 0; i < N; i++) {
         int value = distribution(generator);
         counter[value]++;
