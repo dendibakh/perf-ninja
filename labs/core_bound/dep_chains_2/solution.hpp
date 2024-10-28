@@ -50,17 +50,71 @@ static float cosine(float x) {
 // We do calculations in double precision then convert to float.
 constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 
+
+// #define SOLUTION
+
+#ifdef SOLUTION
 // Simulate the motion of the particles.
 // For every particle, we generate a random angle and move the particle
 // in the corresponding direction.
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-  RNG rng(seed);  
-  for (int i = 0; i < STEPS; i++)
+  int N = particles.size();
+  constexpr int M = 32;
+  std::vector<RNG> ranges;
+  for (int i = 0; i < M; i++) {
+    ranges.emplace_back(seed+i);
+  }
+
+  seed += M;
+
+  int vectorized_set = PARTICLES / M;
+
+  // vectorized
+  for (int s = 0; s < STEPS; s++) {
+    for (int i = 0; i < vectorized_set; i++) {
+      for (int r = 0; r < M; r++) {
+        auto & rng = ranges[r];
+        rng.val = s*PARTICLES + i*M + r;
+        uint32_t angle = rng.gen();
+        float angle_rad = angle * DEGREE_TO_RADIAN;
+        auto & p = particles[i*M + r];
+        p.x += cosine(angle_rad) * p.velocity;
+        p.y += sine(angle_rad) * p.velocity;
+      }
+    }
+  }
+
+  // not vectorized
+  int offset = vectorized_set*M;
+
+  for (int s = 0; s < STEPS; s++) {
+    for (int r = 0; r < N-offset; r++) {
+      auto & rng = ranges[r];
+      rng.val = s*PARTICLES + offset + r;
+      uint32_t angle = rng.gen();
+      float angle_rad = angle * DEGREE_TO_RADIAN;
+      auto & p = particles[offset + r];
+      p.x += cosine(angle_rad) * p.velocity;
+      p.y += sine(angle_rad) * p.velocity;
+    }
+  }
+}
+
+#else
+
+template <class RNG>
+void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
+  RNG rng(seed);
+  for (int i = 0; i < STEPS; i++) {
     for (auto &p : particles) {
       uint32_t angle = rng.gen();
       float angle_rad = angle * DEGREE_TO_RADIAN;
       p.x += cosine(angle_rad) * p.velocity;
       p.y += sine(angle_rad) * p.velocity;
     }
+  }
+
 }
+
+#endif
