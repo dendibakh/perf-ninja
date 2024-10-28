@@ -24,12 +24,10 @@ struct XorShift32 {
   XorShift32 (uint32_t seed) : val(seed) {}
 public:
   uint32_t gen() {
-    val ^= (val << 13);
-    val ^= (val >> 17);
-    val ^= (val << 5);
     return val;
   }
 };
+
 
 constexpr double PI_D = 3.141592653589793238463;
 constexpr float PI_F = 3.14159265358979f;
@@ -56,11 +54,11 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
   RNG rng(seed);  
-  for (int i = 0; i < STEPS; i++)
-    for (auto &p : particles) {
-      uint32_t angle = rng.gen();
-      float angle_rad = angle * DEGREE_TO_RADIAN;
+  for (int i = 0; i < STEPS; i++) {
+    for (auto& p : particles) {
+      float angle_rad = rng.gen() * DEGREE_TO_RADIAN;
       p.x += cosine(angle_rad) * p.velocity;
       p.y += sine(angle_rad) * p.velocity;
     }
+  }
 }
