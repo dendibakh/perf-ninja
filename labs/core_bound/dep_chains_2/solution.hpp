@@ -59,21 +59,19 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 // in the corresponding direction.
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-  int N = particles.size();
+  uint32_t N = particles.size();
   constexpr int M = 32;
   std::vector<RNG> ranges;
-  for (int i = 0; i < M; i++) {
+  for (uint32_t i = 0; i < M; i++) {
     ranges.emplace_back(seed+i);
   }
 
-  seed += M;
-
-  int vectorized_set = PARTICLES / M;
+  constexpr uint32_t vectorized_set = PARTICLES / M;
 
   // vectorized
-  for (int s = 0; s < STEPS; s++) {
-    for (int i = 0; i < vectorized_set; i++) {
-      for (int r = 0; r < M; r++) {
+  for (uint32_t s = 0; s < STEPS; s++) {
+    for (uint32_t i = 0; i < vectorized_set; i++) {
+      for (uint32_t r = 0; r < M; r++) {
         auto & rng = ranges[r];
         rng.val = s*PARTICLES + i*M + r;
         uint32_t angle = rng.gen();
@@ -86,10 +84,10 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
   }
 
   // not vectorized
-  int offset = vectorized_set*M;
+  constexpr int offset = vectorized_set*M;
 
-  for (int s = 0; s < STEPS; s++) {
-    for (int r = 0; r < N-offset; r++) {
+  for (uint32_t s = 0; s < STEPS; s++) {
+    for (uint32_t r = 0; r < N-offset; r++) {
       auto & rng = ranges[r];
       rng.val = s*PARTICLES + offset + r;
       uint32_t angle = rng.gen();
