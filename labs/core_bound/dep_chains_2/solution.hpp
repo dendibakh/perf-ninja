@@ -60,7 +60,7 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
   uint32_t N = particles.size();
-  constexpr int M = 32;
+  constexpr int M = 128;
   std::vector<RNG> ranges;
   for (uint32_t i = 0; i < M; i++) {
     ranges.emplace_back(seed+i);
