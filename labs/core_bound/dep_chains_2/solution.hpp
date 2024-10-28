@@ -51,7 +51,7 @@ static float cosine(float x) {
 constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 
 
-// #define SOLUTION
+#define SOLUTION
 
 #ifdef SOLUTION
 // Simulate the motion of the particles.
