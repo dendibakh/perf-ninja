@@ -70,11 +70,13 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
   constexpr uint32_t vectorized_set = PARTICLES / M;
 
   // vectorized
-    for (uint32_t i = 0; i < vectorized_set; i++) {
-      for (uint32_t s = 0; s < STEPS; s++) {
+  for (uint32_t s = 0; s < STEPS; s++) {
+  for (uint32_t i = 0; i < vectorized_set; i++) {
+    uint32_t offset = i*M;
       for (uint32_t r = 0; r < M; r++) {
         auto & rng = ranges[r];
-        rng.val = s*PARTICLES + i*M + r;
+        // rng.val = s*PARTICLES + i*M + r;
+        rng.val = s*PARTICLES + offset + r;
 
         uint32_t angle = rng.gen();
         float angle_rad = angle * DEGREE_TO_RADIAN;

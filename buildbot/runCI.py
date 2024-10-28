@@ -256,6 +256,7 @@ def getSpeedUp(jsonMeasurement):
   new = jsonMeasurement['real_time_other']
   diff = old - new
   speedup = (diff / old ) * 100
+  print("new", new, "old", old, "diff" , diff, "speedup", speedup)
   return speedup
 
 # We can implement other aggregating function if average
