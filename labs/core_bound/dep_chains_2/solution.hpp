@@ -24,7 +24,7 @@ struct XorShift32 {
   XorShift32 (uint32_t seed) : val(seed) {}
 public:
   uint32_t gen() {
-    return val;
+    return val >> 17 ^ val >> 13 ^ val >> 5;
   }
 };
 
