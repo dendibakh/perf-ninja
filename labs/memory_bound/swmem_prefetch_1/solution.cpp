@@ -1,4 +1,5 @@
 #include "solution.hpp"
+#include <cstddef>
 
 static int getSumOfDigits(int n) {
   int sum = 0;
@@ -13,10 +14,14 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
 #ifdef SOLUTION
+  constexpr size_t prefetch_elements = 5;
+    for (int j = 0; j < std::min(prefetch_elements, lookups.size()); j++) {
+      __builtin_prefetch(hash_map->getPtr(lookups[j]));
+    }
   for (size_t i = 0; i < lookups.size(); ++i) {
     auto val = lookups[i];
-    if (i + 1 < lookups.size()) {
-      __builtin_prefetch(hash_map->getPtr(lookups[i + 1]));
+    if (i + prefetch_elements < lookups.size()) {
+      __builtin_prefetch(hash_map->getPtr(lookups[i + prefetch_elements]));
     }
     if (hash_map->find(val)) {
       result += getSumOfDigits(val);
