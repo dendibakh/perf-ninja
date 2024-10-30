@@ -10,7 +10,7 @@ bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   // constexpr int KiB = 1024;
   // constexpr int L1_size = 32*KiB;  //
   // constexpr int tile_size = (int)std::floor(std::sqrt(L1_size / sizeof(double)));
-  constexpr int tile_size = 64;
+  constexpr int tile_size = 32;
   // int lim = (size / tile_size) * tile_size;
   for (int i = 0; i < size; i += tile_size) {
     for (int j = 0; j < size; j += tile_size) {
