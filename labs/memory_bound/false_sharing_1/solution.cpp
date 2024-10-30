@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 
-#define SOLUTION
+// #define SOLUTION
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
@@ -16,8 +16,8 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   //   std::atomic<uint32_t> value = 0;
   //   std::array<double,7> padding{};
   // };
-  struct Accumulator {
-    alignas(64) std::atomic<uint32_t> value = 0;
+  struct alignas(64) Accumulator {
+    std::atomic<uint32_t> value = 0;
   };
 #else
   struct Accumulator {
