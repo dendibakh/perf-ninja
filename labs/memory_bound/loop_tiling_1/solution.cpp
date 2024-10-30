@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-// #define SOLUTION
+#define SOLUTION
 
 #ifdef SOLUTION
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
