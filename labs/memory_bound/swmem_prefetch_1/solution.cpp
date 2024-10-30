@@ -14,7 +14,7 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
 #ifdef SOLUTION
-  constexpr size_t prefetch_elements = 5;
+  constexpr size_t prefetch_elements = 10;
     for (int j = 0; j < std::min(prefetch_elements, lookups.size()); j++) {
       __builtin_prefetch(hash_map->getPtr(lookups[j]));
     }
