@@ -8,11 +8,15 @@
 S create_entry(int first_value, int second_value) {
   S entry;
 
-  entry.i = first_value;
-  entry.s = static_cast<short>(second_value);
-  entry.l = static_cast<long long>(first_value * second_value);
-  entry.d = static_cast<double>(first_value) / maxRandom;
-  entry.b = first_value < second_value;
+  // entry.i = first_value;
+  entry.setInt(first_value);
+  // entry.s = static_cast<short>(second_value);
+  entry.setShort(static_cast<short>(second_value));
+  // entry.l = static_cast<long long>(first_value * second_value);
+  entry.setLong(static_cast<long long>(first_value * second_value));
+  entry.setDouble( static_cast<double>(first_value) / maxRandom);
+  // entry.b = first_value < second_value;
+  entry.setBool(first_value < second_value);
 
   return entry;
 }

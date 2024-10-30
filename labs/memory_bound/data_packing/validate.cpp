@@ -19,31 +19,32 @@ bool check_entry(int first, int second) {
 
   bool isValid = true;
 
-  if (entry.i != first) {
-    reportError("i", entry.i, first, first, second);
+  // if (entry.i != first) {
+  if (entry.getInt() != first) {
+    reportError("i", entry.getInt(), first, first, second);
     isValid = false;
   }
 
-  if (entry.s != second) {
-    reportError("s", entry.s, second, first, second);
+  if (entry.getShort() != second) {
+    reportError("s", entry.getShort(), second, first, second);
     isValid = false;
   }
 
   const auto expected_l = static_cast<short>(first * second);
-  if (entry.l != expected_l) {
-    reportError("l", entry.l, expected_l, first, second);
+  if (entry.getLong() != expected_l) {
+    reportError("l", entry.getLong(), expected_l, first, second);
     isValid = false;
   }
   
   const auto expected_d = static_cast<double>(first) / maxRandom;
-  if (std::abs(float(entry.d - expected_d)) > 0.001) {
-    reportError("d", entry.d, expected_d, first, second);
+  if (std::abs(float(entry.getDouble() - expected_d)) > 0.001) {
+    reportError("d", entry.getDouble(), expected_d, first, second);
     isValid = false;
   }
 
   const auto expected_b = (first < second);
-  if (entry.b != expected_b) {
-    reportError("b", entry.b, expected_b, first, second);
+  if (entry.getBool() != expected_b) {
+    reportError("b", entry.getBool(), expected_b, first, second);
     isValid = false;
   }
 
@@ -60,9 +61,9 @@ int main() {
 
   for (int i = 0; i < N; i++) {
     // we only check i components since sort can be unstable
-    if (arr[i].i != expected[i].i) {
-      std::cerr << "Validation Failed. Result[" << i << "].i = " << arr[i].i
-                << ". Expected[" << i << "].i = " << expected[i].i << std::endl;
+    if (arr[i].getInt() != expected[i].getInt()) {
+      std::cerr << "Validation Failed. Result[" << i << "].i = " << arr[i].getInt()
+                << ". Expected[" << i << "].i = " << expected[i].getInt() << std::endl;
       return 1;
     }
   }
