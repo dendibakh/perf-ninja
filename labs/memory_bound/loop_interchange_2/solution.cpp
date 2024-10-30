@@ -3,6 +3,78 @@
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <iostream>
+#include <array>
+
+#define SOLUTION
+
+static void filterVerticallyOpt(uint8_t *output, const uint8_t *input,
+                                int width, const int height,
+                                const int *kernel, int radius,
+                                int shift)
+{
+  const int rounding = 1 << (shift - 1);
+  std::array<int, 10'000> dot;
+  std::array<int, 10'000> sum;
+
+  for (int r = 0; r < std::min(radius, height); r++) {
+    // Accumulation
+    std::fill(dot.begin(), dot.begin()+width, 0);
+    std::fill(sum.begin(), sum.begin()+width, 0);
+    auto p = &kernel[radius - r];
+
+    for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+      int weight = *p++;
+      for (int c = 0; c < width; c++) {
+        dot[c] += input[y * width + c] * weight;
+        sum[c] += weight;
+      }
+    }
+    // Normalization
+    for (int c = 0; c < width; c++) {
+      int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+
+  // Middle part of computations with full kernel
+  for (int r = radius; r < height - radius; r++) {
+    // Accumulation
+    std::fill(dot.begin(), dot.begin()+width, 0);
+    for (int i = 0; i < radius + 1 + radius; i++) {
+      for (int c = 0; c < width; c++) {
+        dot[c] += input[(r - radius + i) * width + c] * kernel[i];
+      }
+    }
+
+    // Fast shift instead of division
+    for (int c = 0; c < width; c++) {
+      int value = (dot[c] + rounding) >> shift;
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+
+    // Bottom part of line, partial kernel
+    for (int r = std::max(radius, height - radius); r < height; r++) {
+      // Accumulation
+      std::fill(dot.begin(), dot.begin()+width, 0);
+      std::fill(sum.begin(), sum.begin()+width, 0);
+      auto p = kernel;
+      for (int y = r - radius; y < height; y++) {
+        int weight = *p++;
+        for (int c = 0; c < width; c++) {
+          dot[c] += input[y * width + c] * weight;
+          sum[c] += weight;
+        }
+      }
+
+      // Normalization
+      for (int c = 0; c < width; c++) {
+        int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+        output[r * width + c] = static_cast<uint8_t>(value);
+      }
+    }
+}
 
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
@@ -121,6 +193,7 @@ static void filterHorizontally(uint8_t *output, const uint8_t *input,
 // Applies Gaussian blur to a grayscale image
 void blur(uint8_t *output, const uint8_t *input, const int width,
           const int height, uint8_t *temp) {
+  // std::cout << "width = " << width << std::endl;
   // Integer Gaussian blur with kernel size 5
   // https://en.wikipedia.org/wiki/Kernel_(image_processing)
   constexpr int radius = 2;
@@ -129,7 +202,11 @@ void blur(uint8_t *output, const uint8_t *input, const int width,
   constexpr int shift = 4;
 
   // A pair of 1-dimensional passes to achieve 2-dimensional transform
+#ifdef SOLUTION
+  filterVerticallyOpt(temp, input, width, height, kernel, radius, shift);
+#else
   filterVertically(temp, input, width, height, kernel, radius, shift);
+#endif
   filterHorizontally(output, temp, width, height, kernel, radius, shift);
 }
 
