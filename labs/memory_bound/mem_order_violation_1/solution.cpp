@@ -9,6 +9,60 @@
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
+// #define SOLUTION
+#ifdef SOLUTION
+std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+  std::array<uint32_t, 256> hist;
+  hist.fill(0);
+
+  int range_size = 32;
+  int hist_size = 256;
+
+  for (int i = 0; i < image.width * image.height - 1; i += 2)
+  {
+    auto val1 = image.data[i];
+    auto val2 = image.data[i+1];
+    hist[val1]++;
+    hist[val2]++;
+  }
+
+  // int par = 3;
+  // int limit = (image.width * image.height) / par * par;
+  // for (int i = 0; i <= limit - par; i += par)
+  // {
+  //   auto val1 = image.data[i];
+  //   auto val2 = image.data[i+1];
+  //   auto val3 = image.data[i+2];
+  //   hist[val1]++;
+  //   hist[val2]++;
+  //   hist[val3]++;
+  // }
+
+  // for (int i = limit; i < image.width*image.height; i++)
+  //   hist[image.data[i]]++;
+
+
+  // auto prev_color = image.data[0];
+  // uint32_t cnt{1};
+
+  // for (int i = 1; i < image.width * image.height; i++) {
+  //   auto cur_color = image.data[i];
+  //   if (cur_color == prev_color) {
+  //     cnt++;
+  //   }
+  //   else {
+  //     hist[prev_color] += cnt;
+  //     cnt = 1;
+  //     prev_color = cur_color;
+  //   }
+  // }
+  // hist[prev_color] += cnt;
+
+  return hist;
+}
+
+#else
+
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   std::array<uint32_t, 256> hist;
   hist.fill(0);
@@ -16,6 +70,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
     hist[image.data[i]]++;
   return hist;
 }
+#endif
 // ******************************************
 
 // Calculate Otsu's Threshold
