@@ -8,8 +8,9 @@ static void bench1(benchmark::State &state) {
     // Mesh
     constexpr unsigned n_nodes_x = 800, n_nodes_y = 20000,
                        n_nodes = n_nodes_x * n_nodes_y;
+    initialize_arena(6*n_nodes);
     constexpr unsigned seed = 0xaf173e8au;
-    const auto x_alloc = allocateDoublesArray(n_nodes);
+    const auto x_alloc =  allocateDoublesArray (n_nodes);
     const auto y_alloc = allocateDoublesArray(n_nodes);
     const auto topology =
         generateMesh(n_nodes_x, n_nodes_y, x_alloc.get(), y_alloc.get(), seed);

@@ -39,6 +39,7 @@ template <typename Allocator> auto solve(Allocator &&alloc) {
 
 int main() {
   try {
+    initialize_arena(10*n_nodes);
     const auto sol_user =
         solve([](size_t size) { return allocateDoublesArray(size); });
     const auto sol_valid =

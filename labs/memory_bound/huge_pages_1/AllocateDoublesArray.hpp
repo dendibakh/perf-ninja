@@ -1,5 +1,7 @@
 #include <iostream>
 #include <memory>
+#include <cstddef>
+#include <stdexcept>
 
 #if defined(__linux__) || defined(__linux) || defined(linux) ||                \
     defined(__gnu_linux__)
@@ -149,12 +151,73 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+#define SOLUTION
+
+#ifdef SOLUTION
+template <typename T>
+class Arena {
+  void *_root = nullptr;
+  size_t _offset{0};
+  size_t _capacity{0};
+ public:
+  Arena(size_t size)
+      : _capacity(size)
+  {
+    _root = mmap(nullptr, _capacity*sizeof(T),
+                 PROT_READ | PROT_WRITE | PROT_EXEC,
+                 MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
+    if (_root == MAP_FAILED) {
+      throw std::bad_alloc();
+    }
+    madvise(_root, _capacity*sizeof(T), MADV_HUGEPAGE);
+  }
+  double* allocate(size_t size) {
+    // std::cout << "allocate " << size << " (" <<
+    //     "cur " << _offset << " "
+    //     "max " << _capacity << ")"  << std::endl;
+    if (_offset + size > _capacity)
+      throw std::bad_alloc();
+    double* ans = reinterpret_cast<double*>(_root) + _offset;
+    _offset += size;
+    return ans;
+  }
+  ~Arena() {
+    munmap(_root, _capacity*sizeof(T));
+  }
+};
+
+std::unique_ptr<Arena<double>> arena{nullptr};
+
+void initialize_arena(size_t size) {
+  arena = std::make_unique<Arena<double>>(size);
+}
+
+inline auto allocateDoublesArray(size_t size) {
+  double* ptr = arena->allocate(size);
+  auto deleter = [=](double *ptr) {};
+  return std::unique_ptr<double[], decltype(deleter)>(ptr, std::move(deleter));
+
+  // void* alloc = mmap(nullptr, size*sizeof(double), PROT_READ | PROT_WRITE | PROT_EXEC,
+  //                 MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
+  // madvise(alloc, size, MADV_HUGEPAGE);
+  // // remember to cast the pointer to double* if your allocator returns void*
+  // auto ptr = reinterpret_cast<double*>(alloc);
+  // auto deleter = [=](double *ptr) {
+  //   munmap(alloc, size*sizeof(double));
+  // };
+  // return std::unique_ptr<double[], decltype(deleter)>(ptr, std::move(deleter));
+}
+#else
+
+void initialize_arena(size_t size) {
+}
+
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   double *alloc = new double[size];
-  // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
@@ -168,3 +231,5 @@ inline auto allocateDoublesArray(size_t size) {
   // The more verbose version is meant to demonstrate the use of a custom
   // (potentially stateful) deleter
 }
+
+#endif
