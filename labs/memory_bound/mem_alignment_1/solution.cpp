@@ -1,6 +1,7 @@
 
 #include "solution.h"
 #include <random>
+#include <iostream>
 
 // ******************************************
 // Change this function
@@ -8,9 +9,44 @@
 // This function allows you to change the number of columns in a matrix. 
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
+// #define SOLUTION
+
+#if defined(__linux__) || defined(__linux) || defined(linux) ||                \
+    defined(__gnu_linux__)
+#define ON_LINUX
+#elif defined(__APPLE__) && defined(__MACH__)
+#define ON_MACOS
+#elif defined(_WIN32) || defined(_WIN64)
+#define ON_WINDOWS
+#endif
+
+#ifdef SOLUTION
+#if defined(ON_LINUX) || defined(ON_WINDOWS)
+constexpr int cache_line_size = 64;
+#else
+constexpr int cache_line_size = 128;
+#endif
+
+constexpr int floats_in_cache_line = cache_line_size / sizeof(float);
+
+int n_columns(int N) {
+  if (N <= 100) return N;
+  // if (N % cache_line_size == 0) return N;
+  else {
+    // std::cout << "N = " << N << std::endl;
+    // std::cout << "cache_line_size = " << cache_line_size << std::endl;
+    // auto ans =  (1+(N / cache_line_size)) * (cache_line_size);
+    constexpr int K = floats_in_cache_line;
+    auto ans = ((N + K - 1) / K) * K;
+    // std::cout << "N = " << N << " ans = " << ans << " sizeof float " << sizeof(float)<< std::endl;
+    return ans;
+  }
+}
+#else
 int n_columns(int N) {  
   return N;
 }
+#endif
 // ******************************************
 
 // DO NOT change any of the functions below.
