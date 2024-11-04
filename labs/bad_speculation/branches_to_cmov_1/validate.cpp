@@ -107,6 +107,13 @@ int main() {
   auto original_result = original_solution(grids);
   auto result = solution(grids);
   
+  // for (int i = 0; i < result.size(); i++) {
+  //   for (int j = 0; j < result[i].size(); j++) {
+  //     if (result[i][j] != original_result[i][j]) {
+  //       std::cout << "i = " << i << " j = " << j << " original " << original_result[i][j] << " result = " << result[i][j] << std::endl;
+  //     }
+  //   }
+  // }
   if (original_result != result) {
     std::cerr << "Validation Failed. Population count doesn't match" << "\n";
     return 1;

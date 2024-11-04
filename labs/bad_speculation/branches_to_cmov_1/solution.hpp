@@ -39,7 +39,19 @@ public:
         std::cout << "\n";
     }
 
-  void predictFuture(int i, int j, int aliveNeighbors) {
+#define SOLUTION
+  // __attribute__((noinline))
+  void predictFuture(int i, int j, int aliveNeighbours) {
+    #ifdef SOLUTION
+    int fut = current[i][j];
+    if (__builtin_unpredictable(aliveNeighbours == 3)) {
+      fut = 1;
+    }
+    if (__builtin_unpredictable(aliveNeighbours < 2 || aliveNeighbours >= 4)) {
+      fut = 0;
+    }
+    future[i][j] = fut;
+    #else
     switch(aliveNeighbors) {
       // 1. Cell is lonely and dies
       case 0:
@@ -58,9 +70,9 @@ public:
       default:
         future[i][j] = 0;
     }
+    #endif
   }
 
-#define SOLUTION
 
     // Simulate the next generation of life
   // __attribute__((noinline))
