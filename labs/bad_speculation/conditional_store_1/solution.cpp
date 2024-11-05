@@ -7,9 +7,9 @@
 std::size_t select(std::array<S, N> &output, const std::array<S, N> &input,
                    const std::uint32_t lower, const std::uint32_t upper) {
   std::size_t count = 0;
+  S x{};
   for (const auto item : input) {
     uint32_t cmp = (lower <= item.first) && (item.first <= upper);
-    S x{};
     if (__builtin_unpredictable(cmp)) {
         x = item;
     }
