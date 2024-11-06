@@ -12,6 +12,20 @@ static std::size_t mapToBucket(std::size_t v) {
   return DEFAULT_BUCKET;
 }
 
+#ifdef SOLUTION
+
+std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values,
+                                               std::vector<std::size_t> const & table) {
+  std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
+  for (auto v : values) {
+    retBuckets[table[v]]++;
+  }
+  return retBuckets;
+}
+
+#else
+
+
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
   for (auto v : values) {
@@ -19,3 +33,6 @@ std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
   }
   return retBuckets;
 }
+
+
+#endif

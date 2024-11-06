@@ -26,10 +26,19 @@ original_histogram(const std::vector<int> &values) {
 int main() {
   std::vector<int> values;
   values.reserve(NUM_VALUES);
+#ifdef SOLUTION
+  std::vector<std::size_t> table;
+  init(values, table);
+#else
   init(values);
+#endif
 
   auto original_result = original_histogram(values);
+#ifdef SOLUTION
+  auto result = histogram(values, table);
+#else
   auto result = histogram(values);
+#endif
 
   if (original_result != result) {
     std::cerr << "Validation Failed."
