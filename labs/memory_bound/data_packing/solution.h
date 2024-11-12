@@ -9,16 +9,22 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-// FIXME: this data structure can be reduced in size
 struct S {
-  int i;
-  long long l;
-  short s;
-  double d;
-  bool b;
+  float d;          // 32 bits
+  long long l: 15;  // 15 bits
+  int       i: 8;   // 8 bits
+  short     s: 8;   // 8 bits
+  bool      b: 1;   // 1 bit
 
   bool operator<(const S &s) const { return this->i < s.i; }
-};
+}; /** __attribute__( ( packed, aligned( 8 ) ) ) */
+
+/** Template instantiation for size calculation */
+//template< int N >
+//class TD;
+
+/// Evaluate `sizeof(S)` to get the size of struct `S`. Causes compile error.
+//TD< sizeof( S ) > td;
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
