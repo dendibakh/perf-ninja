@@ -1,10 +1,12 @@
 #include "solution.hpp"
 
 uint16_t checksum(const Blob &blob) {
-  uint16_t acc = 0;
+  uint32_t acc = 0;
   for (auto value : blob) {
     acc += value;
-    acc += acc < value; // add carry
+  }
+  while (acc >> 16) {
+    acc = (acc & 0xFFFF) + (acc >> 16);
   }
   return acc;
 }
