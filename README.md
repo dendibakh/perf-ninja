@@ -62,7 +62,7 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
 Performance Ninja is in a very much work-in-progress state. We will be adding new lab assignments and videos! The course is free by default, but we ask you to support us on [Github Sponsors](https://github.com/sponsors/dendibakh), [Patreon](https://www.patreon.com/dendibakh) or [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=TBM3NW8TKTT34&currency_code=USD&source=url). Your sponsorship will speed up adding new lab assignments.
 
 Current sponsors:
-* Pavel Davydov
+* Pavel Davydov (@pdavydov108)
 * Maya Lekova (@MayaLekova)
 * Aaron St. George (@AaronStGeorge)
 
