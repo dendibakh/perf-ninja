@@ -63,6 +63,7 @@ Performance Ninja is in a very much work-in-progress state. We will be adding ne
 
 Current sponsors:
 * Pavel Davydov (@pdavydov108)
+* Matias Christensen
 * Maya Lekova (@MayaLekova)
 * Aaron St. George (@AaronStGeorge)
 
