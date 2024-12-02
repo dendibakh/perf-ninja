@@ -11,7 +11,8 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  for (int c = 0; c < width; c++) {
+  for (int c = 0; c < width; c++) 
+  {
     // Top part of line, partial kernel
     for (int r = 0; r < std::min(radius, height); r++) {
       // Accumulation
@@ -20,7 +21,7 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       auto p = &kernel[radius - r];
       for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
         int weight = *p++;
-        dot += input[y * width + c] * weight;
+        dot += input[y * width + c] * weight; // This goes in strides rather than sequential. So c and y needs to be interchanged. Can we make it seperate loops?
         sum += weight;
       }
 
@@ -28,20 +29,43 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
 
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
-      output[r * width + c] = static_cast<uint8_t>(value);
+  
+  int* dots = new int[width];
+
+  // The middle part is without a doubt the most expensive one (could probably have been figured out if I had a profiler.)
+  // Middle part of computations with full kernel
+  for (int r = radius; r < height - radius; r++) { // dots need to be [radius+1+radius(aka 5)*height-radius]
+    
+    // Initilization
+    for (int c = 0; c < width; c++) 
+    { 
+      dots[c] = 0;
     }
 
+    // Accumulation
+    for (int i = 0; i < radius + 1 + radius; i++) 
+    { // increase the input by width every increase
+      for (int c = 0; c < width; c++) 
+      {  
+        dots[c] += input[(r - radius + i) * width + c] * kernel[i];
+      }
+    }
+
+    // Fast shift instead of division
+    for (int c = 0; c < width; c++) 
+    { 
+      int value = (dots[c] + rounding) >> shift;
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+  
+  delete [] dots;
+
+  for (int c = 0; c < width; c++) 
+  {
     // Bottom part of line, partial kernel
     for (int r = std::max(radius, height - radius); r < height; r++) {
       // Accumulation
@@ -68,7 +92,8 @@ static void filterHorizontally(uint8_t *output, const uint8_t *input,
                                const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  for (int r = 0; r < height; r++) {
+  for (int r = 0; r < height; r++) 
+  {
     // Left part of line, partial kernel
     for (int c = 0; c < std::min(radius, width); c++) {
       // Accumulation
@@ -77,7 +102,7 @@ static void filterHorizontally(uint8_t *output, const uint8_t *input,
       auto p = &kernel[radius - c];
       for (int x = 0; x <= std::min(c + radius, width - 1); x++) {
         int weight = *p++;
-        dot += input[r * width + x] * weight;
+        dot += input[r * width + x] * weight; // difference here is the weight that is based off c 
         sum += weight;
       }
 
