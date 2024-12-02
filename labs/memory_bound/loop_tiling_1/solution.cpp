@@ -4,18 +4,18 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  int count = 0;
-  int chunkSize = 32;
-  int chunkCount = size/chunkSize;
-  int stride = size/chunkCount;
+  constexpr int stride = 16;
 
   for(int x = 0; x < size; x+=stride)
   {
-    for (int i = 0; i < size; i++) 
+    for(int y = 0; y < size; y+=stride)
     {
-      for (int j = x; j < std::min(size, x+stride); j++) 
+      for (int i = x; i < std::min(size, x+stride); i++) 
       {
-        out[i][j] = in[j][i];
+        for (int j = y; j < std::min(size, y+stride); j++) 
+        {
+         out[i][j] = in[j][i];
+        }
       }
     }
   }
