@@ -11,23 +11,24 @@ static int getSumOfDigits(int n) {
   return sum;
 }
 
+
+constexpr int lookAhead = 16;
 #ifdef SOLUTION
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
-  constexpr int amountOfPrefetch = 32;
-  int j = 0;
-  for(int i =0;i<lookups.size();i++)
+  for (int i = 0; i < lookups.size() - lookAhead; i++) 
   {
-    if(j <= i)
-    {
-      for(j = i; j < std::min(static_cast<int>(lookups.size()), i+amountOfPrefetch); j++)
-      {
-        hash_map->prefetch(lookups[j]);
-      }
-    }
-    
-    if (hash_map->find(lookups[i]))
-      result += getSumOfDigits(lookups[i]);
+    int val = lookups[i];
+    if (hash_map->find(val))
+      result += getSumOfDigits(val);
+    hash_map->prefetch(lookups[i + lookAhead]); // So only do a single prefetch for other instruction
+  }
+
+  for (int i = lookups.size() - lookAhead; i < lookups.size(); i++) 
+  { // get the already prefetched values
+    int val = lookups[i];
+    if (hash_map->find(val))
+      result += getSumOfDigits(val); 
   }
 
   return result;
