@@ -1,7 +1,7 @@
 #include "solution.hpp"
 #include <atomic>
 #include <cstring>
-#include <omp.h>
+
 #include <vector>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
@@ -13,13 +13,9 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   };
   std::vector<Accumulator> accumulators(thread_count);
 
-#pragma omp parallel num_threads(thread_count) default(none)                   \
-    shared(accumulators, data)
-  {
-    int target_index = omp_get_thread_num();
-    auto &target = accumulators[target_index];
 
-#pragma omp for
+  for(auto& target : accumulators)
+  {
     for (int i = 0; i < data.size(); i++) {
       // Perform computation on each input
       auto item = data[i];
@@ -31,6 +27,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
       target.value += item % 13;
     }
   }
+
 
   std::size_t result = 0;
   for (const auto &accumulator : accumulators) {
