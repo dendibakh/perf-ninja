@@ -11,7 +11,7 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int *kernel, const int radius,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
-
+  
   for (int c = 0; c < width; c++) {
     // Top part of line, partial kernel
     for (int r = 0; r < std::min(radius, height); r++) {
@@ -48,28 +48,17 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     }
   }
 
-  int* dot = new int[width * (height - 2 * radius)];
-
-  // Init
-  for (int i = 0; i < width * (height - 2 * radius); i++) {
-      dot[i] = 0;
-  }
-
+  std::unique_ptr<int[]> dot = std::make_unique<int[]>(width * (height - 2 * radius));
   // Accum
   for (int r = radius; r < height - radius; r++) {
-      for (int i = 0; i < radius + 1 + radius; i++) {
-          for (int c = 0; c < width; c++) { 
+      for (int c = 0; c < width; c++) { 
+        for (int i = 0; i < radius + 1 + radius; i++) {
               dot[(r - radius) * width + c] += input[(r - radius + i) * width + c] * kernel[i];
-          }
-      }
-  }
-
-  // Output
-  for (int r = radius; r < height - radius; r++) {
-      for (int c = 0; c < width; c++) {
-          int dotIndex = (r - radius) * width + c;
-          int value = (dot[dotIndex] + rounding) >> shift;
-          output[r * width + c] = static_cast<uint8_t>(value);
+        }
+        // Output
+        int dotIndex = (r - radius) * width + c;
+        int value = (dot[dotIndex] + rounding) >> shift;
+        output[r * width + c] = static_cast<uint8_t>(value);
       }
   }
 }
