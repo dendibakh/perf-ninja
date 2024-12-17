@@ -48,16 +48,15 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     }
   }
 
-  std::unique_ptr<int[]> dot = std::make_unique<int[]>(width * (height - 2 * radius));
   // Accum
   for (int r = radius; r < height - radius; r++) {
       for (int c = 0; c < width; c++) { 
+        int dot = 0;
         for (int i = 0; i < radius + 1 + radius; i++) {
-              dot[(r - radius) * width + c] += input[(r - radius + i) * width + c] * kernel[i];
+              dot += input[(r - radius + i) * width + c] * kernel[i];
         }
         // Output
-        int dotIndex = (r - radius) * width + c;
-        int value = (dot[dotIndex] + rounding) >> shift;
+        int value = (dot + rounding) >> shift;
         output[r * width + c] = static_cast<uint8_t>(value);
       }
   }
