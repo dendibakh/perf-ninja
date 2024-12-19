@@ -2,9 +2,11 @@
 .github/FUNDING.yml;664;matthieu;matthieu
 .github/workflows/CI_Linux_Alderlake.yml;664;matthieu;matthieu
 .github/workflows/CI_Linux_Coffeelake.yml;664;matthieu;matthieu
+.github/workflows/CI_Linux_x64.yml;664;matthieu;matthieu
 .github/workflows/CI_Macos_M1.yml;664;matthieu;matthieu
 .github/workflows/CI_Win_Zen3.yml;664;matthieu;matthieu
 .gitignore;664;matthieu;matthieu
+.permissions;664;matthieu;matthieu
 Contributing.md;664;matthieu;matthieu
 GetStarted.md;664;matthieu;matthieu
 QuickstartLinux.md;664;matthieu;matthieu
