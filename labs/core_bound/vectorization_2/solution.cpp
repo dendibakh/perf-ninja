@@ -1,7 +1,7 @@
 #include "solution.hpp"
 
 uint16_t checksum(const Blob &blob) {
-  uint32_t acc = 0;
+  uint64_t acc = 0;
   for (auto value : blob) {
     acc += value;
   }
@@ -19,5 +19,5 @@ uint16_t checksum(const Blob &blob) {
   }
   uint16_t acc_ = static_cast<uint16_t>(acc);
 
-  return acc;
+  return acc_;
 }
