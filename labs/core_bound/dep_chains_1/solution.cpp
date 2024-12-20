@@ -25,9 +25,12 @@ unsigned solution(List *l1, List *l2) {
 
   List *head2 = l2;
   // 2 at the same time.
-  while (l1 && l1->next) {
+  while (l1 && l1->next && l1->next->next && l1->next->next->next) {
     unsigned v = l1->value;
     unsigned w = l1->next->value;
+    unsigned x = l1->next->next->value;
+    unsigned y = l1->next->next->next->value;
+
     int found = 0;
     l2 = head2;
     while (l2) {
@@ -39,19 +42,27 @@ unsigned solution(List *l1, List *l2) {
         retVal += getSumOfDigits(w);
         found += 1;
       }
-      if (found == 2) {
+      if (l2->value == x) {
+        retVal += getSumOfDigits(x);
+        found += 1;
+      }
+      if (l2->value == y) {
+        retVal += getSumOfDigits(y);
+        found += 1;
+      }
+      if (found == 4) {
         break;
       }
       l2 = l2->next;
     }
     // Handle odd number
-    if (!l1->next) {
+    if (!l1->next || !l1->next->next || !l1->next->next->next) {
       break;
     }
-    l1 = l1->next->next;
+    l1 = l1->next->next->next->next;
   }
   // If uneven -> Process last entry.
-  if (l1) {
+  while (l1) {
     unsigned v = l1->value;
     l2 = head2;
     while (l2) {
@@ -61,6 +72,7 @@ unsigned solution(List *l1, List *l2) {
       }
       l2 = l2->next;
     }
+    l1 = l1->next;
   }
   return retVal;
 }
