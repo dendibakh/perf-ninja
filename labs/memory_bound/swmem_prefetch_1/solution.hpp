@@ -24,6 +24,14 @@ public:
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
     }
+
+    const std::vector<int>& getVector() const {
+        return m_vector;
+    }
+
+    const std::size_t& getNBuckets() const {
+        return N_Buckets;
+    }
 };
 
 void init(hash_map_t* hash_map, std::vector<int>& lookups);
