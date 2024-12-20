@@ -24,8 +24,34 @@ unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
   List *head2 = l2;
-  // O(N^2) algorithm:
-  while (l1) {
+  // 2 at the same time.
+  while (l1 && l1->next) {
+    unsigned v = l1->value;
+    unsigned w = l1->next->value;
+    int found = 0;
+    l2 = head2;
+    while (l2) {
+      if (l2->value == v) {
+        retVal += getSumOfDigits(v);
+        found += 1;
+      }
+      if (l2->value == w) {
+        retVal += getSumOfDigits(w);
+        found += 1;
+      }
+      if (found == 2) {
+        break;
+      }
+      l2 = l2->next;
+    }
+    // Handle odd number
+    if (!l1->next) {
+      break;
+    }
+    l1 = l1->next->next;
+  }
+  // If uneven -> Process last entry.
+  if (l1) {
     unsigned v = l1->value;
     l2 = head2;
     while (l2) {
@@ -35,8 +61,6 @@ unsigned solution(List *l1, List *l2) {
       }
       l2 = l2->next;
     }
-    l1 = l1->next;
   }
-
   return retVal;
 }
