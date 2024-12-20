@@ -55,8 +55,8 @@ unsigned solution(List *l1, List *l2) {
       }
       l2 = l2->next;
     }
-    // Handle odd number
-    if (!l1->next || !l1->next->next || !l1->next->next->next) {
+    // Handle case where the number of elements is not divisible by 4.
+    if (!l1->next || !l1->next->next || !l1->next->next->next || !l1->next->next->next->next) {
       break;
     }
     l1 = l1->next->next->next->next;
