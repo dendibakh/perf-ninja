@@ -11,11 +11,11 @@ static int getSumOfDigits(int n) {
 
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
-
+  int lookahead = 32;
   for (int i = 0; i < lookups.size(); i++) {
     int val = lookups[i];
-    if (i  < lookups.size() - 1) {
-        int future_val = lookups[i + 1];
+    if (i  < lookups.size() - lookahead) {
+        int future_val = lookups[i + lookahead];
         int future_bucket = future_val % hash_map->getNBuckets(); 
         __builtin_prefetch(&((hash_map->getVector())[future_bucket]));
     }
