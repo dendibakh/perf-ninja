@@ -21,7 +21,7 @@ for /f "tokens=* USEBACKQ" %%i in (`%VSWHERE_PATH% -latest -prerelease -requires
 @rem Extract the major version number
 for /f "tokens=1 delims=." %%i in ("%INSTALLATION_VERSION%") do set VS_MAJOR_VER=%%i
 
-@rem Set the appropriate generator based on the major version number
+@REM Set the appropriate generator based on the major version number
 if "%VS_MAJOR_VER%"=="17" (
     set GENERATOR="Visual Studio 17 2022"
 ) else (
@@ -34,6 +34,7 @@ if "%VS_MAJOR_VER%"=="17" (
 )
 endlocal
 
+set GENERATOR="Visual Studio 17 2022"
 echo Using generator %GENERATOR%
 
 @rem Generate build system files with cmake.
