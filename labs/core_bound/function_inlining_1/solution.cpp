@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <stdlib.h>
 
-static int compare(const S &a, const S &b) {
+static int compare(const void *lhs, const void *rhs) {
+  auto &a = *reinterpret_cast<const S *>(lhs);
+  auto &b = *reinterpret_cast<const S *>(rhs);
 
   if (a.key1 < b.key1)
     return -1;
@@ -21,6 +23,5 @@ static int compare(const S &a, const S &b) {
 }
 
 void solution(std::array<S, N> &arr) {
-  //templated so in thoery it inlines..
-  std::sort(arr.begin(), arr.end(), compare);
+  qsort(arr.data(), arr.size(), sizeof(S), compare);
 }
