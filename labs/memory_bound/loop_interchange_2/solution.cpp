@@ -14,6 +14,9 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
+
+  int dot[N];
+
   for (int c = 0; c < width; c++) {
     // Top part of line, partial kernel
     for (int r = 0; r < std::min(radius, height); r++) {
@@ -39,8 +42,9 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     }
 
     for (int i = 0; i < radius + 1 + radius; i++) {
+      int idx = (r - radius + i) * width;
       for (int c = 0; c < width; c++) {
-        dot[c] += input[(r - radius + i) * width + c] * kernel[i];
+        dot[c] += input[idx + c] * kernel[i];
       }
     }
 
@@ -100,8 +104,9 @@ static void filterHorizontally(uint8_t *output, const uint8_t *input,
     for (int c = radius; c < width - radius; c++) {
       // Accumulation
       int dot = 0;
+      int idx = r * width + c - radius;
       for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[r * width + c - radius + i] * kernel[i];
+        dot += input[idx + i] * kernel[i];
       }
 
       // Fast shift instead of division
