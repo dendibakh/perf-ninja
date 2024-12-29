@@ -1,7 +1,7 @@
 
 #include "solution.h"
 #include <memory>
-#include <intrin.h>
+#include "intrin.h"
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
