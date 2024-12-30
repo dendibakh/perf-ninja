@@ -20,6 +20,44 @@ unsigned getSumOfDigits(unsigned n) {
 // Hint: Traversing a linked list is a long data dependency chain:
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
+#define SOLUTION
+#ifdef SOLUTION
+unsigned solution(List *l1, List *l2) {
+  unsigned retVal = 0;
+  constexpr int N = 4;
+  std::array<int, N> val;
+  int to_find = 0;
+
+  List *head2 = l2;
+  // O(N^2) algorithm:
+  int found=0;
+  while (l1) {
+    to_find = 0;
+    found = 0;
+    while(l1 && to_find < N){
+      val[to_find]=l1->value;
+      ++to_find;
+      l1 = l1->next;
+    }
+
+    l2 = head2;
+    while (l2) {
+      for(int i=0; i<to_find; ++i){
+        if(l2->value == val[i]){
+          retVal += getSumOfDigits(val[i]);
+          found++;
+          if(found == to_find){ break; }
+        }
+      }
+      if(found == to_find){ break; }
+
+      l2 = l2->next;
+    }
+  }
+
+  return retVal;
+}
+#else //baseline
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
@@ -40,3 +78,4 @@ unsigned solution(List *l1, List *l2) {
 
   return retVal;
 }
+#endif
