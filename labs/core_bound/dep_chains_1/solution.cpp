@@ -24,7 +24,7 @@ unsigned getSumOfDigits(unsigned n) {
 #ifdef SOLUTION
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
-  constexpr int N = 4;
+  constexpr int N = 8;
   std::array<int, N> val;
   int to_find = 0;
 
