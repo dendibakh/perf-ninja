@@ -23,36 +23,56 @@ unsigned getSumOfDigits(unsigned n) {
 #define SOLUTION
 #ifdef SOLUTION
 unsigned solution(List *l1, List *l2) {
+  constexpr int M = 4;
   unsigned retVal = 0;
-  constexpr int N = 8;
-  std::array<int, N> val;
-  int to_find = 0;
+  List* head2 = l2;
+  List* head1 = l1;
 
-  List *head2 = l2;
-  // O(N^2) algorithm:
-  int found=0;
+  int length1 = 0;
   while (l1) {
-    to_find = 0;
-    found = 0;
-    while(l1 && to_find < N){
-      val[to_find]=l1->value;
-      ++to_find;
+    length1++;
+    l1 = l1->next;
+  }
+
+  l1 = head1;
+
+  // Simultaneously lookup M elements in l1.
+  for (int i = 0; i < length1 / M; i++) {
+    std::array<unsigned, M> vals;
+    // remember M values from l1
+    for (int j = 0; j < M; j++) {
+      vals[j] = l1->value;
       l1 = l1->next;
     }
-
+    // traverse l2 and lookup M elements from vals at the same time
     l2 = head2;
+    int found = 0;
     while (l2) {
-      for(int i=0; i<to_find; ++i){
-        if(l2->value == val[i]){
-          retVal += getSumOfDigits(val[i]);
-          found++;
-          if(found == to_find){ break; }
+      for (int j = 0; j < M; j++) {
+        if (l2->value == vals[j]) {
+          retVal += getSumOfDigits(l2->value);
+          // stop if all M values found
+          if (++found == M)
+            break;
         }
       }
-      if(found == to_find){ break; }
-
       l2 = l2->next;
     }
+  }
+
+  // Process the remainder with sequential algorithm
+  // O(N^2) algorithm:
+  while (l1) {
+    unsigned v = l1->value;
+    l2 = head2;
+    while (l2) {
+      if (l2->value == v) {
+        retVal += getSumOfDigits(v);
+        break;
+      }
+      l2 = l2->next;
+    }
+    l1 = l1->next;
   }
 
   return retVal;
