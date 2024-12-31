@@ -14,6 +14,7 @@ __pycache__
 .idea/
 cmake-build-debug/
 .DS_Store
+.cache
 labs/misc/io_opt1/DataPaths.h
 labs/misc/io_opt1/data/
 labs/memory_bound/mem_order_violation_1/DataPaths.h
