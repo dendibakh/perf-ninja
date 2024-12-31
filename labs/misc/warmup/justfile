@@ -1,0 +1,13 @@
+run: build
+    build/lab
+
+validate: build
+    build/validate
+
+build:
+    mkdir -p build
+    cd build && cmake .. -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g"
+    cd build && make -j8
+
+clean:
+    rm -rf build
