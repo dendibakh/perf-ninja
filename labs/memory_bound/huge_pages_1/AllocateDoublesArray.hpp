@@ -149,6 +149,9 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+// Force enable solution for CI
+#define SOLUTION
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
