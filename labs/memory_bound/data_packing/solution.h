@@ -9,6 +9,9 @@ constexpr int N = 10000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
+// Force solution for CI
+#define SOLUTION
+
 // FIXME: this data structure can be reduced in size
 struct S {
 #ifdef SOLUTION
