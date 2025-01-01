@@ -15,10 +15,11 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
 #ifdef SOLUTION
   PREFETCH(hash_map);
   PREFETCH(lookups.data());
-  constexpr std::size_t lookahead = 8;
+  constexpr std::size_t lookahead = 16;
   const std::size_t len = lookups.size();
+  const std::size_t len_short = len - lookahead;
   std::size_t i = 0;
-  for (; i < len - lookahead; ++i) {
+  for (; i < len_short; ++i) {
     const int val = lookups[i];
     hash_map->prefetch(lookups[i + lookahead]);
     if (hash_map->find(val))
