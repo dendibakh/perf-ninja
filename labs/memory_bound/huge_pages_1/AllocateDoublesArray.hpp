@@ -187,7 +187,7 @@ inline auto allocateDoublesArray(size_t size) {
   #elif defined(ON_LINUX)
 
   const size_t alloc_size = sizeof(double) * size;
-  void *ptr = mmap(
+  double *alloc = (double *) = mmap(
     nullptr /* addr */, 
     alloc_size /* length */, 
     PROT_READ | PROT_WRITE /* prot */,
@@ -195,7 +195,7 @@ inline auto allocateDoublesArray(size_t size) {
     -1 /* fd */ , 
     0 /* offset */
   );
-  madvise(ptr /* addr */, alloc_size /* length */, MADV_HUGEPAGE /* advice */);
+  madvise((void *)alloc /* addr */, alloc_size /* length */, MADV_HUGEPAGE /* advice */);
 
   auto deleter = [alloc_size = alloc_size](double *ptr) { munmap(ptr /* addr */, alloc_size /* len */); };
   #else
