@@ -152,6 +152,52 @@ inline bool setRequiredPrivileges() {
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
+  #ifdef SOLUTION
+
+  #if defined(ON_WINDOWS)
+  const static bool large_page_supported = setRequiredPrivileges();
+  if (!large_page_supported)
+  {
+    std::terminate();
+  }
+
+  const SIZE_T large_page_size = GetLargePageMinimum();
+  SIZE_T alloc_size = static_cast<SIZE_T>(sizeof(double) * size);
+
+  // round to nearest multiple
+  alloc_size = ((alloc_size + large_page_size - 1) / large_page_size) * large_page_size;
+
+  double *alloc = (double *) VirtualAlloc(
+    NULL /* lpAddress */,
+    alloc_size /* dwSize */,
+    MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES /* flAllocationType */,
+    PAGE_READWRITE /* flProtect */
+  );
+  if (!alloc)
+  {
+    std::clog << "VirtualAlloc failed, error " << GetLastError() << std::endl;
+  }
+
+  auto deleter = [/* state = ... */](double *ptr) { 
+    VirtualFree((void *)ptr /* lpAddress */, 0 /* dwSize */, MEM_RELEASE /* dwFreeType */); 
+  };
+  #elif defined(ON_LINUX)
+
+  const size_t alloc_size = sizeof(double) * size;
+  void *ptr = mmap(
+    nullptr /* addr */, 
+    alloc_size /* length */, 
+    PROT_READ | PROT_WRITE /* prot */,
+    MAP_PRIVATE | MAP_ANONYMOUS /* flags */, 
+    -1 /* fd */ , 
+    0 /* offset */
+  );
+  madvise(ptr /* addr */, alloc_size /* length */, MADV_HUGEPAGE /* advice */);
+
+  auto deleter = [alloc_size = alloc_size](double *ptr) { munmap(ptr /* addr */, alloc_size /* len */); };
+  #else
+  // ARM Macs don't seem to support huge pages
+
   // Allocate memory
   double *alloc = new double[size];
   // remember to cast the pointer to double* if your allocator returns void*
@@ -159,6 +205,16 @@ inline auto allocateDoublesArray(size_t size) {
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
   auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  #endif
+  #else
+  // Allocate memory
+  double *alloc = new double[size];
+  // remember to cast the pointer to double* if your allocator returns void*
+
+  // Deleters can be conveniently defined as lambdas, but you can explicitly
+  // define a class if you're not comfortable with the syntax
+  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  #endif
 
   return std::unique_ptr<double[], decltype(deleter)>(alloc,
                                                       std::move(deleter));
