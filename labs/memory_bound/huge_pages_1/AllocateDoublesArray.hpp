@@ -187,7 +187,7 @@ inline auto allocateDoublesArray(size_t size) {
   #elif defined(ON_LINUX)
 
   const size_t alloc_size = sizeof(double) * size;
-  double *alloc = (double *) = mmap(
+  double *alloc = (double *) mmap(
     nullptr /* addr */, 
     alloc_size /* length */, 
     PROT_READ | PROT_WRITE /* prot */,
