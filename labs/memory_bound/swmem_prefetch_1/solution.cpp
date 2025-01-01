@@ -13,15 +13,34 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
 #ifdef SOLUTION
-  const auto begin = lookups.cbegin();
-  const auto final_iter = --lookups.cend();
-  for (auto iter = begin; iter != final_iter; ++iter)
-  {
-    const auto next = std::next(iter);
-    hash_map->prefetch(*next);
-    const int val = *iter;
+  PREFETCH(hash_map);
+  PREFETCH(lookups.data());
+  constexpr std::size_t lookahead = 8;
+  const std::size_t len = lookups.size();
+  std::size_t i = 0;
+  for (; i < len - lookahead; ++i) {
+    const int val = lookups[i];
+    hash_map->prefetch(lookups[i + lookahead]);
     if (hash_map->find(val))
       result += getSumOfDigits(val);
+  }
+  for (; i < len; ++i) {
+    const int val = lookups[i];
+    if (hash_map->find(val))
+      result += getSumOfDigits(val);
+  }
+#elif defined(SOLUTION2)
+  PREFETCH(hash_map);
+  const auto begin = lookups.cbegin();
+  const auto final_iter = --lookups.cend();
+  for (auto iter = begin; iter != final_iter;)
+  {
+    const int val = *iter;
+    const auto next = std::next(iter);
+    hash_map->prefetch(*next);
+    if (hash_map->find(val))
+      result += getSumOfDigits(val);
+    iter = next;
   }
   const int val = *final_iter;
   if (hash_map->find(val))
