@@ -3,14 +3,17 @@
 #define SOLUTION
 #ifdef SOLUTION
 uint16_t checksum(const Blob &blob) {
-  uint64_t acc = 0;
+  uint32_t acc = 0;
   for (auto value : blob) {
     acc += value;
   }
 
-  constexpr uint64_t mask = (1 << 16) - 1;
+  constexpr uint32_t mask = (1 << 16) - 1;
 
+  // N = 64 * 1024 = 2^16
+  // Carry should fit in the upper 16 bits
   acc = (acc & mask) + (acc >> 16);
+  // 2^16 carries might overflow one last time after added
   acc = (acc & mask) + (acc >> 16);
   return (uint16_t)acc;
 }
