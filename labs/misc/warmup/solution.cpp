@@ -2,5 +2,5 @@
 
 int solution(int* arr, int N)
 {
-    return N * (N + 1) >> 1;
+    return N * (N + 1) / 2;
 }
