@@ -197,9 +197,8 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     // permute_mask_hi[4..7] == 1 ==> Copy high to high
     __m256i hi_copied_low = _mm256_permute2f128_si256(result, result, permute_mask_hi);
     current = _mm256_srli_si256(hi_copied_low, 7 * 2); // highest part lowered to lowest part, still need to fill the other 7 per 128 lane
-    current = _mm256_or_si256(current, _mm256_slli_si256(current, 1 * 2));
-    current = _mm256_or_si256(current, _mm256_slli_si256(current, 2 * 2));
-    current = _mm256_or_si256(current, _mm256_slli_si256(current, 4 * 2));
+    current = _mm256_or_si256(current, _mm256_slli_si256(current, 1 * 2)); // Fill the lowest 32 bits per 128 lane
+    current = _mm256_shuffle_epi32(current, 0); // Copy the lowest 32 bits per 128 lane everywhere
 #endif
   }
   currentSum = _mm256_extract_epi16(result, 15);
