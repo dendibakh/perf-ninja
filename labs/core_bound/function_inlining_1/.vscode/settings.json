@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "iterator": "cpp",
+        "initializer_list": "cpp",
+        "random": "cpp",
+        "utility": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp"
+    }
+}

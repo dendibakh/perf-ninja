@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "format": "cpp",
+        "initializer_list": "cpp",
+        "random": "cpp",
+        "utility": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "charconv": "cpp",
+        "xmemory": "cpp"
+    }
+}

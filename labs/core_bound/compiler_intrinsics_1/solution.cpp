@@ -93,8 +93,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   const uint8_t *pLow = input.data() + pos - radius - 1;
   const uint8_t *pHigh = input.data() + pos + radius;
   const uint16_t *pOut = output.data() + pos;
-  __m128i current128 = _mm_set1_epi16(currentSum);
-  __m256i current = _mm256_loadu2_m128i(&current128, &current128);
+  __m256i current = _mm256_set1_epi16(currentSum);
   __m256i result;
   constexpr int lane_width_avx = 256 / 16;
   constexpr int lane_width_sse = 128 / 16;
