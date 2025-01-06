@@ -13,7 +13,7 @@
 #endif
 
 template <int num>
-inline __m256i shiftl16_256(const __m256i a)
+__attribute__((always_inline)) __m256i shiftl16_256(const __m256i a)
 {
 
 #ifdef SOL_SSE_SHIFT
