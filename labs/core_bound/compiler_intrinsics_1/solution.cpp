@@ -7,7 +7,7 @@
 
 #include <immintrin.h>
 
-//#define DEBUG_SHIFT
+// #define DEBUG_SHIFT
 #ifdef DEBUG_SHIFT
 #include <iostream>
 #endif
@@ -95,6 +95,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   const uint16_t *pOut = output.data() + pos;
   __m128i current128 = _mm_set1_epi16(currentSum);
   __m256i current = _mm256_loadu2_m128i(&current128, &current128);
+  __m256i result;
   constexpr int lane_width_avx = 256 / 16;
   constexpr int lane_width_sse = 128 / 16;
 
@@ -178,14 +179,30 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     sums = _mm256_add_epi16(sums, shiftl16_256<8>(sums));
 
     // Save results
-    __m256i result = _mm256_add_epi16(current, sums);
+    result = _mm256_add_epi16(current, sums);
     _mm256_storeu_si256((__m256i *)(pOut + i), result);
 
-    // Prepare next iteration
+// Prepare next iteration
+
+// #define OLD_SHUFFLE
+#ifdef OLD_SHUFFLE
     currentSum = _mm256_extract_epi16(result, 15);
     current128 = _mm_set1_epi16(currentSum);
     current = _mm256_loadu2_m128i(&current128, &current128);
+#else
+
+    // We want to broadcast the last uint16 to all positions
+    constexpr int permute_mask_hi = 3 | (1 << 4);
+    // permute_mask_hi[0..3] == 3 ==> Copy high to low
+    // permute_mask_hi[4..7] == 1 ==> Copy high to high
+    __m256i hi_copied_low = _mm256_permute2f128_si256(result, result, permute_mask_hi);
+    current = _mm256_srli_si256(hi_copied_low, 7 * 2); // highest part lowered to lowest part, still need to fill the other 7 per 128 lane
+    current = _mm256_or_si256(current, _mm256_slli_si256(current, 1 * 2));
+    current = _mm256_or_si256(current, _mm256_slli_si256(current, 2 * 2));
+    current = _mm256_or_si256(current, _mm256_slli_si256(current, 4 * 2));
+#endif
   }
+  currentSum = _mm256_extract_epi16(result, 15);
   pos += i;
 
   // load data unaligned
