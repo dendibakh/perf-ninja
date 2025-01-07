@@ -1,0 +1,15 @@
+sync:
+  defaults:
+    # maxStagingFileSize: "100 MB"
+    mode: "two-way-resolved"
+    ignore:
+      vcs: true
+      paths:
+        - ".DS_Store"
+  files:
+    alpha: "."
+    beta: "rmc-euclid:~/perf-ninja"
+    ignore:
+      paths:
+        - "build"
+

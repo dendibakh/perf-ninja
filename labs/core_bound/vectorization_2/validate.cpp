@@ -20,8 +20,14 @@ int main() {
   auto result = checksum(blob);
 
   if (original_result != result) {
+    std::cerr << std::hex;
     std::cerr << "Validation Failed. Original result = " << original_result
               << "; Modified version returned = " << result << "\n";
+    std::cerr << "; Input:\n[";
+    std::cerr << blob[0];
+    for (size_t i = 1; i < blob.size(); ++i)
+      std::cerr << "," << blob[i];
+    std::cerr << "]\n";
     return 1;
   }
 

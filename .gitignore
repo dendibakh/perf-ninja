@@ -15,6 +15,7 @@ __pycache__
 cmake-build-debug/
 .DS_Store
 .cache
+mutagen.yml.lock
 labs/misc/io_opt1/DataPaths.h
 labs/misc/io_opt1/data/
 labs/memory_bound/mem_order_violation_1/DataPaths.h
@@ -23,5 +24,6 @@ labs/core_bound/compiler_intrinsics_4/data
 build_solution
 build_baseline
 build
+build-remarks
 results.json
 /tools/benchmark/
