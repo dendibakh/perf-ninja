@@ -43,23 +43,32 @@ __attribute__((always_inline)) __m256i shiftl16_256(const __m256i a)
   return _mm256_set_m128i(hi_complete, lo_shift);
 
 #else
+  if constexpr (num != 8)
+  {
+    constexpr int bytes = num * 2;                 // 2 bytes per 16 bit num
+    __m256i shifted = _mm256_slli_si256(a, bytes); // we are missing the values that shifted from low to high
 
-  constexpr int bytes = num * 2;                 // 2 bytes per 16 bit num
-  __m256i shifted = _mm256_slli_si256(a, bytes); // we are missing the values that shifted from low to high
+    // We need to shift right in lo to remove the ones that are not moving
+    constexpr int lane_width_sse = 128 / 16;
+    constexpr int num_r = lane_width_sse - num;
+    constexpr int bytes_r = num_r * 2; // 2 bytes per 16 bit num
 
-  // We need to shift right in lo to remove the ones that are not moving
-  constexpr int lane_width_sse = 128 / 16;
-  constexpr int num_r = lane_width_sse - num;
-  constexpr int bytes_r = num_r * 2; // 2 bytes per 16 bit num
+    // Highest part of low was pushed to high
+    __m256i lo_to_merge_shift = _mm256_srli_si256(a, bytes_r); // still includes parts of high
+    constexpr int permute_mask_lo = 1 << 3;
+    // permute_mask_lo[3] == 1 => zero out low part
+    // permute_mask_lo[4..7] == 0 => copy low to high
+    __m256i lo_to_merge = _mm256_permute2f128_si256(lo_to_merge_shift, lo_to_merge_shift, permute_mask_lo);
 
-  // Highest part of low was pushed to high
-  __m256i lo_to_merge_shift = _mm256_srli_si256(a, bytes_r); // still includes parts of high
-  constexpr int permute_mask_lo = 1 << 3;
-  // permute_mask_lo[3] == 1 => zero out low part
-  // permute_mask_lo[4..7] == 0 => copy low to high
-  __m256i lo_to_merge = _mm256_permute2f128_si256(lo_to_merge_shift, lo_to_merge_shift, permute_mask_lo);
-
-  return _mm256_add_epi16(shifted, lo_to_merge);
+    return _mm256_add_epi16(shifted, lo_to_merge);
+  }
+  else
+  {
+    constexpr int permute_mask_lo = 1 << 3;
+    // permute_mask_lo[3] == 1 => zero out low part
+    // permute_mask_lo[4..7] == 0 => copy low to high
+    return _mm256_permute2f128_si256(a, a, permute_mask_lo);
+  }
 #endif
 }
 #endif
