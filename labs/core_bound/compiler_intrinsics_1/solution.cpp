@@ -100,7 +100,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // process unaligned data
   {
-    constexpr auto alignment = 16;
+    constexpr auto alignment = 32;
     const int miss_alignment = pos % alignment;
     for (int i = 0; i < alignment - miss_alignment; ++i)
     {
