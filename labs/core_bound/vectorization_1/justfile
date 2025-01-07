@@ -1,0 +1,21 @@
+lab-save-cmp: (lab-save "solution") (cmp "baseline" "solution")
+
+lab-save OUT_FILE: build
+    build/lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out="build/{{OUT_FILE}}.json"
+
+lab: build
+    build/lab
+
+cmp FILE_A FILE_B:
+    python3 ../../../tools/benchmark/tools/compare.py benchmarks "build/{{FILE_A}}.json" "build/{{FILE_B}}.json"
+
+validate: build
+    build/validate
+
+build:
+    mkdir -p build
+    cd build && cmake .. -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g"
+    cd build && make -j8
+
+clean:
+    rm -rf build
