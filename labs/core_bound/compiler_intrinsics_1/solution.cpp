@@ -2,7 +2,6 @@
 #include "solution.h"
 #include <memory>
 
-#define SOLUTION
 #if defined(SOLUTION) && defined(__AVX2__)
 
 #include <immintrin.h>
@@ -99,6 +98,19 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   // 2. main loop.
   limit = size - radius;
 
+  // process unaligned data
+  {
+    constexpr auto alignment = 8;
+    const int miss_alignment = pos % alignment;
+    for(int i=0; i<alignment - miss_alignment; ++i)
+    {
+      currentSum -= input[pos - radius - 1];
+      currentSum += input[pos + radius];
+      output[pos] = currentSum;
+      ++pos;
+    }
+  }
+
   const uint8_t *pLow = input.data() + pos - radius - 1;
   const uint8_t *pHigh = input.data() + pos + radius;
   const uint16_t *pOut = output.data() + pos;
@@ -163,13 +175,14 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 #endif
 
   int i = 0;
+#pragma clang loop unroll_count(2)
   for (; i + lane_width_avx - 1 < limit - pos; i += lane_width_avx)
   {
-    __m128i sub_u8 = _mm_loadu_si128((__m128i *)(pLow + i)); // We loaded 16 uint8
-    __m256i sub = _mm256_cvtepu8_epi16(sub_u8);              // Take the 16 uint8 and convert them to 16 uint16 (this fits in 256 bits)
+    __m128i sub_u8 = _mm_load_si128((__m128i *)(pLow + i)); // We loaded 16 uint8
+    __m256i sub = _mm256_cvtepu8_epi16(sub_u8);             // Take the 16 uint8 and convert them to 16 uint16 (this fits in 256 bits)
 
-    __m128i add_u8 = _mm_loadu_si128((__m128i *)(pHigh + i)); // We loaded 16 uint8
-    __m256i add = _mm256_cvtepu8_epi16(add_u8);               // Take the 16 uint8 and convert them to 16 uint16 (this fits in 256 bits)
+    __m128i add_u8 = _mm_load_si128((__m128i *)(pHigh + i)); // We loaded 16 uint8
+    __m256i add = _mm256_cvtepu8_epi16(add_u8);              // Take the 16 uint8 and convert them to 16 uint16 (this fits in 256 bits)
 
     __m256i diff = _mm256_sub_epi16(add, sub); // Calculate moving window's diffs
 
