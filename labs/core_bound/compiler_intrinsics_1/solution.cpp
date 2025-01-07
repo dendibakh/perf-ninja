@@ -100,9 +100,9 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // process unaligned data
   {
-    constexpr auto alignment = 8;
+    constexpr auto alignment = 16;
     const int miss_alignment = pos % alignment;
-    for(int i=0; i<alignment - miss_alignment; ++i)
+    for (int i = 0; i < alignment - miss_alignment; ++i)
     {
       currentSum -= input[pos - radius - 1];
       currentSum += input[pos + radius];
@@ -203,7 +203,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
     // Save results
     result = _mm256_add_epi16(current, sums);
-    _mm256_storeu_si256((__m256i *)(pOut + i), result);
+    _mm256_store_si256((__m256i *)(pOut + i), result);
 
 // Prepare next iteration
 
