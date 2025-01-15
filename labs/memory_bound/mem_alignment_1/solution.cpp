@@ -8,9 +8,14 @@
 // This function allows you to change the number of columns in a matrix. 
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
-int n_columns(int N) { 
-  constexpr int base = 32;
-  return N > 100 ? (N/base+1)*base  : (N/base+1)*base;
+int n_columns(int N) 
+{ 
+  #ifdef SOLUTION
+  constexpr int base = CACHELINE_SIZE;
+  return (N/base+1)*base;
+  #else
+  return N;
+  #endif
 }
 // ******************************************
 
