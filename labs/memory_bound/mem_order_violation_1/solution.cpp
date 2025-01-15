@@ -24,9 +24,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   constexpr size_t histogram_count = 12;
   std::array<std::array<uint32_t, 256>, histogram_count> local_hists;
   for(auto& local_hist : local_hists)
-  {
     local_hist.fill(0);
-  }
 
   uint32_t remainder = image.size % histogram_count;
   int index = 0;
@@ -45,7 +43,7 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
 
   for(int i = 0; i < final_hist.size(); i++)
   {
-    final_hist[i] = std::reduce(local_hists.begin(), local_hists.end(), 0, [i](auto acc, auto& entry){ return acc + entry[i];});
+    final_hist[i] = std::reduce(local_hists.begin(), local_hists.end(), 0, [i](uint32_t acc, const std::array<uint32_t, 256>& entry){ return acc + entry[i];});
   }
   
   return final_hist;
