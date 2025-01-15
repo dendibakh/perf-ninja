@@ -8,8 +8,9 @@
 // This function allows you to change the number of columns in a matrix. 
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
-int n_columns(int N) {  
-  return N;
+int n_columns(int N) { 
+  constexpr int base = 64;
+  return (N/base+1)*base;
 }
 // ******************************************
 
