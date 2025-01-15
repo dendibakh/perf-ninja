@@ -9,8 +9,8 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) { 
-  constexpr int base = 64;
-  return N > 256 ? 512 : (N/base+1)*base;
+  constexpr int base = 32;
+  return N > 100 ? (N/base+1)*base  : (N/base+1)*base;
 }
 // ******************************************
 
