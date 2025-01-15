@@ -11,7 +11,7 @@
 int n_columns(int N) 
 { 
   #ifdef SOLUTION
-  constexpr int base = CACHELINE_SIZE;
+  constexpr int base = CACHELINE_SIZE/sizeof(float);
   return (N/base+1)*base;
   #else
   return N;
