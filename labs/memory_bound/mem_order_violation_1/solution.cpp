@@ -5,16 +5,115 @@
 #include <stdint.h>
 #include <cmath>
 #include <ios>
+#include <vector>
+#include <numeric>
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
+
+// Bonus Exercise: What would be the worst and the best cases for the original implementation and your solution?
+// Best case for the original is that the GrayscaleImages pixel changes constantly up to the number of operations the CPU can have in its pipeline at once
+// E.g. if the CPU can have 5 operations running in parallel, the image data would look something like {0,1,2,3,4,0,1,2,3,4 ... 5,6,7,8,9 ...}. 
+// The worst case would be that all the pixels are ordered in color
+// For my solution
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
-  std::array<uint32_t, 256> hist;
-  hist.fill(0);
-  for (int i = 0; i < image.width * image.height; ++i)
-    hist[image.data[i]]++;
-  return hist;
+  
+  std::array<uint32_t, 256> final_hist = {0};
+  std::array<uint32_t, 256> local_hist_0 = {0};
+  std::array<uint32_t, 256> local_hist_1 = {0};
+  std::array<uint32_t, 256> local_hist_2 = {0};
+  std::array<uint32_t, 256> local_hist_3 = {0};
+ /* std::array<uint32_t, 256> local_hist_4 = {0};
+ std::array<uint32_t, 256> local_hist_5 = {0};
+  std::array<uint32_t, 256> local_hist_6 = {0};
+  std::array<uint32_t, 256> local_hist_7 = {0};
+  std::array<uint32_t, 256> local_hist_8 = {0};
+  std::array<uint32_t, 256> local_hist_9 = {0};
+  std::array<uint32_t, 256> local_hist_10 = {0};
+  std::array<uint32_t, 256> local_hist_11 = {0};*/
+  
+  auto remainder = image.size % 4;
+  int index = 0;
+  for (; index < image.size - remainder; index+=4)
+  {
+    local_hist_0[image.data[index]]++;
+    local_hist_1[image.data[index+1]]++;
+    local_hist_2[image.data[index+2]]++;
+    local_hist_3[image.data[index+3]]++;
+    /*local_hist_4[image.data[index+4]]++;
+    local_hist_5[image.data[index+5]]++;
+    local_hist_6[image.data[index+6]]++;
+    local_hist_7[image.data[index+7]]++;
+    local_hist_8[image.data[index+8]]++;
+    local_hist_9[image.data[index+9]]++;
+    local_hist_10[image.data[index+10]]++;
+    local_hist_11[image.data[index+11]]++;*/
+  }
+
+  switch(remainder)
+  {
+    /*
+    case 11:
+      local_hist_10[image.data[index+10]]++;
+    case 10:
+      local_hist_9[image.data[index+9]]++;
+    case 9:
+      local_hist_8[image.data[index+8]]++;
+    case 8:
+      local_hist_7[image.data[index+7]]++;
+    case 7:
+      local_hist_6[image.data[index+6]]++;
+    case 6:
+      local_hist_5[image.data[index+5]]++;
+    case 5:
+      local_hist_4[image.data[index+4]]++;*/
+    case 4:
+      local_hist_3[image.data[index+3]]++;
+    case 3:
+      local_hist_2[image.data[index+2]]++;
+    case 2:
+      local_hist_1[image.data[index+1]]++;
+    case 1:
+      local_hist_0[image.data[index]]++;
+  }
+
+
+  for(int i = 0; i < final_hist.size(); i++)
+  {
+    final_hist[i] = local_hist_0[i] + local_hist_1[i] + local_hist_2[i] + local_hist_3[i];// + local_hist_4[i] + local_hist_5[i] + local_hist_6[i] + local_hist_7[i] + local_hist_8[i] + local_hist_9[i] + local_hist_10[i] + local_hist_11[i]; 
+  }
+
+  // trying with array of array
+ /* 
+  constexpr size_t histogram_count = 12;
+  std::array<std::array<uint32_t, 256>, histogram_count> local_hists;
+  for(auto& local_hist : local_hists)
+  {
+    local_hist.fill(0);
+  }
+
+  uint32_t remainder = image.size % histogram_count;
+  int index = 0;
+  for (; index < image.size - remainder; index+=histogram_count)
+  {
+    for(int i = 0; i < histogram_count; i++)
+    {
+      local_hists[i][image.data[index+i]]++;
+    }
+  }
+
+  for(int i = 0; i < remainder; i++)
+  {
+      local_hists[i][image.data[index+i]]++;
+  }
+
+  for(int i = 0; i < final_hist.size(); i++)
+  {
+    final_hist[i] = std::reduce(local_hists.begin(), local_hists.end(), 0, [i](auto acc, auto& entry){ return acc + entry[i];});
+  }*/
+  
+  return final_hist;
 }
 // ******************************************
 
