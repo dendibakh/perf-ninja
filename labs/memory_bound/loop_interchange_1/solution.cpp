@@ -3,6 +3,8 @@
 #include <memory>
 #include <string_view>
 
+#define SOLUTION
+
 // Make zero matrix
 void zero(Matrix &result) {
   for (int i = 0; i < N; i++) {
@@ -21,7 +23,33 @@ void identity(Matrix &result) {
     result[i][i] = 1;
   }
 }
+#ifdef SOLUTION
 
+void transpose(Matrix& result, const Matrix& a)
+{
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      result[i][j] = a[j][i];
+    }
+  }
+}
+
+void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
+  zero(result);
+
+  Matrix temp;
+  transpose(temp, b);
+
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      for (int k = 0; k < N; k++) {
+        result[i][j] += a[i][k] * temp[j][k];
+      }
+    }
+  }
+}
+
+#else
 // Multiply two square matrices
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
@@ -34,6 +62,9 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
     }
   }
 }
+
+
+#endif
 
 // Compute integer power of a given square matrix
 Matrix power(const Matrix &input, const uint32_t k) {
