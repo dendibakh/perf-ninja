@@ -6,6 +6,9 @@
 
 #define SOLUTION
 #ifdef SOLUTION
+
+#include <vector>
+
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int width, const int height,
@@ -13,21 +16,35 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-   for (int r = 0; r < std::min(radius, height); r++) {
+  std::vector<int> dots;
+  dots.resize(width);
+
+  std::vector<int> sums;
+  sums.resize(width);
+
+  std::vector<decltype(&kernel[0])> ps;
+  ps.resize(width);
+
+  for (int r = 0; r < std::min(radius, height); r++) {
     // Top part of line, partial kernel
     for (int c = 0; c < width; c++) {
       // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = &kernel[radius - r];
-      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
+      dots[c] = 0;
+      sums[c] = 0;
+      ps[c] = &kernel[radius - r];
+    }
 
+    for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
+      for (int c = 0; c < width; c++) {
+        int weight = *ps[c]++;
+        dots[c] += input[y * width + c] * weight;
+        sums[c] += weight;
+      }
+    }
+    
+    for (int c = 0; c < width; c++) {
       // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      int value = static_cast<int>(dots[c] / static_cast<float>(sums[c]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
@@ -36,13 +53,18 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     // Middle part of computations with full kernel
     for (int c = 0; c < width; c++) {
       // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
+      dots[c] = 0;
+    }
 
+    for (int i = 0; i < radius + 1 + radius; i++) {
+      for (int c = 0; c < width; c++) {
+        dots[c] += input[(r - radius + i) * width + c] * kernel[i];
+      }
+    }
+
+    for (int c = 0; c < width; c++) {
       // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
+      int value = (dots[c] + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
@@ -51,17 +73,22 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
     // Bottom part of line, partial kernel
     for (int c = 0; c < width; c++) {
       // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = kernel;
-      for (int y = r - radius; y < height; y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
+      dots[c] = 0;
+      sums[c] = 0;
+      ps[c] = kernel;
+    }
 
+    for (int y = r - radius; y < height; y++) {
+      for (int c = 0; c < width; c++) {
+        int weight = *ps[c]++;
+        dots[c] += input[y * width + c] * weight;
+        sums[c] += weight;
+      }
+    }
+
+    for (int c = 0; c < width; c++) {
       // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      int value = static_cast<int>(dots[c] / static_cast<float>(sums[c]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
