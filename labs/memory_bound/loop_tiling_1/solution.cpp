@@ -5,7 +5,7 @@
 #ifdef SOLUTION
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out)
 {
-  constexpr int tile_size = 64 / sizeof(double);
+  constexpr int tile_size = 16;
   const int size = in.size();
   for (int ii = 0; ii < size; ii += tile_size)
   {
