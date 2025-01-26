@@ -12,25 +12,24 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
   std::vector<int> dot(width);
-  std::vector<int> sum(width);
 
   // Top part of line, partial kernel
   for (int r = 0; r < std::min(radius, height); r++) {
     // Accumulation
     fill(dot.begin(), dot.end(), 0);
-    fill(sum.begin(), sum.end(), 0);
+    int sum = 0;
     auto p = &kernel[radius - r];
     for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
       int weight = *p++;
+      sum += weight;
       for (int c = 0; c < width; c++) {
         dot[c] += input[y * width + c] * weight;
-        sum[c] += weight;
       }
     }
 
     // Normalization
     for (int c = 0; c < width; c++) {
-      int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+      int value = static_cast<int>(dot[c] / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
@@ -55,19 +54,19 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
   for (int r = std::max(radius, height - radius); r < height; r++) {
     // Accumulation
     fill(dot.begin(), dot.end(), 0);
-    fill(sum.begin(), sum.end(), 0);
+    int sum = 0;
     auto p = kernel;
     for (int y = r - radius; y < height; y++) {
       int weight = *p++;
+      sum += weight;
       for (int c = 0; c < width; c++) {
         dot[c] += input[y * width + c] * weight;
-        sum[c] += weight;
       }
     }
 
     // Normalization
     for (int c = 0; c < width; c++) {
-      int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+      int value = static_cast<int>(dot[c] / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
