@@ -4,6 +4,8 @@
 static constexpr std::size_t HASH_MAP_SIZE = 32 * 1024 * 1024 - 5;
 static constexpr std::size_t NUMBER_OF_LOOKUPS = 1024 * 1024;
 
+void prefetch_memory(const void* ptr);
+
 class hash_map_t {
     static constexpr int UNUSED = std::numeric_limits<int>::max();
     std::vector<int> m_vector;
@@ -23,6 +25,11 @@ public:
     bool find(int val) const {
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
+    }
+
+    void prefetch(int val) const {
+        int bucket = val % N_Buckets;
+        prefetch_memory(&m_vector[bucket]);
     }
 };
 
