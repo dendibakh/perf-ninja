@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdlib.h>
 
-void solution(std::array<S, N> &arr) 
+void solution(std::array<S, N> &arr)
 {
     struct 
     {
