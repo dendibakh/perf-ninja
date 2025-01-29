@@ -3,25 +3,28 @@
 #include <algorithm>
 #include <stdlib.h>
 
-static int compare(const void *lhs, const void *rhs) {
-  auto &a = *reinterpret_cast<const S *>(lhs);
-  auto &b = *reinterpret_cast<const S *>(rhs);
+void solution(std::array<S, N> &arr) 
+{
+    struct 
+    {
+        bool operator()(S& a, S& b) const 
+        {
+          if (a.key1 < b.key1)
+            return true;
+          
+          if (a.key1 > b.key1)
+            return false;
+          
+          if (a.key2 < b.key2)
+            return true;
 
-  if (a.key1 < b.key1)
-    return -1;
+          if (a.key2 > b.key2)
+            return false;
 
-  if (a.key1 > b.key1)
-    return 1;
+          return false;
+        }
+    }
+    customCompare;
 
-  if (a.key2 < b.key2)
-    return -1;
-
-  if (a.key2 > b.key2)
-    return 1;
-
-  return 0;
-}
-
-void solution(std::array<S, N> &arr) {
-  qsort(arr.data(), arr.size(), sizeof(S), compare);
+  std::sort(arr.begin(), arr.end(), customCompare);
 }

@@ -35,9 +35,9 @@ static void bench1(benchmark::State &state) {
 }
 
 // Register the bench1 function as a benchmark
-BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(0)->Name("bird");
-BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(1)->Name("coins");
-BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(2)->Name("pepper");
-BENCHMARK(bench1)->Unit(benchmark::kMillisecond)->Arg(3)->Name("pixabay");
+BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(0)->Name("bird")->Iterations(10);
+BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(1)->Name("coins")->Iterations(10);
+BENCHMARK(bench1)->Unit(benchmark::kMicrosecond)->Arg(2)->Name("pepper")->Iterations(10);
+BENCHMARK(bench1)->Unit(benchmark::kMillisecond)->Arg(3)->Name("pixabay")->Iterations(10);
 
 BENCHMARK_MAIN();

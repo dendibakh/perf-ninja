@@ -1,0 +1,6 @@
+# ninja log v6
+13	59	7542320766404579	CMakeFiles/validate.dir/solution.cpp.obj	3ef9e9b89c3d312b
+7	60	7542320766344589	CMakeFiles/lab.dir/solution.cpp.obj	879734576f9659cd
+10	701	7542320766374569	CMakeFiles/validate.dir/validate.cpp.obj	42275b707233bd7b
+703	802	7542320773304601	validate.exe	f8d165824278fdc
+3	821	7542320766304589	CMakeFiles/lab.dir/bench.cpp.obj	827bf15c7a96e837
