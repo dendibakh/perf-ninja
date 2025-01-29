@@ -24,7 +24,7 @@ void solution(std::array<S, N> &arr)
           return false;
         }
     }
-    customCompare;
+    customCompares;
 
-  std::sort(arr.begin(), arr.end(), customCompare);
+  std::sort(arr.begin(), arr.end(), customCompares);
 }
