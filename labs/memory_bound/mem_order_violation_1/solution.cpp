@@ -18,8 +18,8 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
       ++hist[j][image.data[i + j]];
     }
   }
-  for (int j = 1; j < CNT; ++j) {
-    for (int k = 0; k < hist[0].size(); ++k) {
+  for (int k = 0; k < hist[0].size(); ++k) {
+    for (int j = 1; j < CNT; ++j) {
       hist[0][k] += hist[j][k];
     }
   }
