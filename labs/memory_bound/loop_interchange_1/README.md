@@ -1,4 +1,4 @@
-This is a lab about [loop interchange](https://en.wikipedia.org/wiki/Loop_interchange).
+d This is a lab about [loop interchange](https://en.wikipedia.org/wiki/Loop_interchange).
 
 [<img src="../../../img/LoopInterchange1Intro.png">](https://www.youtube.com/watch?v=TLDR_nO9XVc&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)
 
