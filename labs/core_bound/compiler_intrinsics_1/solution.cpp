@@ -99,7 +99,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // first load
 
-  #define AVX_16
+  #define AVX_32
   int i = 0;
   #ifdef SSE_8
   __m128i current = _mm_set1_epi16(currentSum);
@@ -172,29 +172,33 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   }
   #endif
   #ifdef AVX_32
-  for(; i+7 < limit - pos; i+=8)
+  __m256i current = _mm256_set1_epi16(currentSum);
+  for(; i+15 < limit - pos; i+=16)
   {
     // Calculate vector diff
-    __m128i sub_u8 = _mm_loadu_si64(subtractPtr + i);
-    __m128i sub = _mm_cvtepu8_epi16(sub_u8); // widing it 
+    __m128i sub_u8 = _mm_loadu_si128((__m128i*)(subtractPtr + i));
+    __m256i sub = _mm256_cvtepu8_epi16(sub_u8); // widing it 
 
-    __m128i add_u8 = _mm_loadu_si64(addPtr + i);
-    __m128i add = _mm_cvtepu8_epi16(add_u8);
+    __m128i add_u8 = _mm_loadu_si128((__m128i*)(addPtr + i));;
+    __m256i add = _mm256_cvtepu8_epi16(add_u8);
 
-    __m128i diff = _mm_sub_epi16(add, sub); // order matters, so highest address  first
+    __m256i diff = _mm256_sub_epi16(add, sub); // order matters, so highest address  first
+
+    __m512i extended_diff = _mm512_inserti64x4(_mm512_setzero_si512(), diff, 0);
 
     // Calculate vector prefix sum for 8 elements: SIMD prefix sum
-    __m128i s = _mm_add_epi16(diff, _mm_slli_si128(diff, 2)); // shift by 1 element
-    s = _mm_add_epi16(s, _mm_slli_si128(s, 4)); // shift by 2 elements
-    s = _mm_add_epi16(s, _mm_slli_si128(s, 8));// shift by 4 elements 
+    __m512i s = _mm512_add_epi16(extended_diff, _mm512_bslli_epi128(extended_diff, 2)); // shift by 1 element
+    s = _mm512_add_epi16(s, _mm512_bslli_epi128(s, 4)); // shift by 2 elements
+    s = _mm512_add_epi16(s, _mm512_bslli_epi128(s, 8));// shift by 4 elements 
+    s = _mm512_add_epi16(s, _mm512_bslli_epi128(s, 16));// shift by 8 elements 
 
     // Store the result
-    __m128i result = _mm_add_epi16(s,current);
-    _mm_storeu_si128((__m128i*)(outputPtr + i), result);
+    __m256i result = _mm512_extracti64x4_epi64(s,0);
+    _mm256_storeu_si256((__m256i*)(outputPtr + i), result);
 
     // Update current sum 
-    currentSum = (uint16_t)_mm_extract_epi16(result,7);
-    current = _mm_set1_epi16(currentSum);
+    currentSum = (uint16_t)_mm256_extract_epi16(result,15);
+    current = _mm256_set1_epi16(currentSum);
   }
   #endif
   pos += i;
