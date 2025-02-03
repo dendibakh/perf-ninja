@@ -99,7 +99,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // first load
 
-  #define AVX_32
+  #define SSE_8
   int i = 0;
   #ifdef SSE_8
   __m128i current = _mm_set1_epi16(currentSum);
