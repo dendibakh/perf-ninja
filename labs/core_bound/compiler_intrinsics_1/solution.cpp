@@ -72,7 +72,7 @@ __m128i Shift(__m128i input)
 
 #define SOLUTION
 #ifdef SOLUTION
-static void imageSmoothing(const InputVector &input, uint8_t radius,
+void imageSmoothing(const InputVector &input, uint8_t radius,
                                OutputVector &output) {
   int pos = 0;
   int currentSum = 0;
