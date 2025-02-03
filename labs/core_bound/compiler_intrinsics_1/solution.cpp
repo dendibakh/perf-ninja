@@ -99,7 +99,7 @@ static void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // first load
 
-  #define SSE_8
+  #define AVX_16
   int i = 0;
   #ifdef SSE_8
   __m128i current = _mm_set1_epi16(currentSum);
@@ -118,7 +118,7 @@ static void imageSmoothing(const InputVector &input, uint8_t radius,
     __m128i s = _mm_add_epi16(diff, _mm_slli_si128(diff, 2)); // shift by 1 element
     s = _mm_add_epi16(s, _mm_slli_si128(s, 4)); // shift by 2 elements
     s = _mm_add_epi16(s, _mm_slli_si128(s, 8));// shift by 4 elements
-    
+
     // Store the result
     __m128i result = _mm_add_epi16(s,current);
     _mm_storeu_si128((__m128i*)(outputPtr + i), result);
