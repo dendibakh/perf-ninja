@@ -61,6 +61,15 @@ void print_actual_data(const InputVector& input, int start, int end)
   printf("\n");
 }
 
+__m128i Shift(__m128i input)
+{
+    __m128i result = _mm_add_epi16(input, _mm_slli_si128(input, 2)); // shift by 1 element
+    result = _mm_add_epi16(result, _mm_slli_si128(result, 4)); // shift by 2 elements
+    result = _mm_add_epi16(result, _mm_slli_si128(result, 8));// shift by 4 elements
+
+    return result;
+}
+
 #define SOLUTION
 #ifdef SOLUTION
 static void imageSmoothing(const InputVector &input, uint8_t radius,
@@ -83,12 +92,86 @@ static void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop. During optimization, focus mainly on this part
   limit = size - radius;
+  // SSE solution
   const uint8_t* subtractPtr = input.data() + pos - radius -1;
   const uint8_t* addPtr = input.data() + pos + radius;
   const uint16_t* outputPtr = output.data() + pos;
-  __m128i current = _mm_set1_epi16(currentSum);
 
+  // first load
+
+  #define SSE_8
   int i = 0;
+  #ifdef SSE_8
+  __m128i current = _mm_set1_epi16(currentSum);
+  for(; i+7 < limit - pos; i+=8)
+  {
+    // Calculate vector diff
+    __m128i sub_u8 = _mm_loadu_si64(subtractPtr + i);
+    __m128i sub = _mm_cvtepu8_epi16(sub_u8); // widing it 
+
+    __m128i add_u8 = _mm_loadu_si64(addPtr + i);
+    __m128i add = _mm_cvtepu8_epi16(add_u8);
+
+    __m128i diff = _mm_sub_epi16(add, sub); // order matters, so highest address  first
+
+    // Calculate vector prefix sum for 8 elements: SIMD prefix sum
+    __m128i s = _mm_add_epi16(diff, _mm_slli_si128(diff, 2)); // shift by 1 element
+    s = _mm_add_epi16(s, _mm_slli_si128(s, 4)); // shift by 2 elements
+    s = _mm_add_epi16(s, _mm_slli_si128(s, 8));// shift by 4 elements
+    
+    // Store the result
+    __m128i result = _mm_add_epi16(s,current);
+    _mm_storeu_si128((__m128i*)(outputPtr + i), result);
+
+    // Update current sum 
+    currentSum = (uint16_t)_mm_extract_epi16(result,7);
+    current = _mm_set1_epi16(currentSum);
+  }
+  #endif
+  #ifdef AVX_16
+  __m256i current = _mm256_set1_epi16(currentSum);
+  for(; i+15 < limit - pos; i+=16)
+  {
+    // Calculate vector diff
+    __m128i sub_u8 = _mm_loadu_si128((__m128i*)(subtractPtr + i));
+    __m256i sub = _mm256_cvtepu8_epi16(sub_u8); // widing it 
+
+    __m128i add_u8 = _mm_loadu_si128((__m128i*)(addPtr + i));;
+    __m256i add = _mm256_cvtepu8_epi16(add_u8);
+
+    __m256i diff = _mm256_sub_epi16(add, sub); // order matters, so highest address  first
+
+
+    // _mm256_slli_si256 is restricted/limited to the lower 128 bits (for whatever fucking reason)
+    // which means I have to split them up
+     // Calculate vector prefix sum for 16 elements: SIMD prefix sum
+    __m128i low = _mm256_extracti128_si256(diff, 0);
+    __m128i high = _mm256_extracti128_si256(diff, 1);
+    
+    __m128i shifted_low = Shift(low);
+    __m128i shifted_high = Shift(high);
+
+
+    // We add the total sum of the lower (found in the last 16 bit value), to the higher vector
+    // in order to treat it as a single vector rather than two
+    uint16_t lower_total = (uint16_t)_mm_extract_epi16(shifted_low, 7);
+    __m128i lower_add = _mm_set1_epi16(lower_total);
+    shifted_high = _mm_add_epi16(shifted_high, lower_add);
+
+    // Store the result
+    __m256i result = _mm256_castsi128_si256(shifted_low);
+    result = _mm256_inserti128_si256(result, shifted_high, 1);
+    result = _mm256_add_epi16(result, current);
+   
+    _mm256_storeu_si256((__m256i*)(outputPtr + i), result);
+
+    // Update current sum 
+    currentSum = (uint16_t)_mm256_extract_epi16(result,15);
+    
+    current = _mm256_set1_epi16(currentSum); 
+  }
+  #endif
+  #ifdef AVX_32
   for(; i+7 < limit - pos; i+=8)
   {
     // Calculate vector diff
@@ -113,6 +196,7 @@ static void imageSmoothing(const InputVector &input, uint8_t radius,
     currentSum = (uint16_t)_mm_extract_epi16(result,7);
     current = _mm_set1_epi16(currentSum);
   }
+  #endif
   pos += i;
 
   for (; pos < limit; ++pos) {
