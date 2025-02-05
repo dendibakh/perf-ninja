@@ -4,7 +4,7 @@
 #include <cstdio>
 
 
-
+#ifdef PRINT
 void print_epi8(__m256i vec)
 {
   uint8_t vals[32];
@@ -30,7 +30,7 @@ void print_binary(unsigned int value)
   }
   printf("\n");
 }
-
+#endif
 // Find the longest line in a file.
 // Implementation uses ternary operator with a hope that compiler will
 // turn it into a CMOV instruction.
@@ -71,6 +71,7 @@ unsigned solution(const std::string &inputContents) {
         longestLine = std::max(curLineLength + trailing_zeros, longestLine);
         curLineLength = 0;
       }
+      
       curLineLength += _lzcnt_u32(dumped_mask);
   }
   for (;index < inputContents.size(); index++) 
