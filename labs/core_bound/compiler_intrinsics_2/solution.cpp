@@ -65,13 +65,13 @@ unsigned solution(const std::string &inputContents) {
       unsigned int dumped_mask = _mm256_movemask_epi8(mask_off);
       unsigned int trailing_zeros = 0;
       unsigned int o = 0;
-      for(unsigned int shifted_mask = dumped_mask; shifted_mask > 0; shifted_mask >>= (trailing_zeros + 1))
+      for(unsigned int shifted_mask = dumped_mask; shifted_mask > 0; shifted_mask >>= trailing_zeros)
       {
         trailing_zeros = _tzcnt_u32(shifted_mask);
         longestLine = std::max(curLineLength + trailing_zeros, longestLine);
         curLineLength = 0;
+        shifted_mask >>= 1; // this is to avoid the weird error where a right bitshift by 32 doesnt change the mask,
       }
-      
       curLineLength += _lzcnt_u32(dumped_mask);
   }
   for (;index < inputContents.size(); index++) 
