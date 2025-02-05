@@ -48,12 +48,10 @@ unsigned solution(const std::string &inputContents) {
   unsigned longestLine = 0;
   unsigned curLineLength = 0;
   
-  #define SOLUTION
+  //#define SOLUTION
 
   #ifdef SOLUTION
   unsigned int index = 0;
-
-
   for(; index+31 < inputContents.size(); index+= 32)
   {
       __m256i data = _mm256_loadu_si256 ((__m256i*)&inputContents[index]);
@@ -64,7 +62,6 @@ unsigned solution(const std::string &inputContents) {
       // Dumping the mask
       unsigned int dumped_mask = _mm256_movemask_epi8(mask_off);
       unsigned int trailing_zeros = 0;
-      unsigned int o = 0;
       for(unsigned int shifted_mask = dumped_mask; shifted_mask > 0; shifted_mask >>= trailing_zeros)
       {
         trailing_zeros = _tzcnt_u32(shifted_mask);
