@@ -48,7 +48,7 @@ unsigned solution(const std::string &inputContents) {
   unsigned longestLine = 0;
   unsigned curLineLength = 0;
   
-  //#define SOLUTION
+  #define SOLUTION
 
   #ifdef SOLUTION
   unsigned int index = 0;
