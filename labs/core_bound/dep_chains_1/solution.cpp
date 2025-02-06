@@ -1,5 +1,6 @@
 #include "solution.hpp"
 #include <vector>
+#include <algorithm>
 #include <iostream>
 
 unsigned getSumOfDigits(unsigned n) {
@@ -40,7 +41,7 @@ unsigned solution(List *l1, List *l2) {
   }
 #endif
 #ifdef SOLUTION_2
-  unsigned size = 128; // speed tops out at 128
+  unsigned size = 128; // speed tops out at 128, must mean it moves out of cache
   std::vector<unsigned> values;
   values.reserve(size);
   List *latest_head1 = l1;
