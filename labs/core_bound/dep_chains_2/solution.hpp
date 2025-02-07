@@ -55,13 +55,33 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 // in the corresponding direction.
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-  ; // This is the dependency as it has a seed value that is changed everytime .gen is called
+  #define SOLUTION
+  #ifdef SOLUTION
+  std::vector<RNG> rngses;
+  rngses.reserve(PARTICLES);
+  for(int i = 0; i < PARTICLES; i++)
+  {
+    rngses.push_back(RNG(seed + i));
+  }
+
+  for (int i = 0; i < STEPS; i++)
+  {
+    for (int j =0; j < PARTICLES; j++) 
+    {
+      uint32_t angle = rngses[j].gen();
+      float angle_rad = angle * DEGREE_TO_RADIAN;
+      particles[j].x += cosine(angle_rad) * particles[j].velocity;
+      particles[j].y += sine(angle_rad) * particles[j].velocity;
+    }
+  }
+  #else
+  RNG rng(seed);  
   for (int i = 0; i < STEPS; i++)
     for (auto &p : particles) {
-      RNG rng(seed);
       uint32_t angle = rng.gen();
       float angle_rad = angle * DEGREE_TO_RADIAN;
       p.x += cosine(angle_rad) * p.velocity;
       p.y += sine(angle_rad) * p.velocity;
     }
+  #endif
 }
