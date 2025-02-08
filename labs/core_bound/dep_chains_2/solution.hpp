@@ -52,27 +52,26 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 // Simulate the motion of the particles.
 // For every particle, we generate a random angle and move the particle
 // in the corresponding direction.
-#define NRNG 8
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-  std::array<RNG, NRNG> rng{{RNG(seed), RNG(seed + 1), RNG(seed + 2),
-                             RNG(seed + 3), RNG(seed + 4), RNG(seed + 5),
-                             RNG(seed + 6), RNG(seed + 7)}};
+  RNG rng1(seed);
+  RNG rng2(seed + 1);
   for (int i = 0; i < STEPS; i++) {
-    unsigned int j = 0;
-    for (; j + NRNG < particles.size(); j += NRNG) {
-      for (int k = 0; k < NRNG; ++k) {
-        uint32_t angle = rng[k].gen();
-        float angle_rad = angle * DEGREE_TO_RADIAN;
-        particles[j + k].x += cosine(angle_rad) * particles[j + k].velocity;
-        particles[j + k].y += sine(angle_rad) * particles[j + k].velocity;
-      }
+    for (int j = 0; j + 1 < particles.size(); j += 2) {
+      uint32_t angle1 = rng1.gen();
+      float angle_rad1 = angle1 * DEGREE_TO_RADIAN;
+      particles[j].x += cosine(angle_rad1) * particles[j].velocity;
+      particles[j].y += sine(angle_rad1) * particles[j].velocity;
+      uint32_t angle2 = rng2.gen();
+      float angle_rad2 = angle2 * DEGREE_TO_RADIAN;
+      particles[j + 1].x += cosine(angle_rad2) * particles[j + 1].velocity;
+      particles[j + 1].y += sine(angle_rad2) * particles[j + 1].velocity;
     }
-    for (int k = 0; j + k < particles.size(); ++k) {
-      uint32_t angle = rng[k].gen();
-      float angle_rad = angle * DEGREE_TO_RADIAN;
-      particles[j + k].x += cosine(angle_rad) * particles[j + k].velocity;
-      particles[j + k].y += sine(angle_rad) * particles[j + k].velocity;
+    if (particles.size() & 1) {
+      uint32_t angle1 = rng1.gen();
+      float angle_rad1 = angle1 * DEGREE_TO_RADIAN;
+      particles.back().x += cosine(angle_rad1) * particles.back().velocity;
+      particles.back().y += sine(angle_rad1) * particles.back().velocity;
     }
   }
 }
