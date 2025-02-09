@@ -23,19 +23,31 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
+  constexpr size_t COOL_SIZE = 8;
+  unsigned chunk[COOL_SIZE];
+
   List *head2 = l2;
   // O(N^2) algorithm:
   while (l1) {
-    unsigned v = l1->value;
+    unsigned encountered = 0;
+    for (size_t k = 0; k < COOL_SIZE; ++k) {
+      if (l1) {
+        chunk[encountered++] = l1->value;
+        l1 = l1->next;
+      }
+    }
     l2 = head2;
     while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        break;
+      for (unsigned i = 0; i < encountered; ++i)
+      {
+        const unsigned v = chunk[i];
+        if (l2->value == v) {
+          retVal += getSumOfDigits(v);
+          break;
+        }
       }
       l2 = l2->next;
     }
-    l1 = l1->next;
   }
 
   return retVal;
