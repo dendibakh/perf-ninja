@@ -1,5 +1,6 @@
 #include "solution.hpp"
 #include <cstdio>
+#include <cstdint>
 
 
 #define SOLUTION_2
