@@ -63,24 +63,7 @@ public:
                 aliveNeighbours -= current[i][j];
 
                 // Implementing the Rules of Life:
-                switch(aliveNeighbours) {
-                    // 1. Cell is lonely and dies
-                    case 0:
-                    case 1:
-                        future[i][j] = 0;
-                        break;                   
-                    // 2. Remains the same
-                    case 2:
-                        future[i][j] = current[i][j];
-                        break;
-                    // 3. A new cell is born
-                    case 3:
-                        future[i][j] = 1;
-                        break;
-                    // 4. Cell dies due to over population
-                    default:
-                        future[i][j] = 0;
-                }
+		future[i][j] = 1 < ((unsigned)aliveNeighbours - 2) ? 0 : aliveNeighbours == 2 ? current[i][j] : 1;
             }
         }
         std::swap(current, future);
