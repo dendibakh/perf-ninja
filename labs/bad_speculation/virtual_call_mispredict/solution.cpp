@@ -1,7 +1,8 @@
 #include "solution.h"
-
+#include <algorithm>
 #include <random>
 
+#define SOLUTION
 void generateObjects(InstanceArray& array) {
     std::default_random_engine generator(0);
     std::uniform_int_distribution<std::uint32_t> distribution(0, 2);
@@ -16,6 +17,11 @@ void generateObjects(InstanceArray& array) {
             array.push_back(std::make_unique<ClassC>());
         }
     }
+    
+
+    #ifdef SOLUTION
+    std::sort(array.begin(), array.end(), [](const auto& a, const auto& b) { return a->sort_value() > b->sort_value();} );
+    #endif
 }
 
 // Invoke the `handle` method on all instances in `output`
