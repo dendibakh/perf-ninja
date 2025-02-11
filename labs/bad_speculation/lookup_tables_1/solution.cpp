@@ -3,7 +3,7 @@
 #include <cstdint>
 
 
-#define SOLUTION_2
+#define SOLUTION_1
 #ifdef SOLUTION_1
   constexpr uint8_t look_up[101] { [0 ... 12] = 0, [13 ... 28] = 1, [29 ... 40] = 2, [41 ... 52] = 3, [53 ... 70] = 4, [71 ... 82] = 5, [83 ... 99] = 6, [100] = DEFAULT_BUCKET};
 #elif defined(SOLUTION_2)
@@ -21,7 +21,6 @@ uint8_t look_up[100] = {
 
 static std::size_t mapToBucket(std::size_t v) {
                               //   size of a bucket
-
   #ifdef SOLUTION_1
     return look_up[v * (v < 100) + 100 * (v >= 100)]; // approximately 4 times faster than the Dennis solution and 8 times as fast as the original
   #elif defined(SOLUTION_2)
