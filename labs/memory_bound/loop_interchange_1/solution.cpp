@@ -24,11 +24,13 @@ void identity(Matrix &result) {
 }
 
 // Multiply two square matrices
-void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
+void multiply(Matrix &__restrict result, const Matrix &__restrict a,
+              const Matrix &__restrict b) {
   zero(result);
 
-  for (int k = 0; k < N; k++) {
-    for (int i = 0; i < N; i++) {
+  // Solution assumes N is a multiple of B
+  for (int i = 0; i < N; i++) {
+    for (int k = 0; k < N; k++) {
       for (int j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
       }
