@@ -1,35 +1,36 @@
 
 #include "solution.h"
-#include <algorithm>
-#include <fstream>
+
 #include <stdint.h>
+
+#include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <ios>
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 #define N 4
-std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
-  std::array<uint32_t, 256> hist[N];
+std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
+  alignas(64) std::array<uint32_t, 256> hist[N];
   for (int j = 0; j < N; ++j) hist[j].fill(0);
   for (int i = 0; i < image.width * image.height; ++i)
-    hist[i&(N-1)][image.data[i]]++;
-  for (int i = 0; i < 256; ++i) {
-	  for (int j = 1; j < N; ++j) {
-		  hist[0][i] += hist[j][i];
-	  }
+    hist[i & (N - 1)][image.data[i]]++;
+  for (int j = 1; j < N; ++j) {
+    for (int i = 0; i < 256; ++i) {
+      hist[0][i] += hist[j][i];
+    }
   }
   return hist[0];
 }
 // ******************************************
 
 // Calculate Otsu's Threshold
-int calcOtsuThreshold(const std::array<uint32_t, 256>& hist, int totalPixels) {
+int calcOtsuThreshold(const std::array<uint32_t, 256> &hist, int totalPixels) {
   // normalize histogram
   std::array<double, 256> normHist;
-  for (int i = 0; i < 256; ++i)
-    normHist[i] = (double)hist[i] / totalPixels;
+  for (int i = 0; i < 256; ++i) normHist[i] = (double)hist[i] / totalPixels;
 
   double maxVariance = 0;
   int optimalThreshold = 0;
@@ -65,7 +66,7 @@ int calcOtsuThreshold(const std::array<uint32_t, 256>& hist, int totalPixels) {
 }
 
 // Function to apply the threshold to create a binary image
-void applyOtsuThreshold(GrayscaleImage& image) {
+void applyOtsuThreshold(GrayscaleImage &image) {
   // Compute the histogram
   std::array<uint32_t, 256> hist = computeHistogram(image);
   auto totalPixels = image.height * image.width;
@@ -76,7 +77,7 @@ void applyOtsuThreshold(GrayscaleImage& image) {
 }
 
 // Loads GrayscaleImage image. Format is
-// https://people.sc.fsu.edu/~jburkardt/data/pgmb/pgmb.html 
+// https://people.sc.fsu.edu/~jburkardt/data/pgmb/pgmb.html
 bool GrayscaleImage::load(const std::string &filename, const int maxSize) {
   data.reset();
 
@@ -92,8 +93,7 @@ bool GrayscaleImage::load(const std::string &filename, const int maxSize) {
       char c;
       input.unsetf(std::ios_base::skipws);
       input >> c;
-      if (c == '\r')
-        input >> c;
+      if (c == '\r') input >> c;
 
       if ((width > 0) && (width <= maxSize) && (height > 0) &&
           (height <= maxSize) && (amplitude >= 0) && (amplitude <= 255) &&
