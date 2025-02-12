@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <numeric>
 #include <cmath>
 #include <fstream>
 #include <ios>
@@ -11,18 +12,19 @@
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
-#define N 4
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
-  alignas(64) std::array<uint32_t, 256> hist[N];
-  for (int j = 0; j < N; ++j) hist[j].fill(0);
-  for (int i = 0; i < image.width * image.height; ++i)
-    hist[i & (N - 1)][image.data[i]]++;
-  for (int j = 1; j < N; ++j) {
-    for (int i = 0; i < 256; ++i) {
-      hist[0][i] += hist[j][i];
-    }
+  std::array<uint32_t, 256> hist1{};
+  std::array<uint32_t, 256> hist2{};
+  int N = image.width * image.height;
+  for (int i = 0; i + 1 < N; i += 2) {
+    hist1[image.data[i]]++;
+    hist2[image.data[i+1]]++;
   }
-  return hist[0];
+  if (N&1) hist1[image.data[N-1]]++;
+  for (int i = 0; i < 256; ++i) {
+	  hist1[i] += hist2[i];
+  }
+  return hist1;
 }
 // ******************************************
 
