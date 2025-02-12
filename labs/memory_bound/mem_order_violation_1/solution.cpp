@@ -15,14 +15,17 @@
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage &image) {
   std::array<uint32_t, 256> hist1{};
   std::array<uint32_t, 256> hist2{};
+  std::array<uint32_t, 256> hist3{};
   int N = image.width * image.height;
-  for (int i = 0; i + 1 < N; i += 2) {
+  int i{};
+  for (; i + 2 < N; i += 3) {
     hist1[image.data[i]]++;
     hist2[image.data[i+1]]++;
+    hist3[image.data[i+2]]++;
   }
-  if (N&1) hist1[image.data[N-1]]++;
+  for (; i < N; ++i) hist1[image.data[i]]++;
   for (int i = 0; i < 256; ++i) {
-	  hist1[i] += hist2[i];
+	  hist1[i] += hist2[i] + hist3[i];
   }
   return hist1;
 }
