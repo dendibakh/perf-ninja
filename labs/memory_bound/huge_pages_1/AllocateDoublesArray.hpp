@@ -147,19 +147,44 @@ inline bool setRequiredPrivileges() {
   }
 }
 
+auto initRequiredPrivileges = std::invoke([&]() {
+  return setRequiredPrivileges();
+});
+
 #endif
 
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
+  #if defined(ON_WINDOWS)
+  const auto pageSize = GetLargePageMinimum();
+  const auto allocSize = (sizeof(double) * size + pageSize - 1) / pageSize * pageSize;
+  double *alloc = (double*) VirtualAlloc(NULL, allocSize,
+      MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
+#elif defined(ON_LINUX)
+  const size_t pageSize = 1 << 21; // 2 MiB
+  const auto allocSize = (sizeof(double) * size + pageSize - 1) / pageSize * pageSize;
+  void* ptr = aligned_alloc(pageSize, allocSize);
+  madvise(ptr, allocSize, MADV_HUGEPAGE);
+  double *alloc = (double*) ptr;
+#else
   double *alloc = new double[size];
+#endif
   // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
-
+  auto deleter = [/* state = ... */](double *ptr) {
+    #if defined(ON_WINDOWS)
+        VirtualFree(ptr, 0, MEM_RELEASE);
+    #elif defined(ON_LINUX)
+        free(ptr);
+    #else
+        delete[] ptr;
+    #endif
+  };
+    
   return std::unique_ptr<double[], decltype(deleter)>(alloc,
                                                       std::move(deleter));
 
