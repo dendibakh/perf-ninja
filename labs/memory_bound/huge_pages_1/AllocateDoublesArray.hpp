@@ -162,14 +162,20 @@ inline auto allocateDoublesArray(size_t size) {
   const auto allocSize = (sizeof(double) * size + pageSize - 1) / pageSize * pageSize;
   double *alloc = (double*) VirtualAlloc(NULL, allocSize,
       MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
-  for (char* ptr = (char*)alloc; ptr < (char*)alloc + allocSize; ptr += pageSize) {
+  if (alloc == NULL) {
+    throw std::bad_alloc();
+  }
+  for (volatile char* ptr = (char*)alloc; ptr < (char*)alloc + allocSize; ptr += pageSize) {
     // allocate physical page
-    memset(ptr, 0, 1);
+    *ptr = 0;
   }
 #elif defined(ON_LINUX)
   const size_t pageSize = 1 << 21; // 2 MiB
   const auto allocSize = (sizeof(double) * size + pageSize - 1) / pageSize * pageSize;
   void* ptr = aligned_alloc(pageSize, allocSize);
+  if (ptr == NULL) {
+    throw std::bad_alloc();
+  }
   madvise(ptr, allocSize, MADV_HUGEPAGE);
   double *alloc = (double*) ptr;
 #else
