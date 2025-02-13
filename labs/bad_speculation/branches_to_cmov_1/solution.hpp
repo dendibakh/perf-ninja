@@ -156,15 +156,10 @@ public:
 
                 // Implementing the Rules of Life:
                 // 1. Cell is lonely and dies
+                // 2. Remains the same
                 // 3. A new cell is born
                 // 4. Cell dies due to over population
-                future[i][j] = UNPREDICTABLE(aliveNeighbours == 3) ? 1 : 0;
-
-                if (UNPREDICTABLE(aliveNeighbours == 2))
-                {
-                    // 2. Remains the same
-                    future[i][j] = current[i][j];
-                }
+                future[i][j] = UNPREDICTABLE(aliveNeighbours == 3) ? 1 : UNPREDICTABLE(aliveNeighbours == 2) ? current[i][j] : 0;
             }
         }
         std::swap(current, future);
