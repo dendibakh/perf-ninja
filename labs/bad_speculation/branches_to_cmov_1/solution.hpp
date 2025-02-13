@@ -155,11 +155,18 @@ public:
                 aliveNeighbours -= current[i][j];
 
                 // Implementing the Rules of Life:
+
+                if (UNPREDICTABLE(aliveNeighbours == 2))
+                {
+                    // 2. Remains the same
+                    future[i][j] = current[i][j];
+                    continue;
+                }
+
                 // 1. Cell is lonely and dies
-                // 2. Remains the same
                 // 3. A new cell is born
                 // 4. Cell dies due to over population
-                future[i][j] = UNPREDICTABLE(aliveNeighbours == 3) ? 1 : UNPREDICTABLE(aliveNeighbours == 2) ? current[i][j] : 0;
+                future[i][j] = UNPREDICTABLE(aliveNeighbours == 3) ? 1 : 0;
             }
         }
         std::swap(current, future);
