@@ -147,7 +147,7 @@ inline bool setRequiredPrivileges() {
   }
 }
 
-auto initRequiredPrivileges = std::invoke([&]() {
+auto initRequiredPrivileges = std::invoke([]() {
   return setRequiredPrivileges();
 });
 
