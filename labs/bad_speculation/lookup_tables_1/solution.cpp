@@ -58,7 +58,7 @@ static constexpr std::size_t mapToBucket_ori(const std::size_t v)
 }
 
 constexpr size_t N = 101;
-using Val = unsigned int;
+using Val = std::uint8_t;
 
 static constexpr std::array<Val, N> gen_lookup()
 {
