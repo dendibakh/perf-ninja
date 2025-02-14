@@ -75,7 +75,9 @@ static constexpr std::array<Val, N> lookup = gen_lookup();
 
 static Val mapToBucket(std::size_t v)
 {
-  return v < lookup.size() ? lookup[v] : DEFAULT_BUCKET;
+  if (v < lookup.size())
+    return lookup[v];
+  return DEFAULT_BUCKET;
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values)
