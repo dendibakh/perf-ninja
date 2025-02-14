@@ -56,12 +56,13 @@ static constexpr std::size_t mapToBucket_ori(const std::size_t v)
   return DEFAULT_BUCKET;
 }
 
-using Val = unsigned int;
+constexpr size_t N = 151;
+using Val = uint8_t;
 
-static constexpr std::array<Val, 100> gen_lookup()
+static constexpr std::array<Val, N> gen_lookup()
 {
-  std::array<Val, 100> arr{};
-  for (size_t i = 0; i < 100; i++)
+  std::array<Val, N> arr{};
+  for (size_t i = 0; i < N; i++)
   {
     arr[i] = (Val)mapToBucket_ori(i);
   }
@@ -69,26 +70,11 @@ static constexpr std::array<Val, 100> gen_lookup()
   return arr;
 }
 
-// static constexpr std::array<Val, 100> lookup = gen_lookup();
-
-#if __has_builtin(__builtin_unpredictable)
-#define UNPREDICTABLE(x) __builtin_unpredictable((x))
-#else
-#define UNPREDICTABLE(x) (x)
-#endif
-
-constexpr uint8_t lookup[] = {
-    0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
-    1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U,
-    2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U, 2U,
-    3U, 3U, 3U, 3U, 3U, 3U, 3U, 3U, 3U, 3U, 3U, 3U,
-    4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U,
-    5U, 5U, 5U, 5U, 5U, 5U, 5U, 5U, 5U, 5U, 5U, 5U,
-    6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U, 6U};
+static constexpr std::array<Val, N> lookup = gen_lookup();
 
 static std::size_t mapToBucket(std::size_t v)
 {
-  if (UNPREDICTABLE(v < sizeof(lookup) / sizeof(lookup[0])))
+  if (v < lookup.size())
     return lookup[v];
   return DEFAULT_BUCKET;
 }
