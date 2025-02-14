@@ -35,6 +35,7 @@ std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values)
 #else
 
 #include <array>
+#include <cstdint>
 
 static constexpr std::size_t mapToBucket_ori(const std::size_t v)
 {
@@ -57,7 +58,7 @@ static constexpr std::size_t mapToBucket_ori(const std::size_t v)
 }
 
 constexpr size_t N = 151;
-using Val = uint8_t;
+using Val = std::uint8_t;
 
 static constexpr std::array<Val, N> gen_lookup()
 {
