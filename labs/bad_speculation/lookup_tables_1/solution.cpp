@@ -71,6 +71,12 @@ static constexpr std::array<Val, 100> gen_lookup()
 
 // static constexpr std::array<Val, 100> lookup = gen_lookup();
 
+#if __has_builtin(__builtin_unpredictable)
+#define UNPREDICTABLE(x) __builtin_unpredictable((x))
+#else
+#define UNPREDICTABLE(x) (x)
+#endif
+
 constexpr uint8_t lookup[] = {
     0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
     1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U, 1U,
@@ -82,7 +88,7 @@ constexpr uint8_t lookup[] = {
 
 static std::size_t mapToBucket(std::size_t v)
 {
-  if (v < sizeof(lookup) / sizeof(lookup[0]))
+  if (UNPREDICTABLE(v < sizeof(lookup) / sizeof(lookup[0])))
     return lookup[v];
   return DEFAULT_BUCKET;
 }
