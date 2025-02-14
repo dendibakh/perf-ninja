@@ -57,7 +57,7 @@ static constexpr std::size_t mapToBucket_ori(const std::size_t v)
   return DEFAULT_BUCKET;
 }
 
-constexpr size_t N = 151;
+constexpr size_t N = 101;
 using Val = unsigned int;
 
 static constexpr std::array<Val, N> gen_lookup()
@@ -75,9 +75,7 @@ static constexpr std::array<Val, N> lookup = gen_lookup();
 
 static Val mapToBucket(std::size_t v)
 {
-  if (v < lookup.size())
-    return lookup[v];
-  return DEFAULT_BUCKET;
+  return lookup[std::min(v, lookup.size() - 1)];
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values)
