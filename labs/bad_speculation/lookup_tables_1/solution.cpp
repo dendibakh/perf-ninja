@@ -73,7 +73,7 @@ static constexpr std::array<Val, N> gen_lookup()
 
 static constexpr std::array<Val, N> lookup = gen_lookup();
 
-static std::size_t mapToBucket(std::size_t v)
+static Val mapToBucket(std::size_t v)
 {
   if (v < lookup.size())
     return lookup[v];
