@@ -29,22 +29,24 @@ static constexpr std::size_t mapToBucket_ori(const std::size_t v) {
   return DEFAULT_BUCKET;
 }
 
-static constexpr std::array<std::size_t, 100> gen_lookup()
+using Val = unsigned int;
+
+static constexpr std::array<Val, 100> gen_lookup()
 {
-  std::array<std::size_t, 100> arr{};
+  std::array<Val, 100> arr{};
   for (size_t i = 0; i < 100; i++)
   {
-    arr[i] = mapToBucket_ori(i);
+    arr[i] = (Val)mapToBucket_ori(i);
   }
   
   return arr;
 }
 
-static constexpr std::array<std::size_t, 100> lookup = gen_lookup();
+static constexpr std::array<Val, 100> lookup = gen_lookup();
 
 
 static std::size_t mapToBucket(std::size_t v) {
-  if (v < 100) return lookup[v];
+  if (v < lookup.size()) return lookup[v];
   return DEFAULT_BUCKET;
 }
 #endif
