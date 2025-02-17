@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.3)
 
 project(lab)
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-use=\"${CMAKE_CURRENT_SOURCE_DIR}/fd.profdata\"")
+    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate=\"${CMAKE_CURRENT_SOURCE_DIR}/fd.profraw\"")
+    # Remember to call llvm-profdata merge -output=..\fd.profdata ..\fd.profraw
+endif()
+
 include_directories(lua)
 file(GLOB EXT_LAB_srcs lua/*.c)
 file(GLOB EXT_VALIDATE_srcs lua/*.c)
