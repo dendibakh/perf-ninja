@@ -5,7 +5,8 @@ uint16_t checksum(const Blob &blob) {
   for (auto value : blob) {
     acc += value;
   }
-  const uint16_t val = acc & 0xFFFF;
+  uint16_t val = acc & 0xFFFF;
   const uint16_t carry = acc >> 16;
-  return val + carry;
+  val += carry;
+  return val < carry ? val + 1 : val;
 }
