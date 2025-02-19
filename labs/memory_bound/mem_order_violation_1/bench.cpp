@@ -13,7 +13,11 @@ static void bench1(benchmark::State &state) {
     return;
   }
 
-  std::string output = state.name() + "-binary.pgm";
+  constexpr const char* test_names[] = {"bird", "coins", "pepper", "pixabay"}; 
+
+  const int64_t test_id = state.range(0);
+
+  std::string output = std::string(test_names[test_id]) + "-binary.pgm";
   // Delete an output file
   std::remove(output.data());
 

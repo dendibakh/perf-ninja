@@ -8,6 +8,9 @@
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
+
+#define SOLUTION
+#ifndef SOLUTION
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   std::array<uint32_t, 256> hist;
@@ -16,6 +19,31 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
     hist[image.data[i]]++;
   return hist;
 }
+#else
+// Compute the histogram of image pixels
+std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+  std::array<uint32_t, 256> hist;
+  std::array<uint32_t, 256> hist2;
+  hist.fill(0);
+  hist2.fill(0);
+
+  int i = 0;
+  for (; i < image.width * image.height; i +=2)
+  {
+    hist[image.data[i + 0]]++;
+    hist2[image.data[i + 1]]++;
+  }
+  for (; i < image.width * image.height; ++i)
+    hist[image.data[i]]++;
+
+  for(std::size_t k = 0; k < 256; ++k)
+  {
+    hist[k] += hist2[k];
+  }
+
+  return hist;
+}
+#endif
 // ******************************************
 
 // Calculate Otsu's Threshold
