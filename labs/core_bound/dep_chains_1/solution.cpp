@@ -1,6 +1,7 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
+#include <algorithm>
 
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
@@ -21,21 +22,31 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 unsigned solution(List *l1, List *l2) {
+  constexpr int parallel_check_cnt = N;
   unsigned retVal = 0;
 
   List *head2 = l2;
   // O(N^2) algorithm:
+  std::array<int, parallel_check_cnt> items;
   while (l1) {
-    unsigned v = l1->value;
+    int items_cnt = 0;
+    for (; items_cnt < parallel_check_cnt && l1; ++items_cnt) {
+      items[items_cnt] = l1->value;
+      l1 = l1->next;
+    }
     l2 = head2;
     while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        break;
+      const auto items_iter =
+        std::find(items.begin(), items.begin() + items_cnt, l2->value);
+      if (items_iter != items.begin() + items_cnt) {
+        retVal += getSumOfDigits(*items_iter);
+        if (--items_cnt == 0) {
+          break;
+        }
+        std::iter_swap(items_iter, items.begin() + items_cnt);
       }
       l2 = l2->next;
     }
-    l1 = l1->next;
   }
 
   return retVal;
