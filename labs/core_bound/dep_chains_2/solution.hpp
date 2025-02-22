@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdint>
 #include <array>
+#include <random>
 
 // The number of motion simulation steps.
 constexpr uint32_t STEPS = 10000;
@@ -21,6 +22,7 @@ std::vector<Particle> initParticles();
 // https://www.javamex.com/tutorials/random_numbers/xorshift.shtml
 struct XorShift32 {
   uint32_t val;
+  XorShift32() = default;
   XorShift32 (uint32_t seed) : val(seed) {}
 public:
   uint32_t gen() {
@@ -55,12 +57,33 @@ constexpr float DEGREE_TO_RADIAN = (2 * PI_D) / UINT32_MAX;
 // in the corresponding direction.
 template <class RNG>
 void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
-  RNG rng(seed);  
-  for (int i = 0; i < STEPS; i++)
-    for (auto &p : particles) {
-      uint32_t angle = rng.gen();
-      float angle_rad = angle * DEGREE_TO_RADIAN;
-      p.x += cosine(angle_rad) * p.velocity;
-      p.y += sine(angle_rad) * p.velocity;
+  std::default_random_engine re(seed);
+  std::uniform_int_distribution<uint32_t> dist(
+    std::numeric_limits<uint32_t>::min(),
+    std::numeric_limits<uint32_t>::max()
+  );
+  constexpr int RND_CNT = 4;
+  std::array<RNG, RND_CNT> rngs;
+  for (int i = 0; i < RND_CNT; ++i) {
+    rngs[i] = RNG(dist(re));
+  }
+  const auto psz = particles.size();
+  auto calc = [&](int idx, int rnd_idx) {
+    auto &p = particles[idx];
+    const uint32_t angle = rngs[rnd_idx].gen();
+    const float angle_rad = angle * DEGREE_TO_RADIAN;
+    p.x += cosine(angle_rad) * p.velocity;
+    p.y += sine(angle_rad) * p.velocity;
+  };
+  for (int i = 0; i < STEPS; i++) {
+    int j = 0;
+    for (; j + RND_CNT <= psz; j += RND_CNT) {
+      for (int k = 0; k < RND_CNT; ++k) {
+        calc(j + k, k);
+      }
     }
+    for (; j < psz; ++j) {
+      calc(j, 0);
+    }
+  }
 }
