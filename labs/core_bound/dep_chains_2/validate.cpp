@@ -30,6 +30,7 @@ static bool equals(const std::vector<Particle> &p1, const std::vector<Particle> 
 // For validation we use a deterministic random number generator
 // that uses a global state and thus always generates the same sequence of numbers
 struct rngForValidation {
+  rngForValidation() = default;
   rngForValidation (uint32_t seed) {(void)seed;}
 public:
   static uint32_t val;
