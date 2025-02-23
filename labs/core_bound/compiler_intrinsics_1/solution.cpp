@@ -25,7 +25,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   }
 
   // 2. main loop.
-  constexpr int vec_sz = 8;
+  constexpr int vec_sz = 16;
   //using vec = int16_t __attribute__((ext_vector_type(vec_sz)));
   limit = size - radius;
   for (; pos + vec_sz <= limit; pos += vec_sz) {
@@ -43,18 +43,20 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     //  output[pos + i] = psum[i];
     //}
    
-    auto d = _mm_sub_epi16(
-      _mm_cvtepu8_epi16(_mm_loadu_si64(&input[pos + radius])),
-      _mm_cvtepu8_epi16(_mm_loadu_si64(&input[pos - radius - 1]))
+    auto d = _mm256_sub_epi16(
+      _mm256_cvtepu8_epi16(_mm_loadu_si128((const __m128i*) &input[pos + radius])),
+      _mm256_cvtepu8_epi16(_mm_loadu_si128((const __m128i*) &input[pos - radius - 1]))
     );
-    //__m128i d = _mm_loadu_si128((const __m128i*)&psum);
-    d = _mm_add_epi16(d, _mm_slli_si128(d, 1 * sizeof(int16_t)));
-    d = _mm_add_epi16(d, _mm_slli_si128(d, 2 * sizeof(int16_t)));
-    d = _mm_add_epi16(d, _mm_slli_si128(d, 4 * sizeof(int16_t)));
-    d = _mm_add_epi16(d, _mm_set1_epi16(currentSum));
-    _mm_storeu_si128((__m128i*)&output[pos], d);
-    //currentSum = output[pos + vec_sz - 1];
-    currentSum = _mm_extract_epi16(d, 7);
+    d = _mm256_add_epi16(d, _mm256_slli_si256(d, 1 * sizeof(int16_t)));
+    d = _mm256_add_epi16(d, _mm256_slli_si256(d, 2 * sizeof(int16_t)));
+    d = _mm256_add_epi16(d, _mm256_slli_si256(d, 4 * sizeof(int16_t)));
+    const auto c = _mm256_set_m128i(
+      _mm_set1_epi16(currentSum + _mm256_extract_epi16(d, vec_sz / 2 - 1)),
+      _mm_set1_epi16(currentSum)
+    );
+    d = _mm256_add_epi16(d, c);
+    _mm256_storeu_si256((__m256i*)&output[pos], d);
+    currentSum = _mm256_extract_epi16(d, vec_sz - 1);
   }
   for (; pos < limit; ++pos) {
     currentSum -= input[pos - radius - 1];
