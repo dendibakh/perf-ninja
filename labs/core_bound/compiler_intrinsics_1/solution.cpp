@@ -28,6 +28,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   constexpr int vec_sz = 16;
   //using vec = int16_t __attribute__((ext_vector_type(vec_sz)));
   limit = size - radius;
+  auto current = _mm256_set1_epi16(currentSum);
   for (; pos + vec_sz <= limit; pos += vec_sz) {
     //vec psum;
     //for (int i = 0; i < vec_sz; ++i) {
@@ -51,12 +52,14 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     d = _mm256_add_epi16(d, _mm256_slli_si256(d, 2 * sizeof(int16_t)));
     d = _mm256_add_epi16(d, _mm256_slli_si256(d, 4 * sizeof(int16_t)));
     const auto c = _mm256_set_m128i(
-      _mm_set1_epi16(currentSum + _mm256_extract_epi16(d, vec_sz / 2 - 1)),
-      _mm_set1_epi16(currentSum)
+      _mm_set1_epi16(_mm256_extract_epi16(d, vec_sz / 2 - 1)),
+      _mm_setzero_si128()
     );
     d = _mm256_add_epi16(d, c);
+    d = _mm256_add_epi16(d, current);
     _mm256_storeu_si256((__m256i*)&output[pos], d);
     currentSum = _mm256_extract_epi16(d, vec_sz - 1);
+    current = _mm256_set1_epi16(currentSum);
   }
   for (; pos < limit; ++pos) {
     currentSum -= input[pos - radius - 1];
