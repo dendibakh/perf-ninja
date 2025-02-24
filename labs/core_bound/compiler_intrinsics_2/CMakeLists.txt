@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 
 project(lab)
 
+set(CMAKE_CXX_STANDARD 20)
 set(VALIDATE_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/inputs/")
 set(LAB_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/inputs/")
 
