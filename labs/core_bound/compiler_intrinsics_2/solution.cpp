@@ -17,13 +17,13 @@ unsigned solution(const std::string &inputContents) {
   unsigned longestLine = 0;
   unsigned curLineLength = 0;
 
-  constexpr int vec_sz = 16;
-  const auto mask = _mm_set1_epi8('\n');
+  constexpr int vec_sz = 32;
+  const auto mask = _mm256_set1_epi8('\n');
   int i = 0;
   for (; i + vec_sz <= inputContents.size(); i += vec_sz) {
-    const auto d = _mm_loadu_si128((const __m128i*)&inputContents[i]);
-    const auto cmp = _mm_cmpeq_epi8(d, mask);
-    unsigned cmp_mask = _mm_movemask_epi8(cmp);
+    const auto d = _mm256_loadu_si256((const __m256i*)&inputContents[i]);
+    const auto cmp = _mm256_cmpeq_epi8(d, mask);
+    unsigned cmp_mask = _mm256_movemask_epi8(cmp);
     int prev_idx = 0;
     while (cmp_mask) {
       const int idx = std::countr_zero(cmp_mask);
