@@ -11,4 +11,5 @@ void init(std::vector<int> &values) {
   for (int i = 0; i < NUM_VALUES; i++) {
     values.push_back(distribution(generator));
   }
+  prepareLUT();
 }
