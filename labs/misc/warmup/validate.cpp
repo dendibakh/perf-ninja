@@ -1,6 +1,7 @@
 
-#include "solution.h"
 #include <iostream>
+
+#include "solution.h"
 
 int main() {
   constexpr int N = 1000;

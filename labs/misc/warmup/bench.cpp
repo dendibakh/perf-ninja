@@ -1,6 +1,7 @@
+#include <iostream>
+
 #include "benchmark/benchmark.h"
 #include "solution.h"
-#include <iostream>
 
 static void bench1(benchmark::State &state) {
   // problem: count sum of all the numbers up to N
