@@ -1,17 +1,19 @@
 // NOTE: this lab is currently broken.
-// After migrating to a new compiler version the speedup is no longer measurable consistently.
-// You can still try to solve it to learn the concept, but the result is not guaranteed.
+// After migrating to a new compiler version the speedup is no longer measurable
+// consistently. You can still try to solve it to learn the concept, but the
+// result is not guaranteed.
+
+#include <random>
 
 #include "solution.h"
-#include <random>
 
 S create_entry(int first_value, int second_value) {
   S entry;
 
   entry.i = first_value;
   entry.s = static_cast<short>(second_value);
-  entry.l = static_cast<long long>(first_value * second_value);
-  entry.d = static_cast<double>(first_value) / maxRandom;
+  entry.l = static_cast<int>(first_value * second_value);
+  entry.d = static_cast<float>(first_value) / maxRandom;
   entry.b = first_value < second_value;
 
   return entry;
