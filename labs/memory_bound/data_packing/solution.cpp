@@ -12,6 +12,19 @@ void solution(std::array<S, N> &arr) {
   static std::mt19937 g(rd());
   std::shuffle(arr.begin(), arr.end(), g);
 
-  // 2. sort
-  std::sort(arr.begin(), arr.end());
+  // 2. counting sort
+  constexpr int cntSize = maxRandom - minRandom + 1;
+  std::array<short, cntSize> cnt{};
+  static_assert(N <= std::numeric_limits<decltype(cnt)::value_type>::max());
+  for (const auto& v : arr) {
+    ++cnt[v.i - minRandom + 1];
+  }
+  for (int i = 1; i < cntSize; ++i) {
+    cnt[i] += cnt[i - 1];
+  }
+  std::array<S, N> sorted;
+  for (const auto& v : arr) {
+    sorted[cnt[v.i - minRandom]++] = v;
+  }
+  arr = sorted;
 }
