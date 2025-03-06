@@ -1,0 +1,3 @@
+cmake -G "NMake Makefiles" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_BUILD_TYPE=RelWithDebInfo -B build -S .
+cmake --build build --config RelWithDebInfo --target validateLab
+cmake --build build --config RelWithDebInfo --target benchmarkLab
