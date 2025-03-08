@@ -150,10 +150,14 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
     std::array<VecU64, 3> real_accs = {};
     for (; i + unroll <= input.size(); i += unroll) {
-        uint32x2x3_t deinterleaved = vld3_u32(&input[i].x);
         for (std::size_t k = 0; k < 3; ++k) {
-            real_accs[k] += VecU64{vmovl_u32(deinterleaved.val[k])};
+            real_accs[k] += VecU64{vmovl_u32(vld1_u32(&input[i].x + unroll * k))};
         }
+    }
+
+    alignas(128) std::array<std::uint64_t, 3 * unroll> acc;
+    for (std::size_t k = 0; k < 3; ++k) {
+        real_accs[k].store(acc.data() + unroll * k);
     }
 
     std::uint64_t x = 0;
@@ -161,9 +165,9 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     std::uint64_t z = 0;
 
     for (std::size_t j = 0; j < unroll; ++j) {
-        x += real_accs[0].data[j];
-        y += real_accs[1].data[j];
-        z += real_accs[2].data[j];
+        x += acc[3 * j + 0];
+        y += acc[3 * j + 1];
+        z += acc[3 * j + 2];
     }
 
     for (; i < input.size(); ++i) {
