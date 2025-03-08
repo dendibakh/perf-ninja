@@ -102,7 +102,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   using VecU64 = SIMDVector<std::uint64_t, vec_size>;
   using VecU32 = SIMDVector<std::uint32_t, vec_size>;
 
-  const auto unroll = 6;
+  const auto unroll = 4;
 
   std::array<VecU64, 3 * unroll> real_accs = {};
   for (; i + unroll * vec_size <= input.size(); i += unroll * vec_size) {
