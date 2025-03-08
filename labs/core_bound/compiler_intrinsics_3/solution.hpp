@@ -22,4 +22,5 @@ template<class T>
 constexpr std::ostream &operator<<(std::ostream &oss, Position<T> position) {
     return oss << '(' << position.x << ", " << position.y << ", " << position.z << ')';
 }
+
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input);
