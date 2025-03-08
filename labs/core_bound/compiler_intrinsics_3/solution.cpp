@@ -73,6 +73,10 @@ struct SIMDVector {
     }
 };
 
+#if defined(__arm__) || defined(__aarch64__)
+#include <arm_neon.h>
+#endif
+
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
 #if defined(__AVX512F__)
@@ -84,16 +88,6 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 #else
     constexpr auto native_simd_size = 0;
 #endif
-#elif defined(__arm__) || defined(__aarch64__)
-#if defined(__ARM_NEON)
-    constexpr auto native_simd_size = 16;
-#elif defined(__ARM_FEATURE_SVE)
-    constexpr auto native_simd_size = 32;
-#else
-    constexpr auto native_simd_size = 0;
-#endif
-#endif
-
     static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
 
     constexpr auto unroll = native_simd_size / sizeof(std::uint64_t);
@@ -143,6 +137,55 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
             static_cast<std::uint32_t>(y / std::max<std::uint64_t>(1, input.size())),
             static_cast<std::uint32_t>(z / std::max<std::uint64_t>(1, input.size())),
     };
+#elif defined(__arm__) || defined(__aarch64__)
+    constexpr auto native_simd_size = 16;
+    static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
+
+    constexpr auto unroll = native_simd_size / sizeof(std::uint64_t);
+
+    std::size_t i = 0;
+
+    using VecU64 = SIMDVector<std::uint64_t, unroll>;
+    using VecU32 = SIMDVector<std::uint32_t, unroll>;
+
+    std::array<VecU64, 3> real_accs = {};
+    for (; i + unroll <= input.size(); i += unroll) {
+        std::array<std::uint32_t, 3 * unroll> casted;
+        for (std::size_t j = 0; j < unroll; ++j) {
+            casted[3 * j + 0] = input[i + j].x;
+            casted[3 * j + 1] = input[i + j].y;
+            casted[3 * j + 2] = input[i + j].z;
+        }
+
+
+        uint32x2x3_t deinterleaved = vld3_u32(casted.data());
+        for (std::size_t k = 0; k < 3; ++k) {
+            real_accs[k] += VecU64{vmovl_u32(deinterleaved[k])};
+        }
+    }
+
+    std::uint64_t x = 0;
+    std::uint64_t y = 0;
+    std::uint64_t z = 0;
+
+    for (std::size_t j = 0; j < unroll; ++j) {
+        x += acc[j];
+        y += acc[j + unroll];
+        z += acc[j + unroll * 2];
+    }
+
+    for (; i < input.size(); ++i) {
+        x += input[i].x;
+        y += input[i].y;
+        z += input[i].z;
+    }
+
+    return {
+            static_cast<std::uint32_t>(x / std::max<std::uint64_t>(1, input.size())),
+            static_cast<std::uint32_t>(y / std::max<std::uint64_t>(1, input.size())),
+            static_cast<std::uint32_t>(z / std::max<std::uint64_t>(1, input.size())),
+    };
+#endif
 }
 #else
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
