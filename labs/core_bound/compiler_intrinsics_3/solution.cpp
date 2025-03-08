@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <vector>
 
-#define SOLUTION
 #ifdef SOLUTION
 template<class To, class From>
 std::enable_if_t<
