@@ -1,6 +1,6 @@
 name: Benchmark on Linux + Coffeelake
 
-on: [push]
+# on: [push]
 
 env:
   BUILD_TYPE: Release
