@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
             {biggest_possible_position, {1, 1, 1}},                 // overflow!
     };
 
-    // addSmallRandomInputs(inputs);
+    addSmallRandomInputs(inputs);
 
     bool valid = true;
     for (auto &input: inputs) {
