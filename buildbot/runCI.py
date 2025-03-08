@@ -247,7 +247,7 @@ def checkoutBaseline(workdir):
 
   try:
     # Branch 'main' is always the baseline
-    subprocess.check_call("git checkout compiler_intrinsics_3_baseline", shell=True)
+    subprocess.check_call("git checkout main", shell=True)
     print("Checkout baseline - OK")
   except:
     print(bcolors.FAIL + "Checkout baseline - Failed" + bcolors.ENDC)
