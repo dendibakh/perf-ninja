@@ -148,15 +148,15 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     using VecU64 = SIMDVector<std::uint64_t, unroll>;
     using VecU32 = SIMDVector<std::uint32_t, unroll>;
 
-    std::array<VecU64, 3> real_accs = {};
+    std::array<VecU64, 6> real_accs = {};
     for (; i + unroll <= input.size(); i += unroll) {
-        for (std::size_t k = 0; k < 3; ++k) {
+        for (std::size_t k = 0; k < 6; ++k) {
             real_accs[k] += VecU64{vmovl_u32(vld1_u32(&input[i].x + unroll * k))};
         }
     }
 
-    alignas(128) std::array<std::uint64_t, 3 * unroll> acc;
-    for (std::size_t k = 0; k < 3; ++k) {
+    alignas(128) std::array<std::uint64_t, 6 * unroll> acc;
+    for (std::size_t k = 0; k < 6; ++k) {
         real_accs[k].store(acc.data() + unroll * k);
     }
 
@@ -164,7 +164,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     std::uint64_t y = 0;
     std::uint64_t z = 0;
 
-    for (std::size_t j = 0; j < unroll; ++j) {
+    for (std::size_t j = 0; j < unroll * 2; ++j) {
         x += acc[3 * j + 0];
         y += acc[3 * j + 1];
         z += acc[3 * j + 2];
@@ -174,6 +174,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
         x += input[i].x;
         y += input[i].y;
         z += input[i].z;
+        asm ("" : "+r"(i));
     }
 
     return {
