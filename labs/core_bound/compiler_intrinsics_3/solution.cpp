@@ -102,7 +102,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   using VecU64 = SIMDVector<std::uint64_t, vec_size>;
   using VecU32 = SIMDVector<std::uint32_t, vec_size>;
 
-  const auto unroll = 4;
+  const auto unroll = 2;
 
   std::array<VecU64, 3 * unroll> real_accs = {};
   for (; i + unroll * vec_size <= input.size(); i += unroll * vec_size) {
@@ -116,9 +116,9 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     }
   }
 
-  alignas(128) std::array<std::uint64_t, 3 * vec_size> acc;
-  for (std::size_t k = 0; k < 3; ++k) {
-    real_accs[k].store(acc.data() + vec_size * k);
+  alignas(native_simd_size) std::array<std::uint64_t, 3 * vec_size> acc;
+  for (std::size_t j = 0; j < 3; ++j) {
+    real_accs[j].store(acc.data() + vec_size * j);
   }
 
   std::uint64_t x = 0;
@@ -135,7 +135,6 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     x += input[i].x;
     y += input[i].y;
     z += input[i].z;
-    asm("" : "+r"(i));
   }
 
   return {
