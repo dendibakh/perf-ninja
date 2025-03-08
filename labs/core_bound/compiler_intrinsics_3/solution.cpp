@@ -75,23 +75,23 @@ struct SIMDVector {
 
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
-#if defined(__AVX512F__)
+ #if defined(__AVX512F__)
   constexpr auto native_simd_size = 64;
-#elif defined(__AVX__)
+ #elif defined(__AVX__)
   constexpr auto native_simd_size = 32;
-#elif defined(__SSE__)
+ #elif defined(__SSE__)
   constexpr auto native_simd_size = 16;
-#else
+ #else
   constexpr auto native_simd_size = 0;
-#endif
+ #endif
 #elif defined(__arm__) || defined(__aarch64__)
-#if defined(__ARM_NEON)
+ #if defined(__ARM_NEON)
   constexpr auto native_simd_size = 16;
-#elif defined(__ARM_FEATURE_SVE)
+ #elif defined(__ARM_FEATURE_SVE)
   constexpr auto native_simd_size = 32;
-#else
+ #else
   constexpr auto native_simd_size = 0;
-#endif
+ #endif
 #endif
   static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
 
