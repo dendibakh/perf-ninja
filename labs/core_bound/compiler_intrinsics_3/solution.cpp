@@ -117,7 +117,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
         }
     }
 
-    alignas(std::hardware_constructive_interference_size) std::array<std::uint64_t, 3 * unroll> acc;
+    alignas(128) std::array<std::uint64_t, 3 * unroll> acc;
     for (std::size_t k = 0; k < 3; ++k) {
         real_accs[k].store(acc.data() + unroll * k);
     }
