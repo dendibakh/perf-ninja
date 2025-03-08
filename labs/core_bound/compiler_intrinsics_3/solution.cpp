@@ -169,9 +169,9 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     std::uint64_t z = 0;
 
     for (std::size_t j = 0; j < unroll; ++j) {
-        x += real_accs[j];
-        y += real_accs[j + unroll];
-        z += real_accs[j + unroll * 2];
+        x += real_accs[0].data[j];
+        y += real_accs[1].data[j];
+        z += real_accs[2].data[j];
     }
 
     for (; i < input.size(); ++i) {
