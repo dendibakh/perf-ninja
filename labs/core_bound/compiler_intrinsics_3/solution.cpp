@@ -95,37 +95,37 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 #endif
   static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
 
-  constexpr auto unroll = native_simd_size / sizeof(std::uint64_t);
+  constexpr auto vec_size = native_simd_size / sizeof(std::uint64_t);
 
   std::size_t i = 0;
 
-  using VecU64 = SIMDVector<std::uint64_t, unroll>;
-  using VecU32 = SIMDVector<std::uint32_t, unroll>;
+  using VecU64 = SIMDVector<std::uint64_t, vec_size>;
+  using VecU32 = SIMDVector<std::uint32_t, vec_size>;
 
-  const auto second_unroll = 4;
+  const auto unroll = 6;
 
-  std::array<VecU64, 3 * second_unroll> real_accs = {};
-  for (; i + second_unroll * unroll <= input.size(); i += second_unroll * unroll) {
-    for (std::size_t k = 0; k < 3 * second_unroll; ++k) {
-      real_accs[k] += VecU64{VecU32::load(&input[i].x + unroll * k)};
+  std::array<VecU64, 3 * unroll> real_accs = {};
+  for (; i + unroll * vec_size <= input.size(); i += unroll * vec_size) {
+    for (std::size_t k = 0; k < 3 * unroll; ++k) {
+      real_accs[k] += VecU64{VecU32::load(&input[i].x + vec_size * k)};
     }
   }
   for (std::size_t j = 0; j < 3; ++j) {
-    for (std::size_t k = 1; k < second_unroll; ++k) {
+    for (std::size_t k = 1; k < unroll; ++k) {
       real_accs[j] += real_accs[j + k * 3];
     }
   }
 
-  alignas(128) std::array<std::uint64_t, 3 * unroll> acc;
+  alignas(128) std::array<std::uint64_t, 3 * vec_size> acc;
   for (std::size_t k = 0; k < 3; ++k) {
-    real_accs[k].store(acc.data() + unroll * k);
+    real_accs[k].store(acc.data() + vec_size * k);
   }
 
   std::uint64_t x = 0;
   std::uint64_t y = 0;
   std::uint64_t z = 0;
 
-  for (std::size_t j = 0; j < unroll; ++j) {
+  for (std::size_t j = 0; j < vec_size; ++j) {
     x += acc[3 * j + 0];
     y += acc[3 * j + 1];
     z += acc[3 * j + 2];
