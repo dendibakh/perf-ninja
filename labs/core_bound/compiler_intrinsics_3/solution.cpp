@@ -160,7 +160,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
         uint32x2x3_t deinterleaved = vld3_u32(casted.data());
         for (std::size_t k = 0; k < 3; ++k) {
-            real_accs[k] += VecU64{vmovl_u32(deinterleaved[k])};
+            real_accs[k] += VecU64{vmovl_u32(deinterleaved.val[k])};
         }
     }
 
