@@ -150,15 +150,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
     std::array<VecU64, 3> real_accs = {};
     for (; i + unroll <= input.size(); i += unroll) {
-        std::array<std::uint32_t, 3 * unroll> casted;
-        for (std::size_t j = 0; j < unroll; ++j) {
-            casted[3 * j + 0] = input[i + j].x;
-            casted[3 * j + 1] = input[i + j].y;
-            casted[3 * j + 2] = input[i + j].z;
-        }
-
-
-        uint32x2x3_t deinterleaved = vld3_u32(casted.data());
+        uint32x2x3_t deinterleaved = vld3_u32(&input[i].x);
         for (std::size_t k = 0; k < 3; ++k) {
             real_accs[k] += VecU64{vmovl_u32(deinterleaved.val[k])};
         }
