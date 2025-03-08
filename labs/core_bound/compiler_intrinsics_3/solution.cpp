@@ -148,14 +148,16 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     using VecU64 = SIMDVector<std::uint64_t, unroll>;
     using VecU32 = SIMDVector<std::uint32_t, unroll>;
 
-    std::array<VecU64, 6> real_accs = {};
-    for (; i + 2 * unroll <= input.size(); i += 2 * unroll) {
-        for (std::size_t k = 0; k < 6; ++k) {
+    std::array<VecU64, 12> real_accs = {};
+    for (; i + 4 * unroll <= input.size(); i += 4 * unroll) {
+        for (std::size_t k = 0; k < 12; ++k) {
             real_accs[k] += VecU64{vmovl_u32(vld1_u32(&input[i].x + unroll * k))};
         }
     }
     for (std::size_t k = 0; k < 3; ++k) {
         real_accs[k] += real_accs[k + 3];
+        real_accs[k] += real_accs[k + 6];
+        real_accs[k] += real_accs[k + 9];
     }
 
     alignas(128) std::array<std::uint64_t, 3 * unroll> acc;
