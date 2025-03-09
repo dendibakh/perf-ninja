@@ -78,8 +78,6 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   for (; i + unroll * vec_size <= input.size(); i += unroll * vec_size) {
 #if __GNUC__
 #pragma GCC unroll 8
-#else
-#pragma unroll 8
 #endif
     for (std::size_t k = 0; k < unroll; ++k) {
       const auto xyzx_u32 = unaligned_load<vec_size, std::uint32_t>(&input[i].x + vec_size * (3 * k + 0));
