@@ -2,13 +2,15 @@
 #include <algorithm>
 #include <array>
 #include <csignal>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <string>
 #include <vector>
 
-#define SOLUTION
-#ifdef SOLUTION
-
+#define SOLUTION 1
+#if SOLUTION
+#define big_accumulators 0
 template<std::size_t N, class T>
 struct vector_helper {
   using type __attribute__((__vector_size__(N * sizeof(T)))) = T; // get around GCC restriction
@@ -22,7 +24,7 @@ builtin_vector<N, T> unaligned_load(const T *ptr) {
   std::memcpy(&vec, ptr, sizeof(vec));
   return vec;
 }
-
+#if big_accumulators
 template<std::size_t N, class From, class To>
 builtin_vector<N, To> convert(builtin_vector<N, From> x) { // using __builtin_convertvector gives horrible performance on gcc
 #if __GNUC__
@@ -40,33 +42,32 @@ builtin_vector<N, To> convert(builtin_vector<N, From> x) { // using __builtin_co
   return __builtin_convertvector(x, builtin_vector<N, To>);
 #endif
 }
-
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
- #if defined(__AVX512F__)
+#if defined(__AVX512F__)
   constexpr auto unroll = 8;
   constexpr auto native_simd_size = 64;
- #elif defined(__AVX__)
+#elif defined(__AVX__)
   constexpr auto unroll = 4;
   constexpr auto native_simd_size = 32;
- #elif defined(__SSE__)
+#elif defined(__SSE__)
   constexpr auto unroll = 4;
   constexpr auto native_simd_size = 16;
- #else
+#else
   constexpr auto unroll = 0;
   constexpr auto native_simd_size = 0;
- #endif
+#endif
 #elif defined(__arm__) || defined(__aarch64__)
- #if defined(__ARM_NEON)
+#if defined(__ARM_NEON)
   constexpr auto unroll = 8;
   constexpr auto native_simd_size = 16;
- #elif defined(__ARM_FEATURE_SVE)
+#elif defined(__ARM_FEATURE_SVE)
   constexpr auto unroll = 8;
   constexpr auto native_simd_size = 32;
- #else
+#else
   constexpr auto unroll = 0;
   constexpr auto native_simd_size = 0;
- #endif
+#endif
 #endif
   static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
 
@@ -120,7 +121,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     x += input[i].x;
     y += input[i].y;
     z += input[i].z;
-    asm ("" : "+r"(i)); // prevents unrolling of this loop, measurable speedup, at least on zen5
+    asm("" : "+r"(i)); // prevents unrolling of this loop, measurable speedup, at least on zen5
   }
 
   return {
@@ -129,6 +130,85 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
           static_cast<std::uint32_t>(z / std::max<std::uint64_t>(1, input.size())),
   };
 }
+#else
+Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
+#if __x86_64__
+#if defined(__AVX512F__)
+  constexpr auto unroll = 2;
+  constexpr auto native_simd_size = 64;
+#elif defined(__AVX__)
+  constexpr auto unroll = 4;
+  constexpr auto native_simd_size = 32;
+#elif defined(__SSE__)
+  constexpr auto unroll = 4;
+  constexpr auto native_simd_size = 16;
+#else
+  constexpr auto unroll = 0;
+  constexpr auto native_simd_size = 0;
+#endif
+#elif defined(__arm__) || defined(__aarch64__)
+#if defined(__ARM_NEON)
+  constexpr auto unroll = 8;
+  constexpr auto native_simd_size = 16;
+#elif defined(__ARM_FEATURE_SVE)
+  constexpr auto unroll = 8;
+  constexpr auto native_simd_size = 32;
+#else
+  constexpr auto unroll = 0;
+  constexpr auto native_simd_size = 0;
+#endif
+#endif
+  static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
+
+  constexpr auto vec_size = native_simd_size / sizeof(std::uint32_t);
+  std::array<builtin_vector<vec_size, std::uint32_t>, 3> acc{};
+  std::array<builtin_vector<vec_size, std::uint32_t>, 3> carry{};
+
+  builtin_vector<vec_size, std::uint32_t> one{};
+  std::fill_n((std::uint32_t *) &one, vec_size, 1);
+
+  std::size_t i = 0;
+  for (; i + vec_size <= input.size(); i += vec_size) {
+    const auto xyzx = unaligned_load<vec_size>(&input[i].x + 0 * vec_size);
+    const auto yzxy = unaligned_load<vec_size>(&input[i].x + 1 * vec_size);
+    const auto zxyz = unaligned_load<vec_size>(&input[i].x + 2 * vec_size);
+
+    acc[0] += xyzx;
+    acc[1] += yzxy;
+    acc[2] += zxyz;
+
+    carry[0] += one & (acc[0] < xyzx);
+    carry[1] += one & (acc[1] < yzxy);
+    carry[2] += one & (acc[2] < zxyz);
+  }
+  std::array<std::uint32_t, 3 * vec_size> acc_arr{};
+  std::memcpy(acc_arr.data(), acc.data(), sizeof(acc_arr));
+  std::array<std::uint32_t, 3 * vec_size> carry_arr{};
+  std::memcpy(carry_arr.data(), carry.data(), sizeof(carry_arr));
+
+  std::uint64_t x = 0;
+  std::uint64_t y = 0;
+  std::uint64_t z = 0;
+
+  for (std::size_t j = 0; j < vec_size; ++j) {
+    x += acc_arr[3 * j + 0] + (std::uint64_t(carry_arr[3 * j + 0]) << 32);
+    y += acc_arr[3 * j + 1] + (std::uint64_t(carry_arr[3 * j + 1]) << 32);
+    z += acc_arr[3 * j + 2] + (std::uint64_t(carry_arr[3 * j + 2]) << 32);
+  }
+
+  for (; i < input.size(); ++i) {
+    x += input[i].x;
+    y += input[i].y;
+    z += input[i].z;
+  }
+
+  return {
+          static_cast<std::uint32_t>(x / std::max<std::uint64_t>(1, input.size())),
+          static_cast<std::uint32_t>(y / std::max<std::uint64_t>(1, input.size())),
+          static_cast<std::uint32_t>(z / std::max<std::uint64_t>(1, input.size())),
+  };
+}
+#endif
 #else
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
   std::uint64_t x = 0;
