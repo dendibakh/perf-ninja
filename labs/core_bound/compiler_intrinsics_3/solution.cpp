@@ -20,7 +20,7 @@ namespace {
   constexpr auto& vec_load = _mm256_loadu_si256;
   constexpr auto& vec_store = _mm256_storeu_si256;
   constexpr auto& vec_add = _mm256_add_epi32;
-  constexpr auto& vec_cmp = _mm256_cmpeq_epi32;
+  constexpr auto& vec_cmpeq = _mm256_cmpeq_epi32;
   constexpr auto& vec_max = _mm256_max_epu32;
 #else
   using vec_t = __m128i;
@@ -28,7 +28,7 @@ namespace {
   constexpr auto& vec_load = _mm_loadu_si128;
   constexpr auto& vec_store = _mm_storeu_si128;
   constexpr auto& vec_add = _mm_add_epi32;
-  constexpr auto& vec_cmp = _mm_cmpeq_epi32;
+  constexpr auto& vec_cmpeq = _mm_cmpeq_epi32;
   constexpr auto& vec_max = _mm_max_epu32;
 #endif
 }  // namespace
