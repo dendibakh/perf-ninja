@@ -27,8 +27,4 @@ static void bench1(benchmark::State &state) {
 // Register the function as a benchmark and measure time in microseconds
 BENCHMARK(bench1)->Unit(benchmark::kMicrosecond);
 
-int main(int argc, char **argv) {
-  ::benchmark::Initialize(&argc, argv);
-  ::benchmark::RunSpecifiedBenchmarks();
-  return 0;
-}
+BENCHMARK_MAIN();
