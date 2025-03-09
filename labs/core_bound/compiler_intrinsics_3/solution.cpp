@@ -134,13 +134,13 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
 #if defined(__AVX512F__)
-  constexpr auto unroll = 4;
+  constexpr auto unroll = 2;
   constexpr auto native_simd_size = 64;
 #elif defined(__AVX__)
-  constexpr auto unroll = 4;
+  constexpr auto unroll = 2;
   constexpr auto native_simd_size = 32;
 #elif defined(__SSE__)
-  constexpr auto unroll = 4;
+  constexpr auto unroll = 2;
   constexpr auto native_simd_size = 16;
 #else
   constexpr auto unroll = 0;
@@ -148,10 +148,10 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 #endif
 #elif defined(__arm__) || defined(__aarch64__)
 #if defined(__ARM_NEON)
-  constexpr auto unroll = 8;
+  constexpr auto unroll = 4;
   constexpr auto native_simd_size = 16;
 #elif defined(__ARM_FEATURE_SVE)
-  constexpr auto unroll = 8;
+  constexpr auto unroll = 4;
   constexpr auto native_simd_size = 32;
 #else
   constexpr auto unroll = 0;
@@ -169,6 +169,9 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
   std::size_t i = 0;
   for (; i + vec_size * unroll <= input.size(); i += vec_size * unroll) {
+#ifdef __GNUC__
+#pragma GCC unroll 8
+#endif
     for (std::size_t j = 0; j < unroll; ++j) {
       const auto xyzx = unaligned_load<vec_size>(&input[i].x + (3 * j + 0) * vec_size);
       const auto yzxy = unaligned_load<vec_size>(&input[i].x + (3 * j + 1) * vec_size);
