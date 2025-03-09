@@ -117,7 +117,6 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     acc_ZX4 = vaddq_u64(acc_ZX4, eZX4);     
     acc_YZ4 = vaddq_u64(acc_YZ4, eYZ4);     
   }
-#endif
 
   // [Denis]: again, maybe this reduction can be improved.
   // But I guess it would not make a difference/
@@ -133,6 +132,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
   y += vgetq_lane_u64(acc_YZ, 0);
   z += vgetq_lane_u64(acc_YZ, 1);
+#endif
 
   // remainder
   for (; i < input.size(); ++i) {
