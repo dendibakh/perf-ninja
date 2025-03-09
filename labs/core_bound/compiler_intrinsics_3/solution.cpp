@@ -134,7 +134,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
 #if defined(__AVX512F__)
-  constexpr auto unroll = 2;
+  constexpr auto unroll = 4;
   constexpr auto native_simd_size = 64;
 #elif defined(__AVX__)
   constexpr auto unroll = 4;
@@ -161,36 +161,38 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   static_assert(native_simd_size > 0, "make sure your target CPU supports SIMD!");
 
   constexpr auto vec_size = native_simd_size / sizeof(std::uint32_t);
-  std::array<builtin_vector<vec_size, std::uint32_t>, 3> acc{};
-  std::array<builtin_vector<vec_size, std::uint32_t>, 3> carry{};
+  std::array<builtin_vector<vec_size, std::uint32_t>, 3 * unroll> acc{};
+  std::array<builtin_vector<vec_size, std::uint32_t>, 3 * unroll> carry{};
 
   builtin_vector<vec_size, std::uint32_t> one{};
   std::fill_n((std::uint32_t *) &one, vec_size, 1);
 
   std::size_t i = 0;
-  for (; i + vec_size <= input.size(); i += vec_size) {
-    const auto xyzx = unaligned_load<vec_size>(&input[i].x + 0 * vec_size);
-    const auto yzxy = unaligned_load<vec_size>(&input[i].x + 1 * vec_size);
-    const auto zxyz = unaligned_load<vec_size>(&input[i].x + 2 * vec_size);
+  for (; i + vec_size * unroll <= input.size(); i += vec_size * unroll) {
+    for (std::size_t j = 0; j < unroll; ++j) {
+      const auto xyzx = unaligned_load<vec_size>(&input[i].x + (3 * j + 0) * vec_size);
+      const auto yzxy = unaligned_load<vec_size>(&input[i].x + (3 * j + 1) * vec_size);
+      const auto zxyz = unaligned_load<vec_size>(&input[i].x + (3 * j + 2) * vec_size);
 
-    acc[0] += xyzx;
-    acc[1] += yzxy;
-    acc[2] += zxyz;
+      acc[3 * j + 0] += xyzx;
+      acc[3 * j + 1] += yzxy;
+      acc[3 * j + 2] += zxyz;
 
-    carry[0] += one & (acc[0] < xyzx);
-    carry[1] += one & (acc[1] < yzxy);
-    carry[2] += one & (acc[2] < zxyz);
+      carry[3 * j + 0] += one & (acc[3 * j + 0] < xyzx);
+      carry[3 * j + 1] += one & (acc[3 * j + 1] < yzxy);
+      carry[3 * j + 2] += one & (acc[3 * j + 2] < zxyz);
+    }
   }
-  std::array<std::uint32_t, 3 * vec_size> acc_arr{};
+  std::array<std::uint32_t, 3 * vec_size * unroll> acc_arr{};
   std::memcpy(acc_arr.data(), acc.data(), sizeof(acc_arr));
-  std::array<std::uint32_t, 3 * vec_size> carry_arr{};
+  std::array<std::uint32_t, 3 * vec_size * unroll> carry_arr{};
   std::memcpy(carry_arr.data(), carry.data(), sizeof(carry_arr));
 
   std::uint64_t x = 0;
   std::uint64_t y = 0;
   std::uint64_t z = 0;
 
-  for (std::size_t j = 0; j < vec_size; ++j) {
+  for (std::size_t j = 0; j < vec_size * unroll; ++j) {
     x += acc_arr[3 * j + 0] + (std::uint64_t(carry_arr[3 * j + 0]) << 32);
     y += acc_arr[3 * j + 1] + (std::uint64_t(carry_arr[3 * j + 1]) << 32);
     z += acc_arr[3 * j + 2] + (std::uint64_t(carry_arr[3 * j + 2]) << 32);
