@@ -1,95 +1,70 @@
 #include "solution.hpp"
 #include <algorithm>
 #include <array>
+#include <csignal>
 #include <cstdint>
 #include <cstring>
-#include <type_traits>
 #include <vector>
 
 #define SOLUTION
 #ifdef SOLUTION
-template<class To, class From>
-std::enable_if_t<
-        sizeof(To) == sizeof(From) &&
-                std::is_trivially_copyable_v<From> &&
-                std::is_trivially_copyable_v<To>,
-        To>
-// constexpr support needs compiler magic
-bit_cast(const From &src) noexcept {
-  To dst;
-  std::memcpy(&dst, &src, sizeof(To));
-  return dst;
+
+template<std::size_t N, class T>
+struct vector_helper {
+  using type __attribute__((__vector_size__(N * sizeof(T)))) = T; // get around GCC restriction
+};
+template<std::size_t N, class T>
+using builtin_vector = typename vector_helper<N, T>::type;
+
+template<std::size_t N, class T>
+builtin_vector<N, T> unaligned_load(const T *ptr) {
+  builtin_vector<N, T> vec;
+  std::memcpy(&vec, ptr, sizeof(vec));
+  return vec;
 }
 
-template<class T, std::size_t N>
-struct SIMDVector {
-  struct vector_helper {
-    using type __attribute__((__vector_size__(N * sizeof(T)))) = T; // get around GCC restriction
-  };
-  using builtin_vector = typename vector_helper::type;
+template<std::size_t N, class From, class To>
+builtin_vector<N, To> convert(builtin_vector<N, From> x) { // using __builtin_convertvector gives horrible performance on gcc
+#if __GNUC__
+  From copied[N];
+  std::memcpy(copied, &x, sizeof(copied));
 
-  alignas(N * sizeof(T)) std::array<T, N> data{};
+  To temp[N];
+  for (std::size_t i = 0; i < N; ++i) temp[i] = copied[i];
 
-  constexpr SIMDVector() {}
-  constexpr SIMDVector(T value) {
-    for (T &x: this->data) x = value;
-  }
+  builtin_vector<N, To> res;
+  std::memcpy(&res, &temp, sizeof(res));
 
-  constexpr SIMDVector(std::array<T, N> data) {
-    this->data = data;
-  }
-
-  constexpr SIMDVector(builtin_vector bv) : SIMDVector{from_builtin_vector(bv)} {
-  }
-
-  template<class G>
-  constexpr SIMDVector(SIMDVector<G, N> const &other) : SIMDVector{__builtin_convertvector(other.to_builtin_vector(), builtin_vector)} {
-  }
-
-  SIMDVector from_builtin_vector(builtin_vector bv) {
-    return {bit_cast<std::array<T, N>>(bv)};
-  }
-
-  builtin_vector to_builtin_vector() const {
-    return bit_cast<builtin_vector>(*this);
-  }
-
-  static constexpr SIMDVector load(T const *ptr) {
-    SIMDVector res;
-    for (std::size_t i = 0; i < N; ++i) res.data[i] = ptr[i];
-    return res;
-  }
-
-  constexpr void store(T *ptr) {
-    for (std::size_t i = 0; i < N; ++i) ptr[i] = this->data[i];
-  }
-
-  constexpr SIMDVector operator+(SIMDVector rhs) const {
-    return bit_cast<SIMDVector>(to_builtin_vector() + rhs.to_builtin_vector());
-  }
-
-  constexpr SIMDVector &operator+=(SIMDVector rhs) {
-    return *this = *this + rhs;
-  }
-};
+  return res;
+#else
+  return __builtin_convertvector(res, builtin_vector<N, To>);
+#endif
+}
 
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
 #if __x86_64__
  #if defined(__AVX512F__)
+  constexpr auto unroll = 8;
   constexpr auto native_simd_size = 64;
  #elif defined(__AVX__)
+  constexpr auto unroll = 4;
   constexpr auto native_simd_size = 32;
  #elif defined(__SSE__)
+  constexpr auto unroll = 4;
   constexpr auto native_simd_size = 16;
  #else
+  constexpr auto unroll = 0;
   constexpr auto native_simd_size = 0;
  #endif
 #elif defined(__arm__) || defined(__aarch64__)
  #if defined(__ARM_NEON)
+  constexpr auto unroll = 8;
   constexpr auto native_simd_size = 16;
  #elif defined(__ARM_FEATURE_SVE)
+  constexpr auto unroll = 8;
   constexpr auto native_simd_size = 32;
  #else
+  constexpr auto unroll = 0;
   constexpr auto native_simd_size = 0;
  #endif
 #endif
@@ -99,42 +74,53 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
 
   std::size_t i = 0;
 
-  using VecU64 = SIMDVector<std::uint64_t, vec_size>;
-  using VecU32 = SIMDVector<std::uint32_t, vec_size>;
-
-  const auto unroll = 4;
-
-  std::array<VecU64, 3 * unroll> real_accs = {};
+  std::array<builtin_vector<vec_size, std::uint64_t>, 3 * unroll> accs{};
   for (; i + unroll * vec_size <= input.size(); i += unroll * vec_size) {
-    for (std::size_t k = 0; k < 3 * unroll; ++k) {
-      real_accs[k] += VecU64{VecU32::load(&input[i].x + vec_size * k)};
-    }
-  }
-  for (std::size_t j = 0; j < 3; ++j) {
-    for (std::size_t k = 1; k < unroll; ++k) {
-      real_accs[j] += real_accs[j + k * 3];
+#if __GNUC__
+#pragma GCC unroll 8
+#endif
+    for (std::size_t k = 0; k < unroll; ++k) {
+      const auto xyzx_u32 = unaligned_load<vec_size, std::uint32_t>(&input[i].x + vec_size * (3 * k + 0));
+      const auto yzxy_u32 = unaligned_load<vec_size, std::uint32_t>(&input[i].x + vec_size * (3 * k + 1));
+      const auto zxyz_u32 = unaligned_load<vec_size, std::uint32_t>(&input[i].x + vec_size * (3 * k + 2));
+
+      const auto xyzx_u64 = convert<vec_size, std::uint32_t, std::uint64_t>(xyzx_u32);
+      const auto yzxy_u64 = convert<vec_size, std::uint32_t, std::uint64_t>(yzxy_u32);
+      const auto zxyz_u64 = convert<vec_size, std::uint32_t, std::uint64_t>(zxyz_u32);
+
+      accs[3 * k + 0] += xyzx_u64;
+      accs[3 * k + 1] += yzxy_u64;
+      accs[3 * k + 2] += zxyz_u64;
     }
   }
 
-  alignas(native_simd_size) std::array<std::uint64_t, 3 * vec_size> acc;
-  for (std::size_t j = 0; j < 3; ++j) {
-    real_accs[j].store(acc.data() + vec_size * j);
+  // colled the unrolled accumulators with the same layout to the first 3 accumulators
+  for (std::size_t k = 1; k < unroll; ++k) {
+    accs[0] += accs[k * 3 + 0];
+    accs[1] += accs[k * 3 + 1];
+    accs[2] += accs[k * 3 + 2];
   }
+
+  // flatten the accumulators for easier reduction, this only copies the first three `VecU64`s from `accs`
+  alignas(native_simd_size) std::array<std::uint64_t, 3 * vec_size> first_three_accs;
+  std::memcpy(first_three_accs.data(), accs.data(), sizeof(first_three_accs));
 
   std::uint64_t x = 0;
   std::uint64_t y = 0;
   std::uint64_t z = 0;
 
+  // reduce the first three accumulators from `acc`
   for (std::size_t j = 0; j < vec_size; ++j) {
-    x += acc[3 * j + 0];
-    y += acc[3 * j + 1];
-    z += acc[3 * j + 2];
+    x += first_three_accs[3 * j + 0];
+    y += first_three_accs[3 * j + 1];
+    z += first_three_accs[3 * j + 2];
   }
 
   for (; i < input.size(); ++i) {
     x += input[i].x;
     y += input[i].y;
     z += input[i].z;
+    asm ("" : "+r"(i)); // prevents unrolling of this loop, measurable speedup, at least on zen5
   }
 
   return {
