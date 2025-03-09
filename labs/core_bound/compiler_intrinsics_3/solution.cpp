@@ -12,7 +12,6 @@ namespace {
   constexpr auto& vec_load = _mm512_loadu_si512;
   constexpr auto& vec_store = _mm512_storeu_si512;
   constexpr auto& vec_add = _mm512_add_epi32;
-  constexpr auto& vec_max = _mm512_max_epu32;
   const auto vec_one = _mm512_set1_epi32(1);
 #elif defined(__AVX2__)
   using vec_t = __m256i;
@@ -52,11 +51,10 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     for (int i = 0; i < batch_sz; ++i, idx += vec_sz) {
       const auto d = vec_load((const vec_t*) (data + idx));
       accum[i] = vec_add(accum[i], d);
-      const auto mx = vec_max(accum[i], d);
 #if defined(__AVX512F__)
-      carry[i] = _mm512_mask_add_epi32(carry[i], _mm512_cmpneq_epi32_mask(accum[i], mx), carry[i], vec_one);
+      carry[i] = _mm512_mask_add_epi32(carry[i], _mm512_cmplt_epu32_mask(accum[i], d), carry[i], vec_one);
 #else
-      carry[i] = vec_add(carry[i], vec_cmpeq(accum[i], mx));
+      carry[i] = vec_add(carry[i], vec_cmpeq(accum[i], vec_max(accum[i], d)));
 #endif
     }
   }
