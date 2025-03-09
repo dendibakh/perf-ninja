@@ -37,7 +37,7 @@ builtin_vector<N, To> convert(builtin_vector<N, From> x) { // using __builtin_co
 
   return res;
 #else
-  return __builtin_convertvector(res, builtin_vector<N, To>);
+  return __builtin_convertvector(x, builtin_vector<N, To>);
 #endif
 }
 
