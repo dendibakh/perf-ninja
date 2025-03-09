@@ -36,7 +36,7 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   constexpr int comp_cnt = 3;
   constexpr int vec_sz = sizeof(vec_t) / sizeof(uint32_t);
   constexpr int batch_sz = std::lcm(vec_sz, comp_cnt) / vec_sz;
-  const uint32_t* data = std::bit_cast<uint32_t*>(input.data());
+  const uint32_t* data = reinterpret_cast<const uint32_t*>(input.data());
   const int data_sz = comp_cnt * input.size();
 
   std::array<vec_t, batch_sz> accum;
