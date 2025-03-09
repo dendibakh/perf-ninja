@@ -5,7 +5,16 @@
 #include <numeric>
 #include <x86intrin.h>
 
-#if defined(__AVX2__)
+namespace {
+#if defined(__AVX512F__)
+  using vec_t = __m512i;
+  constexpr auto& vec_setzero = _mm512_setzero_si512;
+  constexpr auto& vec_load = _mm512_loadu_si512;
+  constexpr auto& vec_store = _mm512_storeu_si512;
+  constexpr auto& vec_add = _mm512_add_epi32;
+  constexpr auto& vec_max = _mm512_max_epu32;
+  const auto vec_one = _mm512_set1_epi32(1);
+#elif defined(__AVX2__)
   using vec_t = __m256i;
   constexpr auto& vec_setzero = _mm256_setzero_si256;
   constexpr auto& vec_load = _mm256_loadu_si256;
@@ -22,6 +31,7 @@
   constexpr auto& vec_cmp = _mm_cmpeq_epi32;
   constexpr auto& vec_max = _mm_max_epu32;
 #endif
+}  // namespace
 
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input) {
   constexpr int comp_cnt = 3;
@@ -42,12 +52,21 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     for (int i = 0; i < batch_sz; ++i, idx += vec_sz) {
       const auto d = vec_load((const vec_t*) (data + idx));
       accum[i] = vec_add(accum[i], d);
-      const auto ov = vec_cmp(accum[i], vec_max(accum[i], d));
-      carry[i] = vec_add(carry[i], ov);
+      const auto mx = vec_max(accum[i], d);
+#if defined(__AVX512F__)
+      carry[i] = _mm512_mask_add_epi32(carry[i], _mm512_cmpneq_epi32_mask(accum[i], mx), carry[i], vec_one);
+#else
+      carry[i] = vec_add(carry[i], vec_cmpeq(accum[i], mx));
+#endif
     }
   }
 
+#if defined(__AVX512F__)
+  constexpr int carry_fix_up = 0;
+#else
   const int carry_fix_up = data_sz / (batch_sz * vec_sz);
+#endif
+
   std::array<uint64_t, comp_cnt> sum{};
   for (int i = 0, j = 0; i < batch_sz; ++i) {
     std::array<uint32_t, vec_sz> accum_res;
