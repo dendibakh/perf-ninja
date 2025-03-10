@@ -10,7 +10,7 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int *kernel, const int radius,
                              const int shift) {
 
-  int constexpr c_step = 8;
+  int constexpr c_step = 8; //6856;
 
   const int rounding = 1 << (shift - 1);
 
