@@ -5,17 +5,40 @@
 #include <stdint.h>
 #include <cmath>
 #include <ios>
+#include <cstring>
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
-  std::array<uint32_t, 256> hist;
-  hist.fill(0);
-  for (int i = 0; i < image.width * image.height; ++i)
-    hist[image.data[i]]++;
-  return hist;
+  static constexpr int BLOCK = 8;
+  std::array<std::array<uint32_t, 256>, BLOCK> hist = {};
+  const int length = image.width * image.height;
+  for (int i = 0; i < length + 1 - BLOCK; i += BLOCK) {
+    uint8_t buf[BLOCK];
+    memcpy(buf, &image.data[i], BLOCK * sizeof(uint8_t));
+    for (int j = 0; j < BLOCK; j++) {
+       hist[j][buf[j]]++;
+    }
+  }
+  std::array<uint32_t, 256> result = {};
+  for (int j = 0; j < BLOCK; j++) {
+    for (int i = 0; i < 256; i++) {
+      hist[0][i] += hist[j][i];
+    }
+  }
+  for (int i = length - (length % BLOCK); i < length; i++) {
+    hist[0][image.data[i]]++;
+  }
+  return hist[0];
 }
+
+/*
+length % BLOCK = 0 -> length - BLOCK
+length % BLOCK = x -> length - x
+
+length - (length % BLOCK)
+ */
 // ******************************************
 
 // Calculate Otsu's Threshold
