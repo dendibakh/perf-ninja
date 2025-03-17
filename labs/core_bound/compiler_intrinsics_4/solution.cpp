@@ -89,7 +89,7 @@ namespace {
   constexpr auto kVecSize = sizeof(Vec) / sizeof(double);
 }  // namespace
 
-//#define SOLUTION
+#define SOLUTION
 #ifdef SOLUTION
 
 std::vector<short> mandelbrot(int image_width, int image_height) {
