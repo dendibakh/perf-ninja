@@ -149,13 +149,30 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+constexpr static std::size_t huge_page_size = 1 << 21;
+size_t round_to_huge_page_size(size_t n) {
+  return (((n - 1) / huge_page_size) + 1) * huge_page_size;
+}
+
+size_t round_to_huge_page_n(size_t n) {
+  return (((n - 1) / huge_page_size) + 1);
+}
+
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   // double *alloc = new double[size];
 
-  void* ptr = mmap(nullptr, size * sizeof(double), PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
+  void* ptr = nullptr;
+  // void* ptr = mmap(nullptr,
+  //                 round_to_huge_page_size(size * sizeof(double)),
+  //                 PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+  //                 -1,
+  //                 0);
+  posix_memalign(&ptr, huge_page_size, round_to_huge_page_size(size * sizeof(double)));
+
   if (ptr == MAP_FAILED)
     throw std::bad_alloc{};
 
