@@ -5,6 +5,8 @@
 #include <emmintrin.h>
 #include <immintrin.h>
 #include <smmintrin.h>
+#else
+#include <arm_neon.h>
 #endif
 
 #include <array>
@@ -44,8 +46,23 @@ constexpr auto& vec_sub = _mm_sub_pd;
 constexpr auto& vec_mul = _mm_mul_pd;
 constexpr auto vec_cmpgt_mask = [](auto a, auto b) { return _mm_movemask_pd(_mm_cmpgt_pd(a, b)); };
 #endif
-constexpr auto kVecSize = sizeof(Vec) / sizeof(double);
+#else
+using Vec = float64x2_t;
+constexpr auto vec_setzero = []() { return vdupq_n_f64(0.0); };
+constexpr auto& vec_set1 = vdupq_n_f64;
+constexpr auto vec_load = [](const auto* a) { return vld1q_f64(a); };
+constexpr auto vec_store = [](auto* a, auto b) { vst1q_f64(a, b); };
+constexpr auto& vec_add = vaddq_f64;
+constexpr auto& vec_sub = vsubq_f64;
+constexpr auto& vec_mul = vmulq_f64;
+constexpr auto vec_cmpgt_mask = [](auto a, auto b) {
+  const auto cmp = vcgtq_f64(a, b);
+  const auto bit0 = vgetq_lane_u64(cmp, 0) & 0b01;
+  const auto bit1 = vgetq_lane_u64(cmp, 1) & 0b10;
+  return bit1 | bit0;
+};
 #endif  // __x86_64__
+constexpr auto kVecSize = sizeof(Vec) / sizeof(double);
 }  // namespace
 
 //#define SOLUTION
