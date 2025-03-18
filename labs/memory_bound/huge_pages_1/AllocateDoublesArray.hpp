@@ -161,7 +161,7 @@ inline bool setRequiredPrivileges() {
 #include <sys/mman.h>
 #include <unistd.h>
 
-#define fail(...) do { fprintf(stderr, __VA_ARGS__); } while (0)
+#define fail(...) do { /* fprintf(stderr, __VA_ARGS__); */ hugePagesFailed = true; return;} while (0)
 
 // normal page, 4KiB
 #define PAGE_SIZE (1 << 12)
@@ -191,38 +191,49 @@ size_t round_to_huge_page_n(size_t n) {
 
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
+bool hugePagesFailed = false;
+
+#include <functional>
+
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
-  // double *alloc = new double[size];
-  size *= sizeof(double);
-  // float mb = size / (10e6);
-  // printf("size: %f Mb\n", size / (10e6));
-  size = round_to_huge_page_size(size);
+  using delete_t = std::function<void(double*)>;
 
-  void* alloc = nullptr;
-  alloc = aligned_alloc(huge_page_size, size);
-  if (alloc == NULL)
-    throw std::bad_alloc{};
+  delete_t deleter = [size](double *ptr) { delete [] ptr; };
 
-  madvise(alloc, size, MADV_HUGEPAGE);
 
-  char* it = (char*) alloc;
-  for (char* end = it + size; it < end; it += huge_page_size) {
-    memset(it, 0, 1);
-
-    // uncomment to check if it's really a huge page
-    // check_huge_page(it);
+  if (hugePagesFailed) {
+    double *alloc = new double[size];
+    return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
+                                                        std::move(deleter));
   }
 
+  // [Round to Huge Page Tablle size]
+  size *= sizeof(double);
+  size = round_to_huge_page_size(size);
+
+  // [Request Huge Page Tabel]
+  void* alloc = aligned_alloc(huge_page_size, size);
+  if (alloc == NULL)
+    throw std::bad_alloc{};
+  madvise(alloc, size, MADV_HUGEPAGE);
+
+  // [Allocate and check hugeness of page tables]
+  char* it = (char*) alloc;
+  for (char* end = it + size; !hugePagesFailed && it < end; it += huge_page_size) {
+    memset(it, 0, 1);
+    check_huge_page(it);
+  }
+
+  delete_t deleterok = [size](double *ptr) { munmap(ptr, size); };
+  return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
+                                                      std::move(deleterok));  
+  
   // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [size](double *ptr) { munmap(ptr, size); };
-
-  return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
-                                                      std::move(deleter));
-
+  
   // The above is equivalent to:
   // return std::make_unique<double[]>(size);
   // The more verbose version is meant to demonstrate the use of a custom
