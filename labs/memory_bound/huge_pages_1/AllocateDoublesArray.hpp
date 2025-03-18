@@ -225,7 +225,7 @@ inline auto allocateDoublesArray(size_t size) {
   }
 
   delete_t deleterok = [size](double *ptr) { munmap(ptr, size); };
-  return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
+  return std::unique_ptr<double[], delete_t>(static_cast<double*>(alloc),
                                                       std::move(deleterok));  
   
   // remember to cast the pointer to double* if your allocator returns void*
