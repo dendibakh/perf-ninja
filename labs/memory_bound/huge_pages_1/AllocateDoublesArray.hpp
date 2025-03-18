@@ -199,14 +199,13 @@ inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   using delete_t = std::function<void(double*)>;
 
-  delete_t deleter = [size](double *ptr) { delete [] ptr; };
+  // delete_t deleter = [size](double *ptr) { delete [] ptr; };
 
-
-  if (hugePagesFailed) {
-    double *alloc = new double[size];
-    return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
-                                                        std::move(deleter));
-  }
+  // if (hugePagesFailed) {
+  //   double *alloc = new double[size];
+  //   return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(alloc),
+  //                                                       std::move(deleter));
+  // }
 
   // [Round to Huge Page Tablle size]
   size *= sizeof(double);
@@ -222,7 +221,7 @@ inline auto allocateDoublesArray(size_t size) {
   char* it = (char*) alloc;
   for (char* end = it + size; !hugePagesFailed && it < end; it += huge_page_size) {
     memset(it, 0, 1);
-    check_huge_page(it);
+    // check_huge_page(it);
   }
 
   delete_t deleterok = [size](double *ptr) { munmap(ptr, size); };
