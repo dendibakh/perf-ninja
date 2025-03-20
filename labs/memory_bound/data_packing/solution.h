@@ -13,13 +13,23 @@ constexpr int maxRandom = 100;
 struct S
 {
   float d;
-  short l;
-  unsigned short i : 8;
-  unsigned short s : 7;
-  bool b : 1;
+  unsigned short l;
+  unsigned char i;
+  unsigned char s: 7;
+  bool b :1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
+
+//struct S {
+//  int i;
+//  long long l;
+//  short s;
+//  double d;
+//  bool b;
+//
+//  bool operator<(const S &s) const { return this->i < s.i; }
+//};
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
