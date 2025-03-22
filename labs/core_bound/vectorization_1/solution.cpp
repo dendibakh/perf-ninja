@@ -13,7 +13,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
        ++sequence_idx) {
     using score_t = int16_t;
     using column_t = std::array<score_t, sequence_size_v + 1>;
-
+    column_t score_column{};
+    column_t horizontal_gap_column{};
     sequence_t const &sequence1 = sequences1[sequence_idx];
     sequence_t const &sequence2 = sequences2[sequence_idx];
 
@@ -31,20 +32,18 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      * since we are only interested in the last value of the last column in the
      * score matrix.
      */
-    column_t score_column{};
-    column_t horizontal_gap_column{};
+
     score_t last_vertical_gap{};
 
     /*
      * Initialise the first column of the matrix.
      */
     horizontal_gap_column[0] = gap_open;
-    last_vertical_gap = gap_open;
+    last_vertical_gap = gap_open + score_column.size() * gap_extension;
 
     for (size_t i = 1; i < score_column.size(); ++i) {
-      score_column[i] = last_vertical_gap;
-      horizontal_gap_column[i] = last_vertical_gap + gap_open;
-      last_vertical_gap += gap_extension;
+      score_column[i] = gap_open + (i-1)*gap_extension;
+      horizontal_gap_column[i] = 2*gap_open + (i-1)*gap_extension;
     }
 
     /*
@@ -69,6 +68,13 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         score_column[row] = best_cell_score;
       }
 
+      for (unsigned row = 1; row <= sequence1.size(); ++row){
+        score_t best_cell_score = score_column[row] + gap_open;
+        horizontal_gap_column[row] += gap_extension;
+        horizontal_gap_column[row] =
+            std::max(horizontal_gap_column[row], best_cell_score);
+      }
+
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
@@ -79,11 +85,11 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         // Compute the next values for vertical and horizontal gap.
         best_cell_score += gap_open;
         last_vertical_gap += gap_extension;
-        horizontal_gap_column[row] += gap_extension;
+        // horizontal_gap_column[row] += gap_extension;
         // Store optimum between gap open and gap extension.
         last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
-        horizontal_gap_column[row] =
-            std::max(horizontal_gap_column[row], best_cell_score);
+        // horizontal_gap_column[row] =
+        //     std::max(horizontal_gap_column[row], best_cell_score);
       }
     }
 
