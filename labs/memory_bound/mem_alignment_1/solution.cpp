@@ -69,7 +69,7 @@ bench1/_1024      67572 us        67567 us            8
 #endif
 
 #ifdef SOLUTION_1 // align by cache line size
-  constexpr int CacheLineSize = 64;
+  constexpr int CacheLineSize = 128;
   int aligned_size = ((size / CacheLineSize) + 1) * CacheLineSize;
   N = aligned_size / sizeof(float);
 #endif
