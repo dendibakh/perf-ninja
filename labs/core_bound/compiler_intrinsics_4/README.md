@@ -1,0 +1,1 @@
+This lab calculates an image of [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set). Your task is to improve speed by calculating multiple data points in parallel using vector instructions.
