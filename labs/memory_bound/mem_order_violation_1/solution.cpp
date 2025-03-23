@@ -10,11 +10,100 @@
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+  /*
+    problem here is that, if there is consequence of the same color
+    in the picture, there would be data dependency. to break it
+    we can use saveral hists. so that if we have 4 sequent elements
+    this 4 elements would pretend to different data addresses.
+    so load and stores to these hists can be reordered. 
+  */
+  
+#define SOLUTION
+/*
+TLDR: Best number of hists is 16. That's seems enough to break dependencies
+and let pipeline reorder load-stores. That's importatnt that that's really depends on
+sepecific underlying data. As if data is diverse processor will be able to reorder
+load-stores without our efforts.
+
+    No optimization:
+      bird/0           52.3 us         52.3 us        13406
+      coins/1          25.3 us         25.2 us        27327
+      pepper/2         18.3 us         18.2 us        37453
+      pixabay/3        8.03 ms         7.97 ms           87
+
+    32 hists:
+      bird/0           37.9 us         37.9 us        18281
+      coins/1          18.7 us         18.7 us        37706
+      pepper/2         16.4 us         16.4 us        42487
+      pixabay/3        7.60 ms         7.55 ms           93
+
+    16 hists:
+      bird/0           37.1 us         37.0 us        18564
+      coins/1          18.4 us         18.4 us        37074
+      pepper/2         16.1 us         16.0 us        43733
+      pixabay/3        7.51 ms         7.49 ms           93
+
+    8 hists:
+      bird/0           37.4 us         37.4 us        18601
+      coins/1          18.8 us         18.8 us        36659
+      pepper/2         16.0 us         16.0 us        43101
+      pixabay/3        7.66 ms         7.66 ms           88
+
+    4 hists:
+      bird/0           38.3 us         38.3 us        18233
+      coins/1          19.1 us         19.1 us        36303
+      pepper/2         16.4 us         16.4 us        42973
+      pixabay/3        7.75 ms         7.75 ms           85
+
+    2 hists:
+      bird/0           46.1 us         46.1 us        15048
+      coins/1          22.0 us         22.0 us        32083
+      pepper/2         20.5 us         20.5 us        33829
+      pixabay/3        8.16 ms         8.16 ms           85
+
+    1 hists:
+      bird/0           47.9 us         47.9 us        14314
+      coins/1          24.5 us         24.5 us        28875
+      pepper/2         17.8 us         17.7 us        39422
+      pixabay/3        8.10 ms         8.10 ms           86
+*/
+
+#ifdef SOLUTION
+  constexpr int HistNum = 16;
+  using hist_t = std::array<uint32_t, 256>;
+  std::array<hist_t, HistNum> hists;
+  hist_t hist;
+
+  for (auto& hist : hists) {
+    hist.fill(0);
+  }
+
+  int tail_size = (image.width * image.height) % HistNum;
+  int body_size = (image.width * image.height / HistNum) * HistNum;
+  for (int i = 0; i < body_size; i += HistNum) {
+    for (int hist_idx = 0; hist_idx < HistNum; hist_idx++) {
+      hists[hist_idx][image.data[i + hist_idx]]++;
+    }
+  }
+
+  for (int i = 0; i < tail_size; i++) {
+    hists[0][image.data[body_size + i]]++;
+  }
+
+  for (int i = 0; i < hist.size(); i++) {
+    int total = 0;
+    for (int hist_idx = 0; hist_idx < HistNum; hist_idx++) {
+      total += hists[hist_idx][i];
+    }
+    hist[i] = total;
+  }
+#else
   std::array<uint32_t, 256> hist;
   hist.fill(0);
   for (int i = 0; i < image.width * image.height; ++i)
     hist[image.data[i]]++;
-  return hist;
+#endif
+    return hist;
 }
 // ******************************************
 
