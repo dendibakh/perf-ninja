@@ -32,7 +32,7 @@ static void bench1(benchmark::State &state, Args&&... args) {
 // matrices with sizes of powers of two, e.g. 64, 128, etc.
 // That's why we don't see speedups on macOS for such matrices.
 
-BENCHMARK_CAPTURE(bench1, _63,  63)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(bench1, _63,  63)->Unit(benchmark::kMicrosecond)->Iterations(500);
 #ifndef ON_MACOS
 BENCHMARK_CAPTURE(bench1, _64,  64)->Unit(benchmark::kMicrosecond);
 #endif
