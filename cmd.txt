@@ -1,4 +1,5 @@
 cmake -G "NMake Makefiles" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_BUILD_TYPE=RelWithDebInfo -B build -S .
+cmake -G "Ninja" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_CXX_FLAGS="-g" -D CMAKE_BUILD_TYPE=Release -B build -S .
 cmake -D CMAKE_C_COMPILER=/usr/lib/llvm-19/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-19/bin/clang++ -D CMAKE_BUILD_TYPE=RelWithDebInfo -D CMAKE_C_FLAGS="-mno-avx512f -fno-omit-frame-pointer" -D CMAKE_CXX_FLAGS="-mno-avx512f -fno-omit-frame-pointer" -B build -S .
 cmake --build build --config RelWithDebInfo --target validateLab
 cmake --build build --config RelWithDebInfo --target benchmarkLab
