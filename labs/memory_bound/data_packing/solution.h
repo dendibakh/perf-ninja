@@ -11,13 +11,21 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
-  long long l; // 8 ?
-  double d; // 8
-  int i; // 4 
-  short s;  // 2
-  bool b; // 1
+
+  float d; // 32 bits = 4 bytes ; double d; // 8
+  int i:8; // only need 8 bits // 4 
+  short s:8;// only need 7 bits  // 2
+  long long l:15;// only need 16 bits // 64 bits = 8 bytes ?
+  bool b:1; // 8 bits = 1 byte // no dataype can be smaller than 8,but S is our datatype
+            // so we can make this smaller
   bool operator<(const S &s) const { return this->i < s.i; }
 };
+
+// template <int N>
+// class TD;
+
+// // never compiles but shows the value of sizeof(s)
+// TD<sizeof(S)> td;
 
 void init(std::array<S, N> &arr);
 S create_entry(int first_value, int second_value);
