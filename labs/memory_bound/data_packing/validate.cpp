@@ -50,19 +50,34 @@ bool check_entry(int first, int second) {
   return isValid;
 }
 
+std::ostream& operator<<(std::ostream& os, const S& s) {
+  os << "{ i: " << s.i << ", s: " << s.s << ", l: " << s.l << ", d: " << s.d << ", b: " << s.b << " }";
+  return os;
+}
+
 int main() {
   std::array<S, N> arr;
   init(arr);
 
   auto expected = arr;
   solution(arr);
-  std::sort(expected.begin(), expected.end());
+  if (!std::is_sorted(arr.begin(), arr.end())) {
+    std::cerr << "Validation Failed. Array is not properly sorted." << std::endl;
+    return 1;
+  }
+  auto cmp_eq = [](const S a, const S b) {
+    return std::tie(a.i, a.s, a.l, a.d, a.b) == std::tie(b.i, b.s, b.l, b.d, b.b);
+  };
+  auto cmp_less = [](const S a, const S b) {
+    return std::tie(a.i, a.s, a.l, a.d, a.b) < std::tie(b.i, b.s, b.l, b.d, b.b);
+  };
+  std::sort(expected.begin(), expected.end(), cmp_less);
+  std::sort(arr.begin(), arr.end(), cmp_less);
 
   for (int i = 0; i < N; i++) {
-    // we only check i components since sort can be unstable
-    if (arr[i].i != expected[i].i) {
-      std::cerr << "Validation Failed. Result[" << i << "].i = " << arr[i].i
-                << ". Expected[" << i << "].i = " << expected[i].i << std::endl;
+    if (!cmp_eq(arr[i], expected[i])) {
+      std::cerr << "Validation Failed. Result[" << i << "] = " << arr[i]
+                << ". Expected[" << i << "] = " << expected[i] << std::endl;
       return 1;
     }
   }
