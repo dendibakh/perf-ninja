@@ -23,17 +23,17 @@ Currently, compilers fail to vectorize it for x86. However, for ARM they generat
 
 To vectorize this loop manually, think about the memory layout and operations applied to the elements.
 
-Caveat: current benchmark processes 16k positions, which takes 192KB of space (`12 bytes * 16K positions`). As the input size grows, the benchmarks becomes more memory bound which reduces the ç gains. 
+Caveat: current benchmark processes 16k positions, which takes 192KB of space (`12 bytes * 16K positions`). As the input size grows, the benchmarks becomes more memory bound which reduces the gains. 
 
 **The lab is contributed by Jonathan Hallström (@JonathanHallstrom).**
 
 [^1]: Here is an example of the ARM's LDM instruction.
-```
-// Assume input points to an array of structures {u32 x, u32 y, u32 z}
-LD3 {V0.4S, V1.4S, V2.4S}, [input] // Load 4 positions at once (each containing xyz elements) 
-// After that:
-//  V0.4S will have four X coordinates,
-//  V1.4S will have four Y coordinates,
-//  V2.4S will have four Z coordinates,
-// Reducing vectors with such a friendly layout is much easier.
-```
+    ```asm
+    // Assume input points to an array of structures {u32 x, u32 y, u32 z}
+    LD3 {V0.4S, V1.4S, V2.4S}, [input] // Load 4 positions at once (each containing xyz elements) 
+    // After that:
+    //  V0.4S will have four X coordinates,
+    //  V1.4S will have four Y coordinates,
+    //  V2.4S will have four Z coordinates,
+    // Reducing vectors with such a friendly layout is much easier.
+    ```
