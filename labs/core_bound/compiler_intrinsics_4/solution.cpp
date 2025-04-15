@@ -121,7 +121,7 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
   for (auto u = 0; u < kUnrollSz; ++u) {
     px[u] = u;
     py[u] = 0;
-    while (px[u] >= data_width) {
+    if (px[u] >= data_width) {
       px[u] -= data_width;
       ++py[u];
     }
@@ -136,7 +136,7 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
       c_x_arr[u][idx] = std::lerp(min_x, max_x, 1.0 * px[u] / data_width);
       c_y_arr[u][idx] = std::lerp(min_y, max_y, 1.0 * py[u] / data_height);
       px[u] += kUnrollSz;
-      while (px[u] >= data_width) {
+      if (px[u] >= data_width) {
         px[u] -= data_width;
         ++py[u];
       }
