@@ -16,7 +16,7 @@ Each lab assignment focuses on a specific performance problem and can take anywh
 
 Performance Ninja is supported on Linux, Windows, and Mac, and is run on all the recent HW including Intel's 12th-gen Alderlake, AMD's Zen3, and Apple's M1 CPUs. You can observe the effect of your optimizations on a variety of modern platforms.
 
-Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://book.easyperf.net/perf_book) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
+Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://products.easyperf.net/perf-book-2) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
 
 Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
 
