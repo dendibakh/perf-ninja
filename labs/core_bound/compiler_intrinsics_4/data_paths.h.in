@@ -1,0 +1,3 @@
+constexpr auto validation_image_path = "@VALIDATION_IMAGE_PATH@";
+constexpr auto reference_image_path = "@REFERENCE_IMAGE_PATH@";
+constexpr auto benchmark_image_path = "@BENCHMARK_IMAGE_PATH@";
