@@ -1,5 +1,6 @@
 #include "const.h"
 #include "solution.h"
+#include <cmath>
 
 std::vector<short> mandelbrot(int image_width, int image_height) {
   const auto data_width = image_width + 2;
