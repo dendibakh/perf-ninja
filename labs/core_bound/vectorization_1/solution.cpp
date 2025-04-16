@@ -51,8 +51,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      * Compute the main recursion to fill the matrix.
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
-      score_t last_diagonal_score =
-          score_column[0]; // Cache last diagonal score to compute this cell.
+      // Cache last diagonal score to compute this cell.
+      score_t last_diagonal_score = score_column[0];
       score_column[0] = horizontal_gap_column[0];
       last_vertical_gap = horizontal_gap_column[0] + gap_open;
       horizontal_gap_column[0] += gap_extension;
