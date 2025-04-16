@@ -33,18 +33,15 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     column_t score_column{};
     column_t horizontal_gap_column{};
-    score_t last_vertical_gap{};
 
     /*
      * Initialise the first column of the matrix.
      */
     horizontal_gap_column[0] = gap_open;
-    last_vertical_gap = gap_open;
 
     for (size_t i = 1; i < score_column.size(); ++i) {
-      score_column[i] = last_vertical_gap;
-      horizontal_gap_column[i] = last_vertical_gap + gap_open;
-      last_vertical_gap += gap_extension;
+      score_column[i] = (i - 1) * gap_extension + gap_open;
+      horizontal_gap_column[i] = (i - 1) * gap_extension + 2 * gap_open;
     }
 
     /*
@@ -52,10 +49,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       // Cache last diagonal score to compute this cell.
-      score_t last_diagonal_score = score_column[0];
-      score_column[0] = horizontal_gap_column[0];
-      last_vertical_gap = horizontal_gap_column[0] + gap_open;
-      horizontal_gap_column[0] += gap_extension;
+      score_t last_diagonal_score = col == 1 ? 0 : gap_open + (col - 2) * gap_extension;
+      score_t last_vertical_gap = (col - 1) * gap_extension + 2 * gap_open;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Compute next score from diagonal direction with match/mismatch.
