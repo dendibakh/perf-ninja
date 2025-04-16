@@ -23,7 +23,7 @@ namespace {
   constexpr auto vec_set1 = [](auto a) { return _mm512_set1_pd(a); };
   constexpr auto vec_set1_int = [](auto a) { return _mm512_set1_epi64(a); };
   constexpr auto vec_load = [](auto* a) { return _mm512_load_pd(a); };
-  constexpr auto vec_store_int = [](auto* a, auto b) { _mm512_store_si512((__m256i*)a, b); };
+  constexpr auto vec_store_int = [](auto* a, auto b) { _mm512_store_si512((VecInt*)a, b); };
   constexpr auto vec_add = [](auto a, auto b) { return _mm512_add_pd(a, b); };
   constexpr auto vec_add_int = [](auto a, auto b) { return _mm512_add_epi64(a, b); };
   constexpr auto vec_sub = [](auto a, auto b) { return _mm512_sub_pd(a, b); };
@@ -41,7 +41,7 @@ namespace {
   constexpr auto vec_set1 = [](auto a) { return _mm256_set1_pd(a); };
   constexpr auto vec_set1_int = [](auto a) { return _mm256_set1_epi64x(a); };
   constexpr auto vec_load = [](auto* a) { return _mm256_load_pd(a); };
-  constexpr auto vec_store_int = [](auto* a, auto b) { _mm256_store_si256((__m256i*)a, b); };
+  constexpr auto vec_store_int = [](auto* a, auto b) { _mm256_store_si256((VecInt*)a, b); };
   constexpr auto vec_add = [](auto a, auto b) { return _mm256_add_pd(a, b); };
   constexpr auto vec_add_int = [](auto a, auto b) { return _mm256_add_epi64(a, b); };
   constexpr auto vec_sub = [](auto a, auto b) { return _mm256_sub_pd(a, b); };
@@ -59,7 +59,7 @@ namespace {
   constexpr auto vec_set1 = [](auto a) { return _mm_set1_pd(a); };
   constexpr auto vec_set1_int = [](auto a) { return _mm_set1_epi64x(a); };
   constexpr auto vec_load = [](auto* a) { return _mm_load_pd(a); };
-  constexpr auto vec_store_int = [](auto* a, auto b) { _mm_store_si128((__m128i*)a, b); };
+  constexpr auto vec_store_int = [](auto* a, auto b) { _mm_store_si128((VecInt*)a, b); };
   constexpr auto vec_add = [](auto a, auto b) { return _mm_add_pd(a, b); };
   constexpr auto vec_add_int = [](auto a, auto b) { return _mm_add_epi64(a, b); };
   constexpr auto vec_sub = [](auto a, auto b) { return _mm_sub_pd(a, b); };
