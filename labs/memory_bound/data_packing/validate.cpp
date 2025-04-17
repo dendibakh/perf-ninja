@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const S& s) {
 }
 
 int main() {
-  std::array<S, N> arr;
+  std::vector<S> arr(N);
   init(arr);
 
   auto expected = arr;
