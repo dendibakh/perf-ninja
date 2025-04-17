@@ -49,29 +49,46 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       // Cache last diagonal score to compute this cell.
-      score_t last_diagonal_score = col == 1 ? 0 : gap_open + (col - 2) * gap_extension;
+      score_t last_diagonal_score =
+          col == 1 ? 0 : gap_open + (col - 2) * gap_extension;
       score_t last_vertical_gap = (col - 1) * gap_extension + 2 * gap_open;
 
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        // Compute next score from diagonal direction with match/mismatch.
-        score_t best_cell_score =
-            last_diagonal_score +
-            (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
-        // Determine best score from diagonal, vertical, or horizontal
-        // direction.
-        best_cell_score = std::max(best_cell_score, last_vertical_gap);
-        best_cell_score = std::max(best_cell_score, horizontal_gap_column[row]);
-        // Cache next diagonal value and store optimum in score_column.
-        last_diagonal_score = score_column[row];
-        score_column[row] = best_cell_score;
-        // Compute the next values for vertical and horizontal gap.
-        best_cell_score += gap_open;
-        last_vertical_gap += gap_extension;
-        horizontal_gap_column[row] += gap_extension;
-        // Store optimum between gap open and gap extension.
-        last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
-        horizontal_gap_column[row] =
-            std::max(horizontal_gap_column[row], best_cell_score);
+      constexpr unsigned unroll = 4;
+      for (unsigned orow = 1; orow <= sequence1.size(); orow += unroll) {
+        score_t tmp[unroll];
+        for (unsigned row = orow;
+             row <= std::min(orow + unroll - 1,
+                             static_cast<unsigned>(sequence1.size()));
+             row++) {
+          auto i = row - orow;
+          // Compute next score from diagonal direction with match/mismatch.
+          tmp[i] =
+              last_diagonal_score +
+              (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
+          last_diagonal_score = score_column[row];
+        }
+        for (unsigned row = orow;
+             row <= std::min(orow + unroll - 1,
+                             static_cast<unsigned>(sequence1.size()));
+             row++) {
+          auto i = row - orow;
+          score_t best_cell_score = tmp[i];
+          // Determine best score from diagonal, vertical, or horizontal
+          // direction.
+          best_cell_score = std::max(best_cell_score, last_vertical_gap);
+          best_cell_score =
+              std::max(best_cell_score, horizontal_gap_column[row]);
+          // Cache next diagonal value and store optimum in score_column.
+          score_column[row] = best_cell_score;
+          // Compute the next values for vertical and horizontal gap.
+          best_cell_score += gap_open;
+          last_vertical_gap += gap_extension;
+          horizontal_gap_column[row] += gap_extension;
+          // Store optimum between gap open and gap extension.
+          last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
+          horizontal_gap_column[row] =
+              std::max(horizontal_gap_column[row], best_cell_score);
+        }
       }
     }
 
