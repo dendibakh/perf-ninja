@@ -1,7 +1,3 @@
-// NOTE: this lab is currently broken.
-// After migrating to a new compiler version the speedup is no longer measurable consistently.
-// You can still try to solve it to learn the concept, but the result is not guaranteed.
-
 #include "solution.h"
 #include <algorithm>
 #include <iostream>
@@ -56,7 +52,7 @@ std::ostream& operator<<(std::ostream& os, const S& s) {
 }
 
 int main() {
-  std::array<S, N> arr;
+  std::vector<S> arr(N);
   init(arr);
 
   auto expected = arr;
