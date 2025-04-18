@@ -298,8 +298,16 @@ def benchmarkLab(labPath):
   benchmarkSolutionOrBaseline(solutionDir, "solution")
   benchmarkSolutionOrBaseline(baselineDir, "baseline")
 
-  outJsonSolution = gbench.util.load_benchmark_results(os.path.join(solutionDir, "result.json"))
-  outJsonBaseline = gbench.util.load_benchmark_results(os.path.join(baselineDir, "result.json"))
+  try:
+    outJsonSolution = gbench.util.load_benchmark_results(os.path.join(solutionDir, "result.json"))
+  except JSONDecodeError:
+    print (bcolors.FAIL + "Error while loading solution's result.json file. Submission for the lab " + getLabNameStr(labPath) + " failed." + bcolors.ENDC)
+    return False 
+  try:
+    outJsonBaseline = gbench.util.load_benchmark_results(os.path.join(baselineDir, "result.json"))
+  except JSONDecodeError:
+    print (bcolors.FAIL + "Error while loading baseline's result.json file. Submission for the lab " + getLabNameStr(labPath) + " failed." + bcolors.ENDC)
+    return False 
 
   # Parse two report files and compare them
   diff_report = gbench.report.get_difference_report(
