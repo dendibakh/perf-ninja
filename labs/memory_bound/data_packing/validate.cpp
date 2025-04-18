@@ -88,6 +88,7 @@ int main() {
     return 2;
   }
 
+  std::cout << "sizeof(S) = " << sizeof(S) << std::endl;
   std::cout << "Validation Successful" << std::endl;
   return 0;
 }
