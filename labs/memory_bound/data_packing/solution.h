@@ -16,6 +16,8 @@ struct S {
   bool operator<(const S &s) const { return this->i < s.i; }
 };
 
+static_assert(sizeof(S) == 8, "Bit packing failed, performance improvement is not guaranteed");
+
 void init(std::vector<S> &arr);
 S create_entry(int first_value, int second_value);
 void solution(std::vector<S> &arr);
