@@ -67,8 +67,8 @@ int main() {
   if (cmp_result.first != data.end()) {
     std::cerr << "Validation Failed at position: "
               << std::distance(data.begin(), cmp_result.first)
-              << ". Expected: " << *cmp_result.first
-              << " received: " << *cmp_result.second
+              << ". Expected: " << *cmp_result.second
+              << " received: " << *cmp_result.first
               << "." << std::endl;
     return EXIT_FAILURE;
   }
