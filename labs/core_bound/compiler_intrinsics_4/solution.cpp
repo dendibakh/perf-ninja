@@ -209,7 +209,7 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
       // Compute the logical OR for maximum iterations and escape conditions
       const auto cond_mask = vec_or_mask(max_iter_mask, squared_bound_mask);
       // Process points that meet the condition above
-      if (uint8_t mask = vec_movemask(cond_mask); mask) {
+      if (uint32_t mask = vec_movemask(cond_mask); mask) {
         vec_store_int(iter_cnt_arr.data(), iter_cnt[u]);
         // Process every set bit in the mask
         for (; mask; mask &= mask - 1) {
