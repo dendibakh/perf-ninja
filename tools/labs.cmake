@@ -22,7 +22,7 @@ endif()
 
 # Set compiler options
 if(NOT MSVC)
-  set(CMAKE_C_FLAGS "-O3 -ffast-math -march=native ${CMAKE_C_FLAGS}")
+  set(CMAKE_C_FLAGS "-O3 -march=native ${CMAKE_C_FLAGS}")
 else()
   include("${CMAKE_CURRENT_LIST_DIR}/msvc_simd_isa.cmake")
   if(SUPPORT_MSVC_AVX512)
@@ -34,7 +34,15 @@ else()
   else()
     set(MSVC_SIMD_FLAGS "")
   endif()
-  set(CMAKE_C_FLAGS "/O2 /fp:fast ${MSVC_SIMD_FLAGS} ${CMAKE_C_FLAGS}")
+  set(CMAKE_C_FLAGS "/O2 ${MSVC_SIMD_FLAGS} ${CMAKE_C_FLAGS}")
+endif()
+
+if(NOT DISABLE_FAST_MATH)
+  if(NOT MSVC)
+    set(CMAKE_C_FLAGS "-ffast-math ${CMAKE_C_FLAGS}")
+  else()
+    set(CMAKE_C_FLAGS "/fp:fast ${CMAKE_C_FLAGS}")
+  endif()
 endif()
 
 # Set Windows stack size as on Linux: 2MB on 32-bit, 8MB on 64-bit

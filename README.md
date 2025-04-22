@@ -16,7 +16,7 @@ Each lab assignment focuses on a specific performance problem and can take anywh
 
 Performance Ninja is supported on Linux, Windows, and Mac, and is run on all the recent HW including Intel's 12th-gen Alderlake, AMD's Zen3, and Apple's M1 CPUs. You can observe the effect of your optimizations on a variety of modern platforms.
 
-Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://book.easyperf.net/perf_book) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
+Prerequisites: basic C++ skills are an absolute must-have for the course. Denis' [book](https://products.easyperf.net/perf-book-2) "Performance Analysis and Tuning on Modern CPUs" is recommended as an introduction to performance analysis basics. Knowledge of compilers, computer architecture, and the ability to read assembly code is a plus.
 
 Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
 
@@ -34,8 +34,10 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
   * [Dependency Chains 2](labs/core_bound/dep_chains_2)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
   * [Compiler Intrinsics 2](labs/core_bound/compiler_intrinsics_2)
+  * [Compiler Intrinsics 3](labs/core_bound/compiler_intrinsics_3)
+  * [Compiler Intrinsics 4](labs/core_bound/compiler_intrinsics_4)
 * Memory Bound:
-  * [Data Packing](labs/memory_bound/data_packing) (currently broken)
+  * [Data Packing](labs/memory_bound/data_packing)
   * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
   * [Loop Tiling](labs/memory_bound/loop_tiling_1)
@@ -76,6 +78,8 @@ Lab authors:
 * Adam Folwarczny (@adamf88)
 * Jakub Beránek (@Kobzol)
 * Jakub Gałecki (@kubagalecki)
+* Jonathan Hallstrom (@JonathanHallstrom)
+* Oleg Makovski (@0legmak)
 * Denis Bakhvalov (@dendibakh)
 
 ## Contributing
@@ -84,4 +88,4 @@ We warmly welcome contributions! See [Contributing.md](Contributing.md) for the 
 
 Please write to dendibakh@gmail.com with suggestions.
 
-Copyright © 2022 by Denis Bakhvalov under Creative Commons license (CC BY 4.0).
+Copyright © 2025 by Denis Bakhvalov under Creative Commons license (CC BY 4.0).
