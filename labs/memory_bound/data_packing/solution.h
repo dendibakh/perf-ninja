@@ -13,9 +13,9 @@ constexpr int maxRandom = 100;
 struct S {
 
   float d; // 32 bits = 4 bytes ; double d; // 8
+  long long l:15;// only need 16 bits // 64 bits = 8 bytes ?
   int i:8; // only need 8 bits // 4 
   short s:8;// only need 7 bits  // 2
-  long long l:15;// only need 16 bits // 64 bits = 8 bytes ?
   bool b:1; // 8 bits = 1 byte // no dataype can be smaller than 8,but S is our datatype
             // so we can make this smaller
   bool operator<(const S &s) const { return this->i < s.i; }
