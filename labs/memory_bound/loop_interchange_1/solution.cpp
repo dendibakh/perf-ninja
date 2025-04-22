@@ -26,23 +26,10 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  constexpr int stride_i { 8 };
-  constexpr int stride_k { 8 };
-  constexpr int stride_j { 80 };
-
-  for (int block_i = 0; block_i < N; block_i += stride_i) {
-    for (int block_k = 0; block_k < N; block_k += stride_k) {
-      for (int block_j = 0; block_j < N; block_j += stride_j) {
-
-        for (int i = block_i; i < block_i + stride_i; i++) {
-          for (int k = block_k; k < block_k + stride_k; k++) {
-            const float aik{ a[i][k] };
-            for (int j = block_j; j < block_j + stride_j; j++) {
-
-              result[i][j] += aik * b[k][j];
-            }
-          }
-        }
+  for (int i = 0; i < N; i++) {
+    for (int k = 0; k < N; k++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
