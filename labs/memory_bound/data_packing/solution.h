@@ -11,9 +11,9 @@ struct S {
   float d;
   uint16_t l;
 
-  uint_fast8_t i; // using  the fast integer (3.51 ms instead of 6.74 ms with uint8_t)
+  // uint_fast8_t i; // using  the fast integer (3.51 ms instead of 6.74 ms with uint8_t)
   // uint_fast8_t is at least 8 bites but can be larger (maybe unsigned int = 32 bits)
-  // uint8_t i;
+  uint8_t i;
   
   uint8_t s : 7;
   bool b : 1;
