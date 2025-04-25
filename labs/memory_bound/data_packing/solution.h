@@ -6,12 +6,12 @@ constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
-struct __attribute__((packed)) S {
-  long long l;
-  int i;
+struct S {
   float d;
-  short s;
-  bool b;
+  long long l : 15;
+  bool b : 1;
+  int i : 8;
+  short s : 8;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
