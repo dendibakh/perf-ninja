@@ -4,6 +4,9 @@
 
 // Assume this constant never changes
 constexpr int N = 400;
+constexpr int i_stride = 40;
+constexpr int j_stride = 40;
+constexpr int k_stride = 40;
 
 // Square matrix 400 x 400
 using Matrix = std::array<std::array<float, N>, N>;

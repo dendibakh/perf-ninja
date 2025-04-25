@@ -26,12 +26,18 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      for (int k = 0; k < N; k++) {
-        result[i][j] += a[i][k] * b[k][j];
-      }
-    }
+  for (int ii = 0; ii < N; ii += i_stride) { 
+    for (int kk = 0; kk < N; kk += k_stride) {
+       for (int jj = 0; jj < N; jj += j_stride) {
+         for (int i = ii; i < ii + i_stride; i++) {
+           for (int k = kk; k < kk + k_stride; k++) {
+             for (int j = jj; j < jj + j_stride; j++) {
+               result[i][j] += a[i][k] * b[k][j];
+             }
+           }
+         }
+       }
+     }
   }
 }
 
