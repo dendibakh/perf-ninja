@@ -27,11 +27,14 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
   for (int ii = 0; ii < N; ii += i_stride) { 
+    int i_bound = std::min(ii + i_stride, N);
     for (int kk = 0; kk < N; kk += k_stride) {
+      int k_bound = std::min(kk + k_stride, N);
        for (int jj = 0; jj < N; jj += j_stride) {
-         for (int i = ii; i < ii + i_stride; i++) {
-           for (int k = kk; k < kk + k_stride; k++) {
-             for (int j = jj; j < jj + j_stride; j++) {
+         int j_bound = std::min(jj + j_stride, N);
+         for (int i = ii; i < i_bound; i++) {
+           for (int k = kk; k < k_bound; k++) {
+             for (int j = jj; j < j_bound; j++) {
                result[i][j] += a[i][k] * b[k][j];
              }
            }
