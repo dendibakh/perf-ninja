@@ -69,7 +69,8 @@ def buildAndRunBench(iterNumber, variant, cmakeFlags):
     # this will save score in result.json file
     callWrapper("cmake --build . --config Release --target validateLab")
     callWrapper("cmake --build . --config Release --target benchmarkLab")
-  except:
+  except Exception as e:
+    print(e)
     print(bcolors.FAIL + variant + ": iteration " + str(iterNumber) + " - Failed" + bcolors.ENDC)
     return False
   print(bcolors.OKGREEN + variant + ": iteration " + str(iterNumber) + " - Done" + bcolors.ENDC)
