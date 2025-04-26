@@ -9,11 +9,11 @@ constexpr int maxRandom = 100;
 #define SOLUTION
 #ifdef SOLUTION
 struct S {
-  double d;
-  long long l;
-  int i;
-  short s;
-  bool b;
+  float d;
+  long long l : 16;
+  int i : 8;
+  short s : 7;
+  bool b : 1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
