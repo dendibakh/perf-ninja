@@ -1,5 +1,6 @@
 #include "solution.h"
 #include <random>
+#include <iostream>
 
 S create_entry(int first_value, int second_value) {
   S entry;
@@ -14,6 +15,7 @@ S create_entry(int first_value, int second_value) {
 }
 
 void init(std::vector<S> &arr) {
+  std::cout << sizeof(S) << std::endl;
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(minRandom, maxRandom - 1);
 
