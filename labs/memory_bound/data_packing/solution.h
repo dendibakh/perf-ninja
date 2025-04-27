@@ -1,4 +1,5 @@
 #include <vector>
+#include <stdint.h>
 
 // Assume those constants never change
 constexpr int N = 1000000;
