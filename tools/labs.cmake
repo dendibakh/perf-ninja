@@ -22,7 +22,7 @@ endif()
 
 # Set compiler options
 if(NOT MSVC)
-  set(CMAKE_C_FLAGS "-O3 -march=native ${CMAKE_C_FLAGS}")
+  set(CMAKE_C_FLAGS "-g -O3 -march=native ${CMAKE_C_FLAGS}")
 else()
   include("${CMAKE_CURRENT_LIST_DIR}/msvc_simd_isa.cmake")
   if(SUPPORT_MSVC_AVX512)
