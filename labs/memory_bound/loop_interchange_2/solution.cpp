@@ -11,70 +11,73 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
+  int max_accumulator_size = width * std::max(radius, height);
+
+  auto dot = new int[max_accumulator_size]();
+  auto sum = new int[max_accumulator_size]();
+
   // Top part of line, partial kernel
   for (int r = 0; r < std::min(radius, height); r++) {
     // Accumulation
-    auto dot = new int[width]();
-    auto sum = new int[width]();
     auto p = &kernel[radius - r];
     for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
       int weight = *p++;
       for (int c = 0; c < width; c++) {
-        dot[c] += input[y * width + c] * weight;
-        sum[c] += weight;
+        dot[r * width + c] += input[y * width + c] * weight;
+        sum[r * width + c] += weight;
       }
     }
 
     for (int c = 0; c < width; c++) {
       // Normalization
-      int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+      int value = static_cast<int>(dot[r * width + c] / static_cast<float>(sum[r * width + c]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
-    delete[] dot;
-    delete[] sum;
   }
+
+  std::fill(dot, dot + max_accumulator_size, 0);
 
   // Middle part of computations with full kernel
   for (int r = radius; r < height - radius; r++) {
     // Accumulation
-    auto dot = new int[width]();
     for (int i = 0; i < radius + 1 + radius; i++) {
       for (int c = 0; c < width; c++) {
-        dot[c] += input[(r - radius + i) * width + c] * kernel[i];
+        dot[r * width + c] += input[(r - radius + i) * width + c] * kernel[i];
       }
     }
 
     for (int c = 0; c < width; c++) {
       // Fast shift instead of division
-      int value = (dot[c] + rounding) >> shift;
+      int value = (dot[r * width + c] + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
-    delete[] dot;
   }
+
+  std::fill(dot, dot + max_accumulator_size, 0);
+  std::fill(sum, sum + max_accumulator_size, 0);
 
   // Bottom part of line, partial kernel
   for (int r = std::max(radius, height - radius); r < height; r++) {
     // Accumulation
-    auto dot = new int[width]();
-    auto sum = new int[width]();
     auto p = kernel;
     for (int y = r - radius; y < height; y++) {
       int weight = *p++;
       for (int c = 0; c < width; c++) {
-        dot[c] += input[y * width + c] * weight;
-        sum[c] += weight;
+        dot[r * width + c] += input[y * width + c] * weight;
+        sum[r * width + c] += weight;
       }
     }
 
     // Normalization
     for (int c = 0; c < width; c++) {
-      int value = static_cast<int>(dot[c] / static_cast<float>(sum[c]) + 0.5f);
+      int value = static_cast<int>(dot[r * width + c] / static_cast<float>(sum[r * width + c]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
 
-    delete[] dot;
-    delete[] sum;
   }
+
+  delete[] dot;
+  delete[] sum;
 }
 
 // Applies Gaussian blur in independent horizontal lines
