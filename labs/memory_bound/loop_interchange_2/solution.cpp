@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <cstring>
 
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
@@ -11,14 +12,16 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  auto dot = new int[width]();
-  auto sum = new int[width]();
+  int dot[width];
+  int sum[width];
 
   // Top part of line, partial kernel
   for (int r = 0; r < std::min(radius, height); r++) {
+    // Initialization
+    memset(dot, 0, sizeof(dot));
+    memset(sum, 0, sizeof(sum));
+
     // Accumulation
-    std::fill(dot, dot + width, 0);
-    std::fill(sum, sum + width, 0);
     auto p = &kernel[radius - r];
     for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
       int weight = *p++;
@@ -37,8 +40,10 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
 
   // Middle part of computations with full kernel
   for (int r = radius; r < height - radius; r++) {
+    // Initialization
+    memset(dot, 0, sizeof(dot));
+
     // Accumulation
-    std::fill(dot, dot + width, 0);
     for (int i = 0; i < radius + 1 + radius; i++) {
       for (int c = 0; c < width; c++) {
         dot[c] += input[(r - radius + i) * width + c] * kernel[i];
@@ -54,9 +59,11 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
 
   // Bottom part of line, partial kernel
   for (int r = std::max(radius, height - radius); r < height; r++) {
+    // Initialization
+    memset(dot, 0, sizeof(dot));
+    memset(sum, 0, sizeof(sum));
+
     // Accumulation
-    std::fill(dot, dot + width, 0);
-    std::fill(sum, sum + width, 0);
     auto p = kernel;
     for (int y = r - radius; y < height; y++) {
       int weight = *p++;
@@ -72,9 +79,6 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
-
-  delete[] dot;
-  delete[] sum;
 }
 
 // Applies Gaussian blur in independent horizontal lines
