@@ -152,13 +152,24 @@ inline bool setRequiredPrivileges() {
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
+  size_t size_in_bytes = sizeof(double)*size;
+
   // Allocate memory
-  double *alloc = new double[size];
+  void *ptr = mmap(nullptr, size_in_bytes, PROT_READ | PROT_WRITE | PROT_EXEC,
+                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+  if (ptr == MAP_FAILED)
+    throw std::bad_alloc{};
+
+  // Enable transparent huge pages
+  madvise(ptr, size_in_bytes, MADV_HUGEPAGE);
+
   // remember to cast the pointer to double* if your allocator returns void*
+  double *alloc = static_cast<double*>(ptr);
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  auto deleter = [ alloc_size = size_in_bytes ](double *ptr) { munmap(static_cast<void*>(ptr), alloc_size); };
 
   return std::unique_ptr<double[], decltype(deleter)>(alloc,
                                                       std::move(deleter));
