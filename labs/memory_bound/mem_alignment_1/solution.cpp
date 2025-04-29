@@ -9,7 +9,10 @@
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
 int n_columns(int N) {  
-  return N;
+  constexpr int element_size = sizeof(float);
+  constexpr int elements_per_cacheline = (CACHELINE_SIZE / element_size);
+  return (elements_per_cacheline *
+          ((N + elements_per_cacheline - 1) / elements_per_cacheline));
 }
 // ******************************************
 
@@ -54,11 +57,17 @@ void blocked_matmul(float* RESTRICT A,
                     float* RESTRICT B,
                     float* RESTRICT C, int N, int K) {
   constexpr int blockSize = 64;
-  for (int ii = 0; ii < N; ii += blockSize)
-    for (int kk = 0; kk < N; kk += blockSize)
-      for (int jj = 0; jj < N; jj += blockSize)
-        for (int i = ii; i < std::min(ii + blockSize, N); ++i)
-          for (int k = kk; k < std::min(kk + blockSize, N); ++k)
-            for (int j = jj; j < std::min(jj + blockSize, N); ++j)                        
+  for (int ii = 0; ii < N; ii += blockSize) {
+    int i_limit = std::min(ii + blockSize, N);
+    for (int kk = 0; kk < N; kk += blockSize) {
+      int k_limit = std::min(kk + blockSize, N);
+      for (int jj = 0; jj < N; jj += blockSize) {
+        int j_limit = std::min(jj + blockSize, N);
+        for (int i = ii; i < i_limit; ++i)
+          for (int k = kk; k < k_limit; ++k)
+            for (int j = jj; j < j_limit; ++j)                        
               C[i * K + j] += A[i * K + k] * B[k * K + j];
+      }
+    }
+  }
 }
