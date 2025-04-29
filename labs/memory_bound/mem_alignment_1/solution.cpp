@@ -11,8 +11,9 @@
 int n_columns(int N) {  
   constexpr int element_size = sizeof(float);
   constexpr int elements_per_cacheline = (CACHELINE_SIZE / element_size);
-  return (elements_per_cacheline *
-          ((N + elements_per_cacheline - 1) / elements_per_cacheline));
+  int K = (elements_per_cacheline *
+           ((N + elements_per_cacheline - 1) / elements_per_cacheline));
+  return K;
 }
 // ******************************************
 
