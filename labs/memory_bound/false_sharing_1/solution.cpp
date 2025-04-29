@@ -3,6 +3,7 @@
 #include <cstring>
 #include <omp.h>
 #include <vector>
+#include <new>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
