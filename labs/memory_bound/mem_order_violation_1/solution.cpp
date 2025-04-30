@@ -9,13 +9,13 @@
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
-constexpr int unroll_factor = 5;
+constexpr int unroll_factor = 20;
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   int pixels = image.width * image.height;
 
   std::array<std::array<uint32_t, 256>, unroll_factor> hist;
 
-  // Fill the histograms
+  // Initialize the histograms
   for (int j = 0; j < unroll_factor; j++) {
     hist[j].fill(0);
   }
