@@ -9,7 +9,7 @@
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
-constexpr int unroll_factor = 4;
+constexpr int unroll_factor = 5;
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   int pixels = image.width * image.height;
 
