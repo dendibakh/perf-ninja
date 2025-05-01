@@ -9,7 +9,7 @@ static int getSumOfDigits(int n) {
   return sum;
 }
 
-constexpr size_t prefetch_distance = 8;
+constexpr size_t prefetch_distance = 16;
 
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
