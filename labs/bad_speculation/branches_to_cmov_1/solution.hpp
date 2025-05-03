@@ -18,7 +18,17 @@ private:
 public:
 
     void reset(const Grid& grid) {
-        current = future = grid;
+        auto M = grid.size();
+        auto N = grid[0].size();
+        current = grid;
+        for (auto& row : current) {
+          row.insert(row.begin(), 0);
+          row.push_back(0);
+        }
+        current.insert(current.begin(), std::vector<int>(N + 2));
+        current.push_back(std::vector<int>(N + 2));
+
+        future = current;
     }
 
     int getPopulationCount() {
@@ -36,55 +46,16 @@ public:
             std::cout << "\n";
         }
         std::cout << "\n";
-    }    
-
-    void visitNeighboursEdges(int i, int j) {
-      int M = current.size();
-      int N = current[0].size();
-      int aliveNeighbours = 0;
-      for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
-          for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-              if((i + p < 0) ||                   // if row offset less than UPPER boundary
-                 (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                 (j + q < 0) ||                   // if column offset less than LEFT boundary
-                 (j + q > N - 1))                 // if column offset more than RIGHT boundary
-                  continue;
-              aliveNeighbours += current[i + p][j + q];
-          }
-      }
-
-      aliveNeighbours -= current[i][j];
-
-      // Implementing the Rules of Life:
-      future[i][j] =
-        __builtin_unpredictable(aliveNeighbours == 2) ?
-          // 2. Remains the same
-          current[i][j] :
-          __builtin_unpredictable(aliveNeighbours == 3) ?
-            // 3. A new cell is born
-            1 :
-            // 1. Cell is lonely and dies (or)
-            // 4. Cell dies due to over population
-            0;
     }
 
     // Simulate the next generation of life
     void simulateNext() {
         //printCurrentGrid();
-        int M = current.size();
-        int N = current[0].size();
+        int M_prime = current.size();
+        int N_prime = current[0].size();
         
-        for(int i = 0; i < M; i++) {
-          visitNeighboursEdges(i, 0);
-          visitNeighboursEdges(i, N - 1);
-        }
-        for (int j = 1; j < N - 1; j++) {
-          visitNeighboursEdges(0, j);
-          visitNeighboursEdges(M - 1, j);
-        }
-
-        for(int i = 1; i < M - 1; i++) {
-            for(int j = 1; j < N - 1; j++) {
+        for(int i = 1; i < M_prime - 1; i++) {
+            for(int j = 1; j < N_prime - 1; j++) {
                 int aliveNeighbours = 0;
 
                 for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
