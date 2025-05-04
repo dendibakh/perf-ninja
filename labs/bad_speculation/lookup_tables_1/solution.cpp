@@ -2,19 +2,28 @@
 #define SOL
 
 #ifdef SOL
-alignas(64) constexpr int buckets[100] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                          1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-                                          3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
-                                          5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
+#include <array>
+
+constexpr int makeLUT(int i)
+{
+    return (i < 13) ? 0 : (i < 29) ? 1 : (i < 41) ? 2 : (i < 53) ? 3 : (i < 71) ? 4 : (i < 83) ? 5 : (i < 100) ? 6 : -1;
+}
+
+constexpr std::array<int, 100> generateBuckets()
+{
+    std::array<int, 100> b = {};
+    for (int i = 0; i < 100; ++i)
+        b[i] = makeLUT(i);
+    return b;
+}
+
+alignas(64) constexpr std::array<int, 100> buckets = generateBuckets();
 
 static size_t mapToBucket(size_t v)
 {
-
-    if (v < (sizeof(buckets) / sizeof(int)))
-
+    if (v < 100)
         return buckets[v];
-
-    return -1; // let it crash
+    return DEFAULT_BUCKET;
 }
 #else
 static std::size_t mapToBucket(std::size_t v)
