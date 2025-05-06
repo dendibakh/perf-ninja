@@ -2,7 +2,7 @@
 #define SOL
 
 #ifdef SOL
-#include <array>
+// #include <array>
 
 // constexpr int makeLUT(int i)
 // {
@@ -18,8 +18,8 @@
 //     return b;
 // }
 
-alignas(64) constexpr std::array<int, 100> buckets = {
-    // generateBuckets();
+// alignas(64) constexpr std::array<int, 100> buckets = { // generateBuckets();
+int buckets[100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                // 13
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,       // 16
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,                   // 12
