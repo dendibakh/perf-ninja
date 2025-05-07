@@ -8,7 +8,7 @@ int ao_bench()
 
     render(img, WIDTH, HEIGHT, NSUBSAMPLES);
 
-    saveppm("ao.ppm", WIDTH, HEIGHT, img); 
+    saveppm("ao.ppm", WIDTH, HEIGHT, img);
 
     free(img);
 

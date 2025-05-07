@@ -2,23 +2,24 @@
 #include <random>
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
-// this is an implementation of drand48 as defined in 
+// this is an implementation of drand48 as defined in
 // https://man7.org/linux/man-pages/man3/drand48.3.html
 // (linear_congruential_engine)
-double mydrand48() {
-  static std::minstd_rand generator;
-  static std::uniform_real_distribution<double> distribution(0,1);
-  return distribution(generator);
+double mydrand48()
+{
+    static std::minstd_rand generator;
+    static std::uniform_real_distribution<double> distribution(0, 1);
+    return distribution(generator);
 }
 
 void ambient_occlusion(vec *col, const Isect *isect)
 {
-    int    i, j;
-    int    ntheta = NAO_SAMPLES;
-    int    nphi   = NAO_SAMPLES;
+    int i, j;
+    int ntheta = NAO_SAMPLES;
+    int nphi = NAO_SAMPLES;
     double eps = 0.0001;
 
     vec p;
@@ -32,10 +33,12 @@ void ambient_occlusion(vec *col, const Isect *isect)
 
     double occlusion = 0.0;
 
-    for (j = 0; j < ntheta; j++) {
-        for (i = 0; i < nphi; i++) {
+    for (j = 0; j < ntheta; j++)
+    {
+        for (i = 0; i < nphi; i++)
+        {
             double theta = sqrt(mydrand48());
-            double phi   = 2.0 * M_PI * mydrand48();
+            double phi = 2.0 * M_PI * mydrand48();
 
             double x = cos(phi) * theta;
             double y = sin(phi) * theta;
@@ -54,16 +57,16 @@ void ambient_occlusion(vec *col, const Isect *isect)
             ray.dir.z = rz;
 
             Isect occIsect;
-            occIsect.t   = 1.0e+17;
+            occIsect.t = 1.0e+17;
             occIsect.hit = 0;
 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[0]); 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[1]); 
-            ray_sphere_intersect(&occIsect, &ray, &spheres[2]); 
-            ray_plane_intersect (&occIsect, &ray, &plane); 
+            ray_sphere_intersect(&occIsect, &ray, &spheres[0]);
+            ray_sphere_intersect(&occIsect, &ray, &spheres[1]);
+            ray_sphere_intersect(&occIsect, &ray, &spheres[2]);
+            ray_plane_intersect(&occIsect, &ray, &plane);
 
-            if (occIsect.hit) occlusion += 1.0;
-            
+            if (occIsect.hit)
+                occlusion += 1.0;
         }
     }
 

@@ -1,13 +1,13 @@
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <math.h>
 
-#define WIDTH        256
-#define HEIGHT       256
-#define NSUBSAMPLES  2
-#define NAO_SAMPLES  8
+#define WIDTH 256
+#define HEIGHT 256
+#define NSUBSAMPLES 2
+#define NAO_SAMPLES 8
 
 typedef struct _vec
 {
@@ -16,37 +16,36 @@ typedef struct _vec
     double z;
 } vec;
 
-
 typedef struct _Isect
 {
     double t;
-    vec    p;
-    vec    n;
-    int    hit; 
+    vec p;
+    vec n;
+    int hit;
 } Isect;
 
 typedef struct _Sphere
 {
-    vec    center;
+    vec center;
     double radius;
 
 } Sphere;
 
 typedef struct _Plane
 {
-    vec    p;
-    vec    n;
+    vec p;
+    vec n;
 
 } Plane;
 
 typedef struct _Ray
 {
-    vec    org;
-    vec    dir;
+    vec org;
+    vec dir;
 } Ray;
 
 extern Sphere spheres[3];
-extern Plane  plane;
+extern Plane plane;
 
 // ao_helpers.c
 double vdot(vec v0, vec v1);
@@ -72,4 +71,4 @@ void render(unsigned char *img, int w, int h, int nsubsamples);
 void init_scene();
 
 // ao.c
-//int ao_bench();
+// int ao_bench();
