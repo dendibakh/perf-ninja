@@ -20,6 +20,8 @@ uint32_t solution(const std::string &inputContents)
     uint64_t pos{0};
     auto strLength = inputContents.size();
 
+#ifdef __AVX512F__
+
     if (strLength >= 64)
     {                                               // size of YMM
         const __m512i eol = _mm512_set1_epi8('\n'); // fill with \n
@@ -28,7 +30,7 @@ uint32_t solution(const std::string &inputContents)
 
         for (; pos + 64 < strLength; pos += 64)
         {
-            // Load the next 32-byte chucnk of the input string
+            // Load the next 64-byte chucnk of the input string
 
             __m512i vect = _mm512_loadu_si512(buffer);
             //_mm_prefetch(buffer + 64, _MM_HINT_NTA); // doesnt help, compiler is smart
@@ -65,12 +67,65 @@ uint32_t solution(const std::string &inputContents)
                 else
                     mask >>= maskPos;
             }
-            // Advance the pointer to the next 32-byte input chunk
+            // Advance the pointer to the next 64-byte input chunk
             buffer += 64;
         }
         // Calculate the length of the current line
         curLineLength = pos - curLineBegin;
     }
+#else
+    if (strLength >= 64)
+    {                                               // size of YMM
+        const __m256i eol = _mm256_set1_epi8('\n'); // fill with \n
+        auto *buffer = inputContents.data();
+        uint32_t curLineBegin{0};
+
+        for (; pos + 32 < strLength; pos += 32)
+        {
+            // Load the next 32-byte chucnk of the input string
+
+            __m256i vect = _mm256_loadu_si256((const __m256i *)buffer);
+            //_mm_prefetch(buffer + 64, _MM_HINT_NTA); // doesnt help, compiler is smart
+            // compare vect to \n
+            __m256i vectMask = _mm256_cmpeq_epi8(vect, eol);
+            // Convert the vector mask into the 32-bit integer representation.
+            uint32_t mask = _mm256_movemask_epi8(vectMask);
+            while (mask)
+            {
+                // find the position of the trailing '1' bit
+                int maskPos = _tzcnt_u32(mask); // vectors loaded in opposite order
+                // thats why we dont use leading zeros
+
+                // Compute the length of the current string
+                // if we start from 0 the first \n char will be curLine begin
+                // then we need this check
+                uint32_t curLineLength = (pos >= curLineBegin) ? (pos - curLineBegin + maskPos) : maskPos;
+
+                // Set the beginning of the next line char after
+                // the line separator \n
+                curLineBegin += curLineLength + 1;
+
+                // check if it is the longest
+                longestLine = (longestLine > curLineLength) ? longestLine : curLineLength;
+
+                // shift the mask to check if we have more line
+                // separators \n
+                ++maskPos;
+                // note right shift since loaded reversed
+                // shifting 64-bit int by
+                // 64 positions is an UB
+                if (maskPos > 31)
+                    break;
+                else
+                    mask >>= maskPos;
+            }
+            // Advance the pointer to the next 32-byte input chunk
+            buffer += 32;
+        }
+        // Calculate the length of the current line
+        curLineLength = pos - curLineBegin;
+    }
+#endif
     // process remainder
     for (; pos < strLength; pos++)
     {
