@@ -49,18 +49,18 @@ public:
                 // finding the number of neighbours that are alive
                 for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
                     for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-                        const bool is_out = ((i + p < 0) ||                   // if row offset less than UPPER boundary
-                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                           (j + q < 0) ||                   // if column offset less than LEFT boundary
-                           (j + q > N - 1));
-                        aliveNeighbours += !is_out * current[i + p][j + q];
+                        const bool is_in= ((i + p >= 0) &&                   // if row offset less than UPPER boundary
+                           (i + p < M ) &&               // if row offset more than LOWER boundary
+                           (j + q >= 0) &&                    // if column offset less than LEFT boundary
+                           (j + q < N ));
+                        aliveNeighbours += is_in * current[i + p][j + q];
                     }
                 }
                 // The cell needs to be subtracted from
                 // its neighbours as it was counted before
                 aliveNeighbours -= current[i][j];
                 // Implementing the Rules of Life:
-                future[i][j] = (aliveNeighbours == 2)*current[i][j] + (aliveNeighbours == 3)*1;
+                future[i][j] = (aliveNeighbours == 2)*current[i][j] + (aliveNeighbours == 3);
             }
         }
         std::swap(current, future);
