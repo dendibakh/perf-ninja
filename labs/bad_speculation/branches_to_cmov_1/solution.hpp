@@ -5,7 +5,7 @@ constexpr int NumberOfGrids = 16;
 constexpr int GridXDimension = 1024;
 constexpr int GridYDimension = 1024;
 constexpr int NumberOfSims = 10;
-
+#define SOLUTION
 class Life {
 
 public:
@@ -36,7 +36,36 @@ public:
         }
         std::cout << "\n";
     }    
+#ifdef SOLUTION
+    void simulateNext() {
+        //printCurrentGrid();
+        int M = current.size();
+        int N = current[0].size();
 
+        // Loop through every cell
+        for(int i = 0; i < M; i++) {
+            for(int j = 0; j < N; j++) {
+                int aliveNeighbours = 0;
+                // finding the number of neighbours that are alive
+                for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
+                    for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
+                        const bool is_out = ((i + p < 0) ||                   // if row offset less than UPPER boundary
+                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
+                           (j + q < 0) ||                   // if column offset less than LEFT boundary
+                           (j + q > N - 1));
+                        aliveNeighbours += !is_out * current[i + p][j + q];
+                    }
+                }
+                // The cell needs to be subtracted from
+                // its neighbours as it was counted before
+                aliveNeighbours -= current[i][j];
+                // Implementing the Rules of Life:
+                future[i][j] = (aliveNeighbours == 2)*current[i][j] + (aliveNeighbours == 3)*1;
+            }
+        }
+        std::swap(current, future);
+    }
+#else
     // Simulate the next generation of life
     void simulateNext() {
         //printCurrentGrid();
@@ -85,8 +114,9 @@ public:
         }
         std::swap(current, future);
     }
-};
 
+#endif
+};
 // Init random starting grid of the game
 Life::Grid initRandom();
 // Simulates N steps of the game for each starting grid 
