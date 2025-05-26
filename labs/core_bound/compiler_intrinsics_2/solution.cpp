@@ -1,6 +1,6 @@
 #include "solution.hpp"
 #include <iostream>
-
+#include <cstring>
 // Find the longest line in a file.
 // Implementation uses ternary operator with a hope that compiler will
 // turn it into a CMOV instruction.
@@ -12,6 +12,30 @@ if (s == '\n') {
 } else {
   curLineLength++;
 }*/
+
+#define SOLUTION
+
+#ifdef SOLUTION
+unsigned solution(const std::string &inputContents) {
+  const char* data  = inputContents.data();
+  const char* const end = data + inputContents.size();
+  unsigned longest = 0;
+
+  while (data < end) {
+    const void* p = std::memchr(data, '\n', end - data);
+    const char* nl = static_cast<const char*>(p);
+
+    unsigned len = (nl ? nl : end) - data;
+    longest = std::max(len, longest);
+
+    if (!nl) break;
+    data = nl + 1;
+  }
+  return longest;
+}
+
+#else
+
 unsigned solution(const std::string &inputContents) {
   unsigned longestLine = 0;
   unsigned curLineLength = 0;
@@ -23,3 +47,4 @@ unsigned solution(const std::string &inputContents) {
 
   return longestLine;
 }
+#endif
