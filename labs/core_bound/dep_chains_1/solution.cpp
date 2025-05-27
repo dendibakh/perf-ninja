@@ -32,6 +32,7 @@ unsigned solution(List *l1, List *l2) {
     l2 = l2->next;
   }
   len2 = len2/2;
+  unsigned len = len2/2;
   while (len2--) {
     mid_head2 = mid_head2->next;
   }
@@ -40,7 +41,8 @@ unsigned solution(List *l1, List *l2) {
     unsigned v = l1->value;
     l2 = head2;
     ml2 = mid_head2;
-    while (ml2 != nullptr) {
+    unsigned cl = len;
+    while (cl--) {
       unsigned v2 = l2->value;
       unsigned mv2 = ml2->value;
       l2 = l2->next;
