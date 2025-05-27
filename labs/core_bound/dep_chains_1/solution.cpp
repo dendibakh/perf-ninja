@@ -21,39 +21,75 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 
-unsigned solution(List *l1, List *l2) {
-  List *head2 = l2;
-  List *mid_head2 = l2;
-  unsigned retVal = 0;
-  int len2 = 0;
-
-  while (l2) {
-    len2++;
-    l2 = l2->next;
-  }
-  len2 = len2/2;
-  unsigned len = len2/2;
-  while (len2--) {
-    mid_head2 = mid_head2->next;
-  }
-  List *ml2 = mid_head2;
-  while (l1) {
-    unsigned v = l1->value;
-    l2 = head2;
-    ml2 = mid_head2;
-    unsigned cl = len;
-    while (cl--) {
-      unsigned v2 = l2->value;
-      unsigned mv2 = ml2->value;
-      l2 = l2->next;
-      ml2 = ml2->next;
-      if (v2 == v || mv2 == v) {
-        retVal += getSumOfDigits(v);
-        break;
-      }
+unsigned solution4blocks(List* l1, List* l2) {
+    // 1) count total length of l2
+    std::size_t total = 0;
+    for (List* p = l2; p; p = p->next) {
+        ++total;
     }
-    l1 = l1->next;
-  }
+    if (total == 0) return 0;
 
-  return retVal;
+    // 2) compute base size and remainder
+    std::size_t q = total / 4;
+    std::size_t r = total % 4;
+    std::size_t len0 = q + (r > 3 ? 1 : 0);
+    std::size_t len1 = q + (r > 2 ? 1 : 0);
+    std::size_t len2 = q + (r > 1 ? 1 : 0);
+    std::size_t len3 = q + (r > 0 ? 1 : 0);
+
+    // 3) find the head pointer of each of the 4 blocks
+    List* h0 = l2;
+    List* p  = l2;
+    for (std::size_t i = 0; i < len0 && p; ++i) p = p->next;
+    List* h1 = p;
+    for (std::size_t i = 0; i < len1 && p; ++i) p = p->next;
+    List* h2 = p;
+    for (std::size_t i = 0; i < len2 && p; ++i) p = p->next;
+    List* h3 = p;
+
+    unsigned retVal = 0;
+    for (List* p1 = l1; p1; p1 = p1->next) {
+        unsigned v = p1->value;
+
+        List *c0 = h0, *c1 = h1, *c2 = h2, *c3 = h3;
+
+        for (std::size_t i = 0; i < len0; ++i) {
+            if (i >= len3) {
+                break;
+            }
+            unsigned v0 = c0->value;
+            unsigned v1 = c1->value;
+            unsigned v2 = c2->value;
+            unsigned v3 = c3->value;
+            if (v0 == v) {
+                retVal += getSumOfDigits(v);
+                break;
+            }
+
+            if (v1 == v) {
+                retVal += getSumOfDigits(v);
+                break;
+            }
+
+            if (v2 == v) {
+                retVal += getSumOfDigits(v);
+                break;
+            }
+
+            if (v3 == v) {
+                retVal += getSumOfDigits(v);
+                break;
+            }
+            c0 = c0->next;
+            c1 = c1->next;
+            c2 = c2->next;
+            c3 = c3->next;
+        }
+    }
+
+    return retVal;
+}
+
+unsigned solution(List *l1, List *l2) {
+  return solution4blocks(l1, l2);
 }
