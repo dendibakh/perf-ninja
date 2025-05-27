@@ -20,20 +20,35 @@ unsigned getSumOfDigits(unsigned n) {
 // Hint: Traversing a linked list is a long data dependency chain:
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
-unsigned solution(List *l1, List *l2) {
-  unsigned retVal = 0;
 
+unsigned solution(List *l1, List *l2) {
   List *head2 = l2;
-  // O(N^2) algorithm:
+  List *mid_head2 = l2;
+  unsigned retVal = 0;
+  int len2 = 0;
+
+  while (l2) {
+    len2++;
+    l2 = l2->next;
+  }
+  len2 = len2/2;
+  while (len2--) {
+    mid_head2 = mid_head2->next;
+  }
+  List *ml2 = mid_head2;
   while (l1) {
     unsigned v = l1->value;
     l2 = head2;
-    while (l2) {
-      if (l2->value == v) {
+    ml2 = mid_head2;
+    while (ml2 != nullptr) {
+      unsigned v2 = l2->value;
+      unsigned mv2 = ml2->value;
+      l2 = l2->next;
+      ml2 = ml2->next;
+      if (v2 == v || mv2 == v) {
         retVal += getSumOfDigits(v);
         break;
       }
-      l2 = l2->next;
     }
     l1 = l1->next;
   }
