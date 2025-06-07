@@ -23,8 +23,7 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   // 2. main loop.
   limit = size - radius;
   for (; pos < limit; ++pos) {
-    currentSum -= input[pos - radius - 1];
-    currentSum += input[pos + radius];
+    currentSum += input[pos + radius] - input[pos - radius - 1];
     output[pos] = currentSum;
   }
 
