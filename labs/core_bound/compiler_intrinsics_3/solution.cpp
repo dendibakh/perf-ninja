@@ -12,8 +12,12 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   __m256i acc1 = _mm256_setzero_si256();
   __m256i acc2 = _mm256_setzero_si256();
   __m256i acc3 = _mm256_setzero_si256();
+  __m256i acc4 = _mm256_setzero_si256();
+  __m256i acc5 = _mm256_setzero_si256();
+  __m256i acc6 = _mm256_setzero_si256();
+  __m256i acc7 = _mm256_setzero_si256();
 
-  constexpr std::size_t step = 4;
+  constexpr std::size_t step = 8;
   const std::size_t size = input.size();
   std::size_t i = 0;
   const Position<std::uint32_t> *const data = input.data();
@@ -55,11 +59,46 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
       const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
       acc3 = _mm256_add_epi64(acc3, data64);
     }
+
+    {
+      const Position<std::uint32_t> *const dataToLoad = data + i + 4;
+      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad->x), static_cast<std::int64_t>(dataToLoad->y), static_cast<std::int64_t>(dataToLoad->z), 0};
+      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      acc4 = _mm256_add_epi64(acc4, data64);
+    }
+
+    {
+      const Position<std::uint32_t> *const dataToLoad = data + i + 5;
+      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad->x), static_cast<std::int64_t>(dataToLoad->y), static_cast<std::int64_t>(dataToLoad->z), 0};
+      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      acc5 = _mm256_add_epi64(acc5, data64);
+    }
+
+    {
+      const Position<std::uint32_t> *const dataToLoad = data + i + 6;
+      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad->x), static_cast<std::int64_t>(dataToLoad->y), static_cast<std::int64_t>(dataToLoad->z), 0};
+      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      acc6 = _mm256_add_epi64(acc6, data64);
+    }
+
+    {
+      const Position<std::uint32_t> *const dataToLoad = data + i + 7;
+      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad->x), static_cast<std::int64_t>(dataToLoad->y), static_cast<std::int64_t>(dataToLoad->z), 0};
+      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      acc7 = _mm256_add_epi64(acc7, data64);
+    }
   }
 
   acc0 = _mm256_add_epi64(acc0, acc1);
   acc2 = _mm256_add_epi64(acc2, acc3);
+  acc4 = _mm256_add_epi64(acc4, acc5);
+  acc6 = _mm256_add_epi64(acc6, acc7);
+
   acc0 = _mm256_add_epi64(acc0, acc2);
+  acc4 = _mm256_add_epi64(acc4, acc6);
+
+  acc0 = _mm256_add_epi64(acc0, acc4);
+
 
   const std::size_t divisor = std::max<std::uint64_t>(1, input.size());
   std::int64_t data64[4];
