@@ -15,8 +15,8 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
   constexpr std::size_t step = 4;
   const std::size_t size = input.size();
   std::size_t i = 0;
-  static_assert(sizeof(Position<std::uint32_t>) == 3 *sizeof(std::uint32_t));
-  const std::uint32_t *const data = reinterpret_cast<const std::uint32_t*>(input.data());
+  static_assert(sizeof(Position<std::uint32_t>) == 3 * sizeof(std::uint32_t));
+  const std::uint32_t *const data = reinterpret_cast<const std::uint32_t *>(input.data());
 
   for (; i < size % step; ++i)
   {
@@ -32,25 +32,24 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     {
       const std::uint32_t *const dataToLoad = data + i * 3 + 0 * 4;
       // X Y Z X
-      // Test _mm256_cvtepu32_epi64 
-      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad[0]), static_cast<std::int64_t>(dataToLoad[1]), static_cast<std::int64_t>(dataToLoad[2]), static_cast<std::int64_t>(dataToLoad[3])};
-      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      const __m128i data32 = _mm_loadu_si128((__m128i *)dataToLoad);
+      const __m256i data64 = _mm256_cvtepu32_epi64(data32);
       acc_xyzx = _mm256_add_epi64(acc_xyzx, data64);
     }
 
     {
       const std::uint32_t *const dataToLoad = data + i * 3 + 1 * 4;
       // Y Z X Y
-      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad[0]), static_cast<std::int64_t>(dataToLoad[1]), static_cast<std::int64_t>(dataToLoad[2]), static_cast<std::int64_t>(dataToLoad[3])};
-      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      const __m128i data32 = _mm_loadu_si128((__m128i *)dataToLoad);
+      const __m256i data64 = _mm256_cvtepu32_epi64(data32);
       acc_yzxy = _mm256_add_epi64(acc_yzxy, data64);
     }
 
     {
       const std::uint32_t *const dataToLoad = data + i * 3 + 2 * 4;
       // Z X Y Z
-      const std::int64_t data64Mem[4] = {static_cast<std::int64_t>(dataToLoad[0]), static_cast<std::int64_t>(dataToLoad[1]), static_cast<std::int64_t>(dataToLoad[2]), static_cast<std::int64_t>(dataToLoad[3])};
-      const __m256i data64 = _mm256_loadu_si256((__m256i *)data64Mem);
+      const __m128i data32 = _mm_loadu_si128((__m128i *)dataToLoad);
+      const __m256i data64 = _mm256_cvtepu32_epi64(data32);
       acc_zxyz = _mm256_add_epi64(acc_zxyz, data64);
     }
   }
@@ -66,9 +65,6 @@ Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &inp
     acc_mem[1] += acc_mem[i * 3 + 1];
     acc_mem[2] += acc_mem[i * 3 + 2];
   }
-  
-
-
 
   const std::size_t divisor = std::max<std::uint64_t>(1, input.size());
 
