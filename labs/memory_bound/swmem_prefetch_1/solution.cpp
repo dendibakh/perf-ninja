@@ -9,14 +9,21 @@ static int getSumOfDigits(int n) {
   return sum;
 }
 
+const int lookahead = 64;
+
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
-  for (int idx = 0; idx < lookups.size(); idx++) {
+  for (int idx = 0; idx < lookups.size() - lookahead; idx++) {
     if (hash_map->find(lookups[idx]))
       result += getSumOfDigits(lookups[idx]);
 
-    __builtin_prefetch(&hash_map->m_vector[lookups[idx + 1]]);
+    hash_map->mem_prefetch(lookups[idx + lookahead]);
+  }
+
+  for(int idx = lookups.size() - lookahead; idx < lookups.size(); idx++) {
+    if (hash_map->find(lookups[idx]))
+      result += getSumOfDigits(lookups[idx]);
   }
 
   return result;
