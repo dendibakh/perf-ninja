@@ -31,6 +31,7 @@ static bool equals(const std::vector<Particle> &p1, const std::vector<Particle> 
 // that uses a global state and thus always generates the same sequence of numbers
 struct rngForValidation {
   rngForValidation (uint32_t seed) {(void)seed;}
+  rngForValidation() = default;
 public:
   static uint32_t val;
   uint32_t gen() {
