@@ -1,7 +1,7 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
-
+ 
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
   while (n != 0) {
