@@ -1,7 +1,7 @@
 #include "solution.hpp"
 #include <array>
 #include <iostream>
- 
+
 unsigned getSumOfDigits(unsigned n) {
   unsigned sum = 0;
   while (n != 0) {
@@ -11,6 +11,13 @@ unsigned getSumOfDigits(unsigned n) {
   return sum;
 }
 
+inline void update(unsigned& v, unsigned& sum, const List* l)
+{
+  if (l->value == v) {
+    sum += getSumOfDigits(v);
+    v = 0;
+  }
+}
 // Task: lookup all the values from l2 in l1.
 // For every found value, find the sum of its digits.
 // Return the sum of all digits in every found number.
@@ -27,30 +34,31 @@ unsigned solution(List *l1, List *l2) {
   // O(N^2) algorithm:
   while (l1) {
     unsigned v = l1->value;
-    bool v_found = false;
-    bool v2_found = true;
     
     unsigned v2 = 0;
+    unsigned v3 = 0;
+
     l1 = l1->next;
     if (l1)
     {
       v2 = l1->value;
-      v2_found = false;
 
       l1 = l1->next;
+      
+      if (l1)
+      {
+        v3 = l1->value;
+
+        l1 = l1->next;
+      }
     }
     
 
     l2 = head2;
     while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        v = 0;
-      }
-      if (l2->value == v2) {
-        retVal += getSumOfDigits(v2);
-        v2 = 0;
-      }
+      update(v, retVal, l2);
+      update(v2, retVal, l2);
+      update(v3, retVal, l2);
       l2 = l2->next;
     }
   }
