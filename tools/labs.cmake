@@ -138,6 +138,19 @@ if(NOT MSVC)
     target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
   endif()
 
+if (MSVC)
+  set(PGO_PGD_FILE "${CMAKE_SOURCE_DIR}/lab.pgd")
+
+  if (EXISTS "${PGO_PGD_FILE}")
+    message(STATUS "Using profile data from ${PGO_PGD_FILE}")
+    target_compile_options(lab PRIVATE /USEPROFILE /PGD:"${PGO_PGD_FILE}")
+    target_link_options(lab PRIVATE /USEPROFILE /PGD:"${PGO_PGD_FILE}" /INCREMENTAL:NO)
+  else()
+    message(WARNING "PGD file not found at ${PGO_PGD_FILE}, skipping /USEPROFILE")
+  endif()
+endif()
+
+
   # MinGW
   if(MINGW)
     target_link_libraries(lab shlwapi)
