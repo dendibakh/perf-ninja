@@ -9,7 +9,7 @@ constexpr int maxRandom = 100;
 struct S {
   unsigned long long l : 14;
   unsigned i : 7;
-  short s : 7;
+  unsigned s : 7;
   float d;
   bool b;
 
