@@ -7,11 +7,11 @@ constexpr int maxRandom = 100;
 
 //#pragma pack(push, 4)
 struct S {
-  int i       :8;
-  short s     :8;
-  long long l :16;
   float d;
-  bool b; 
+  unsigned long long l :16;
+  unsigned int i       :8;
+  unsigned short s     :7;
+  bool b               :1; 
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
