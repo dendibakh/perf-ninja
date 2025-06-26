@@ -6,11 +6,12 @@ constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
 struct S {
-  long long l;
+  int i       :8;
+  short s     :8;
+  long long l :16;
+  bool b; 
   double d;
-  int i;
-  short s;
-  bool b;
+
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
