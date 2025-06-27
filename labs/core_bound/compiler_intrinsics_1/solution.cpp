@@ -1,6 +1,7 @@
 
 #include "solution.h"
 #include <memory>
+#include <immintrin.h>
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -22,9 +23,39 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
+
+  for (; pos + 7 < limit; pos += 8) {
+      uint16_t add[8]{};
+
+      // This loop calculates the diff for all 8 respective values
+      // However currentSum after 2 iterations = currentSum add[0]
+      // + add[1]
+      for (int i = 0; i < 8; ++i)
+        add[i] = input[i + pos + radius] - input[i + pos - radius - 1];
+
+      // Update add so that add[n] contians the sum of all elements between 0..n
+      __m128i addreg = _mm_loadu_si128((__m128i*) add);
+      addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 2));
+      addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 4));
+      addreg = _mm_add_epi16(addreg, _mm_slli_si128(addreg, 8));
+      _mm_storeu_si128((__m128i*) add, addreg);
+
+      // Vals holds the diffs applied to currentSum
+      uint16_t vals[8];
+      for (int i = 0; i < 8; ++i) {
+        vals[i] = currentSum + add[i];
+      }
+
+      // Apply the diffs at their respective locations in output
+      for (int i = 0; i < 8; ++i)
+        output[pos + i] = vals[i];
+
+      // Update currentSum
+      currentSum += add[7];
+  }
+
   for (; pos < limit; ++pos) {
-    currentSum -= input[pos - radius - 1];
-    currentSum += input[pos + radius];
+    currentSum += input[pos + radius] - input[pos - radius - 1];
     output[pos] = currentSum;
   }
 
