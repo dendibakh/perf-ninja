@@ -20,7 +20,7 @@ static void bench1(benchmark::State &state) {
 }
 
 // Register the function as a benchmark
-BENCHMARK(bench1)->Iterations(1000)->Unit(benchmark::kNanosecond);
+BENCHMARK(bench1);
 
 // Run the benchmark
 BENCHMARK_MAIN();
