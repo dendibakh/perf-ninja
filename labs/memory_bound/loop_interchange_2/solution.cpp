@@ -2,7 +2,8 @@
 #include "solution.h"
 #include <algorithm>
 #include <fstream>
-#include <vector>
+#include <cstdint>
+#include <cstring>
 #include <ios>
 
 // Applies Gaussian blur in independent vertical lines
@@ -69,8 +70,10 @@ static void filterVertically1(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
   
-  std::vector<std::vector<uint16_t>> dots(height, std::vector<uint16_t>(width, 0));
-  std::vector<int> sums(radius+1, 0);
+  uint16_t* dots = new uint16_t[height * width];
+  std::memset(dots, 0, height * width * sizeof(uint16_t));
+  int* sums = new int[radius + 1];
+  std::memset(sums, 0, (radius + 1) * sizeof(int));
 
   //Calculate sums
   for(int k = 0; k < radius + 1 + radius; k++){
@@ -96,7 +99,7 @@ static void filterVertically1(uint8_t *output, const uint8_t *input,
 
     for(; i < limit; i++){
         for(int c = 0; c < width; c++) {
-            dots[r - radius + i][c] += input[r*width + c] * kernel[i];
+            dots[(r - radius + i)*width + c] += input[r*width + c] * kernel[i];
         }
     }
   }
@@ -104,24 +107,27 @@ static void filterVertically1(uint8_t *output, const uint8_t *input,
   // Calculate output for top part of the line
   for(int r = 0; r < radius; r++) {
     for (int c = 0; c < width; c++) {
-      int value = static_cast<int>(dots[r][c] / static_cast<float>(sums[r]) + 0.5f);
+      int value = static_cast<int>(dots[r*width + c] / static_cast<float>(sums[r]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
   // Calculate output for middle part of the line
   for(int r = radius; r < height - radius; r++) {
     for(int c = 0; c < width; c++) {
-      int value = (dots[r][c] + rounding) >> shift;
+      int value = (dots[r*width+c] + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
   // Calculate output for bottom part of the line
   for(int r = height - radius; r < height; r++) {
     for (int c = 0; c< width; c++) {
-      int value = static_cast<int>(dots[r][c] / static_cast<float>(sums[height - r - 1]) + 0.5f);
+      int value = static_cast<int>(dots[r * width + c] / static_cast<float>(sums[height - r - 1]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
+
+  delete[] dots;
+  delete[] sums;
 }
 
 // Applies Gaussian blur in independent horizontal lines
