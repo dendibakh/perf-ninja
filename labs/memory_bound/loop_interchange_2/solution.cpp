@@ -2,6 +2,7 @@
 #include "solution.h"
 #include <algorithm>
 #include <fstream>
+#include <vector>
 #include <ios>
 
 // Applies Gaussian blur in independent vertical lines
@@ -56,6 +57,68 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
 
       // Normalization
       int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+}
+
+// Applies Gaussian blur in independent vertical lines
+static void filterVertically1(uint8_t *output, const uint8_t *input,
+                             const int width, const int height,
+                             const int *kernel, const int radius,
+                             const int shift) {
+  const int rounding = 1 << (shift - 1);
+  
+  std::vector<std::vector<uint32_t>> dots(height, std::vector<uint32_t>(width, 0));
+  std::vector<int> sums(radius+1, 0);
+
+  //Calculate sums
+  for(int k = 0; k < radius + 1 + radius; k++){
+    if(k <= radius) {
+        sums[0] += kernel[k];
+    }
+    else {
+        sums[k-radius] = sums[k-radius-1] + kernel[k];
+    }
+  }
+
+  // Calculate dot products
+  for (int r = 0; r < height; r++) {
+    int i = 0;
+    if(r < radius) [[unlikely]] {
+        i = radius - r;
+    }
+
+    int limit = radius + 1 + radius;
+    if(r + radius >= height) [[unlikely]]{
+        limit = radius + 1 + (height - r -1);
+    }
+
+    for(; i < limit; i++){
+        for(int c = 0; c < width; c++) {
+            dots[r - radius + i][c] += input[r*width + c] * kernel[i];
+        }
+    }
+  }
+  
+  // Calculate output for top part of the line
+  for(int r = 0; r < radius; r++) {
+    for (int c = 0; c< width; c++) {
+      int value = static_cast<int>(dots[r][c] / static_cast<float>(sums[r]) + 0.5f);
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+  // Calculate output for middle part of the line
+  for(int r = radius; r < height - radius; r++) {
+    for(int c = 0; c < width; c++) {
+      int value = (dots[r][c] + rounding) >> shift;
+      output[r * width + c] = static_cast<uint8_t>(value);
+    }
+  }
+  // Calculate output for bottom part of the line
+  for(int r = height - radius; r < height; r++) {
+    for (int c = 0; c< width; c++) {
+      int value = static_cast<int>(dots[r][c] / static_cast<float>(sums[height - r - 1]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
   }
@@ -129,7 +192,7 @@ void blur(uint8_t *output, const uint8_t *input, const int width,
   constexpr int shift = 4;
 
   // A pair of 1-dimensional passes to achieve 2-dimensional transform
-  filterVertically(temp, input, width, height, kernel, radius, shift);
+  filterVertically1(temp, input, width, height, kernel, radius, shift);
   filterHorizontally(output, temp, width, height, kernel, radius, shift);
 }
 
