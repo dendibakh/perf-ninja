@@ -69,7 +69,7 @@ static void filterVertically1(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
   
-  std::vector<std::vector<uint32_t>> dots(height, std::vector<uint32_t>(width, 0));
+  std::vector<std::vector<uint16_t>> dots(height, std::vector<uint16_t>(width, 0));
   std::vector<int> sums(radius+1, 0);
 
   //Calculate sums
@@ -103,7 +103,7 @@ static void filterVertically1(uint8_t *output, const uint8_t *input,
   
   // Calculate output for top part of the line
   for(int r = 0; r < radius; r++) {
-    for (int c = 0; c< width; c++) {
+    for (int c = 0; c < width; c++) {
       int value = static_cast<int>(dots[r][c] / static_cast<float>(sums[r]) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
