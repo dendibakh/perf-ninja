@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #ifdef _WIN32
-    const int TILE_SIZE = 4;
+    const int TILE_SIZE = 12;
 #else
     const int TILE_SIZE = 8;
 #endif
