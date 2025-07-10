@@ -1,7 +1,11 @@
 #include "solution.hpp"
 #include <algorithm>
 
-const int TILE_SIZE = 8;
+#ifdef _WIN32
+    const int TILE_SIZE = 4;
+#else
+    const int TILE_SIZE = 8;
+#endif
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
   int n = size / TILE_SIZE;
