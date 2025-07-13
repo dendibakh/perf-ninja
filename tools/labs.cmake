@@ -1,5 +1,7 @@
 # https://cmake.org/documentation/
 
+message("cmake 2 ${CMAKE_CURRENT_LIST_FILE} >>>")
+message("cmake 2.0 CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
 # Check usage of 'build' subdirectory
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message("CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
@@ -23,6 +25,7 @@ endif()
 # Set compiler options
 if(NOT MSVC)
   set(CMAKE_C_FLAGS "-O3 -march=native ${CMAKE_C_FLAGS}")
+  message("cmake 2.1 CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
 else()
   include("${CMAKE_CURRENT_LIST_DIR}/msvc_simd_isa.cmake")
   if(SUPPORT_MSVC_AVX512)
@@ -40,6 +43,7 @@ endif()
 if(NOT DISABLE_FAST_MATH)
   if(NOT MSVC)
     set(CMAKE_C_FLAGS "-ffast-math ${CMAKE_C_FLAGS}")
+    message("cmake 2.1 CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
   else()
     set(CMAKE_C_FLAGS "/fp:fast ${CMAKE_C_FLAGS}")
   endif()
@@ -57,9 +61,12 @@ if (WIN32)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
+message("cmake 2.1 CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
+message("cmake 2.2 CMAKE_CURRENT_LIST_DIR=${CMAKE_CURRENT_LIST_DIR}")
 # https://github.com/google/benchmark
 find_package(benchmark PATHS "${CMAKE_CURRENT_LIST_DIR}/benchmark/build" REQUIRED)
+# "${CMAKE_CURRENT_LIST_DIR}/benchmark/build"没有，则会去系统默认路径下找"/usr/local"
 set(BENCHMARK_LIBRARY "benchmark::benchmark")
 
 # Find source files
@@ -67,10 +74,12 @@ file(GLOB srcs *.c *.h *.cpp *.hpp *.cxx *.hxx *.inl)
 list(FILTER srcs EXCLUDE REGEX ".*bench.cpp$")
 list(FILTER srcs EXCLUDE REGEX ".*validate.cpp$")
 
+message("cmake 2.3 srcs=${srcs} EXT_LAB_srcs=${EXT_LAB_srcs} EXT_VALIDATE_srcs=${EXT_VALIDATE_srcs}")
 # Add main targets
 add_executable(lab bench.cpp ${srcs} ${EXT_LAB_srcs})
 add_executable(validate validate.cpp ${srcs} ${EXT_VALIDATE_srcs})
 
+message("cmake 2.4 BENCHMARK_FOLDER=${BENCHMARK_FOLDER}")
 # Add path to a local benchmark library
 if(EXISTS "${BENCHMARK_FOLDER}/include")
   target_include_directories(lab BEFORE PRIVATE "${BENCHMARK_FOLDER}/include")
@@ -94,6 +103,7 @@ endif()
 
 if("${BENCHMARK_MIN_TIME}" STREQUAL "")
   set(BENCHMARK_MIN_TIME "2s")
+  message("cmake 2.5 BENCHMARK_MIN_TIME=${BENCHMARK_MIN_TIME}")
 endif()
 set(LAB_BENCHMARK_ARGS --benchmark_min_time=${BENCHMARK_MIN_TIME} --benchmark_out_format=json --benchmark_out=result.json)
 
@@ -118,6 +128,8 @@ if(CI)
       VERBATIM)
   endif()
 else()
+  message("cmake 2.6 VALIDATE_ARGS=${VALIDATE_ARGS}")
+  message("cmake 2.6 LAB_ARGS=${LAB_ARGS} LAB_BENCHMARK_ARGS=${LAB_BENCHMARK_ARGS}")
   # Add robust execution targets
   add_custom_target(validateLab
     COMMAND validate ${VALIDATE_ARGS}
@@ -134,6 +146,7 @@ if(NOT MSVC)
     target_link_libraries(lab ${BENCHMARK_LIBRARY} shlwapi)
     target_link_libraries(validate ${BENCHMARK_LIBRARY} shlwapi)
   else()
+    message("cmake 2.7 BENCHMARK_LIBRARY=${BENCHMARK_LIBRARY}")
     target_link_libraries(lab ${BENCHMARK_LIBRARY} pthread m)
     target_link_libraries(validate ${BENCHMARK_LIBRARY} pthread m)
   endif()
@@ -162,3 +175,4 @@ else()
   set_target_properties(validateLab PROPERTIES FOLDER CI)
   set_target_properties(benchmarkLab PROPERTIES FOLDER CI)
 endif()
+message("cmake 2 ${CMAKE_CURRENT_LIST_FILE} <<<")

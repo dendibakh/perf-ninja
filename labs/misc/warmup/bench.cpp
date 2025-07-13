@@ -20,6 +20,7 @@ static void bench1(benchmark::State &state) {
 }
 
 // Register the function as a benchmark
+// BENCHMARK(bench1)->Iterations(10000000);
 BENCHMARK(bench1);
 
 // Run the benchmark
