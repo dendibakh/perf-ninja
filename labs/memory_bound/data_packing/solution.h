@@ -12,7 +12,7 @@ struct S {
   // short s;
   // double d;
   // bool b;
-  double d;
+  float d;
   unsigned long long l: 14;
   unsigned int i: 7;
   unsigned short s: 7;
