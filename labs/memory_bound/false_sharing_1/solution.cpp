@@ -5,11 +5,12 @@
 #include <vector>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
+  constexpr size_t hardware_destructive_interference_size = 128; /*std::hardware_destructive_interference_size*/
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
   struct Accumulator {
-    std::atomic<uint32_t> value = 0;
+    alignas(hardware_destructive_interference_size) std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
 
