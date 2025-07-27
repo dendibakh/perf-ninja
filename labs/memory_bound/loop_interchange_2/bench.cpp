@@ -36,7 +36,8 @@ BENCHMARK(bench1);
 
 // Run the benchmark
 int main(int argc, char **argv) {
-  benchmark::MaybeReenterWithoutASLR(argc, argv);
+  // Below line is required to mitigate noise on my hetzner test machine. Commented out because it breaks CI.
+  // benchmark::MaybeReenterWithoutASLR(argc, argv);
   constexpr int mandatoryArgumentsCount = 2;
   if (argc < 1 + mandatoryArgumentsCount) {
     std::cerr << "Usage: input.pgm output.pgm [--name=value...]" << std::endl;
