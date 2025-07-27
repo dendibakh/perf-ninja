@@ -2,7 +2,7 @@ These commands must be executed for any given lab to build it
 ```
 cmake -E make_directory build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_C_FLAGS="-g -fno-omit-frame-pointer" -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer" ..
 cmake --build . --config Release --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
@@ -10,7 +10,7 @@ cmake --build . --target benchmarkLab
 
 You can also configure and build a debug version like so:
 ```
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .. -DCMAKE_C_FLAGS="-g --fno-omit-frame-pointer" -DCMAKE_CXX_FLAGS="-g --fno-omit-frame-pointer"
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .. -DCMAKE_C_FLAGS="-g -fno-omit-frame-pointer" -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer"
 cmake --build . --config Debug --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
