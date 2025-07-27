@@ -12,10 +12,10 @@ struct S {
   // short s;
   // double d;
   // bool b;
-  unsigned int i: 7;
-  unsigned long long l: 14;
-  unsigned short s: 7;
   double d;
+  unsigned long long l: 14;
+  unsigned int i: 7;
+  unsigned short s: 7;
   bool b: 1;
 
   bool operator<(const S &s) const { return this->i < s.i; }
