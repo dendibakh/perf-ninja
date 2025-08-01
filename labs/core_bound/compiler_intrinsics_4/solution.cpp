@@ -93,12 +93,28 @@ std::vector<short> mandelbrot(int image_width, int image_height)
       __m256d z_x_wide = _mm256_setzero_pd();
       __m256d z_y_wide = _mm256_setzero_pd();
 
-      for (auto iter_cnt = 0; iter_cnt < kMaxIterations; ++iter_cnt)
+      int prev_mask = 0xF;
+
+      auto iter_cnt = 0;
+      for (; iter_cnt < kMaxIterations; ++iter_cnt)
       {
         const __m256d z_xx_wide = _mm256_mul_pd(z_x_wide, z_x_wide);
         const __m256d z_yy_wide = _mm256_mul_pd(z_y_wide, z_y_wide);
         const __m256d lte_mask_wide = _mm256_cmp_pd(_mm256_add_pd(z_xx_wide, z_yy_wide), kSquareBound_wide, _CMP_LE_OQ);
         const int lte_mask = _mm256_movemask_pd(lte_mask_wide);
+
+        const int mask_change = lte_mask ^ prev_mask;
+        if (mask_change != 0)
+        {
+          for (auto i = 0; i < step; i++)
+          {
+            if ((mask_change >> i) & 1)
+            {
+              result[result_idx + i] = iter_cnt;
+            }
+          }
+        }
+        prev_mask = lte_mask;
 
         // No one passed
         if (lte_mask == 0)
@@ -106,18 +122,20 @@ std::vector<short> mandelbrot(int image_width, int image_height)
           break;
         }
 
-        for (auto i = 0; i < step; i++)
-        {
-          if ((lte_mask >> i) & 1)
-          {
-            result[result_idx + i] = iter_cnt + 1;
-          }
-        }
-
         const __m256d z_xy_wide = _mm256_mul_pd(z_x_wide, z_y_wide);
         z_x_wide = _mm256_add_pd(_mm256_sub_pd(z_xx_wide, z_yy_wide), c_x_wide);
         z_y_wide = _mm256_add_pd(_mm256_add_pd(z_xy_wide, z_xy_wide), c_y_wide);
       }
+
+      // Survivors
+      for (auto i = 0; i < step; i++)
+      {
+        if ((prev_mask >> i) & 1)
+        {
+          result[result_idx + i] = iter_cnt;
+        }
+      }
+
       result_idx += step;
     }
   }
