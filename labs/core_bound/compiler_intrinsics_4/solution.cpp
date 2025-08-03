@@ -28,7 +28,7 @@ inline __m256d lerp(const __m256d a, const __m256d b, const __m256d t)
 
 std::vector<short> mandelbrot(int image_width, int image_height)
 {
-  constexpr auto kUnrollSize = 2;
+  constexpr auto kUnrollSize = 4;
   constexpr auto kVecSize = 4;
 
   const auto data_width = image_width + 2;
