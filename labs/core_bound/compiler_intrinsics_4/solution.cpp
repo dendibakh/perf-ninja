@@ -28,12 +28,12 @@ inline __m256d lerp(const __m256d a, const __m256d b, const __m256d t)
 
 std::vector<short> mandelbrot(int image_width, int image_height)
 {
-  constexpr auto step = 4;
+  constexpr auto kVecSize = 4;
 
   const auto data_width = image_width + 2;
   const auto data_height = image_height + 2;
 
-  const auto unaligned_width = data_width % step;
+  const auto unaligned_width = data_width % kVecSize;
 
   const auto diameter_y = kDiameterX / image_width * image_height;
 
@@ -85,7 +85,7 @@ std::vector<short> mandelbrot(int image_width, int image_height)
       result[result_idx++] = iter_cnt;
     }
 
-    for (; px < data_width; px += step)
+    for (; px < data_width; px += kVecSize)
     {
       const __m256d px_wide = _mm256_set_pd(((double)px + 3), ((double)px + 2), ((double)px + 1), ((double)px + 0));
       const __m256d c_x_wide = lerp(min_x_wide, max_x_wide, _mm256_mul_pd(px_wide, inv_data_width_wide));
@@ -106,7 +106,7 @@ std::vector<short> mandelbrot(int image_width, int image_height)
         const int mask_change = lte_mask ^ prev_mask;
         if (mask_change != 0)
         {
-          for (auto i = 0; i < step; i++)
+          for (auto i = 0; i < kVecSize; i++)
           {
             if ((mask_change >> i) & 1)
             {
@@ -128,7 +128,7 @@ std::vector<short> mandelbrot(int image_width, int image_height)
       }
 
       // Survivors
-      for (auto i = 0; i < step; i++)
+      for (auto i = 0; i < kVecSize; i++)
       {
         if ((prev_mask >> i) & 1)
         {
@@ -136,7 +136,7 @@ std::vector<short> mandelbrot(int image_width, int image_height)
         }
       }
 
-      result_idx += step;
+      result_idx += kVecSize;
     }
   }
   return result;
