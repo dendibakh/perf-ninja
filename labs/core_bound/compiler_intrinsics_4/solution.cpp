@@ -7,7 +7,7 @@
 
 #include <immintrin.h>
 
-#include <iostream>
+#include <array>
 
 inline double lerp(const double a, const double b, const double t)
 {
@@ -28,12 +28,13 @@ inline __m256d lerp(const __m256d a, const __m256d b, const __m256d t)
 
 std::vector<short> mandelbrot(int image_width, int image_height)
 {
+  constexpr auto kUnrollSize = 2;
   constexpr auto kVecSize = 4;
 
   const auto data_width = image_width + 2;
   const auto data_height = image_height + 2;
 
-  const auto unaligned_width = data_width % kVecSize;
+  const auto unaligned_width = data_width % (kVecSize * kUnrollSize);
 
   const auto diameter_y = kDiameterX / image_width * image_height;
 
@@ -85,58 +86,81 @@ std::vector<short> mandelbrot(int image_width, int image_height)
       result[result_idx++] = iter_cnt;
     }
 
-    for (; px < data_width; px += kVecSize)
+    std::array<__m256d, kUnrollSize> c_x_wide_arr;
+    std::array<__m256d, kUnrollSize> z_x_wide_arr;
+    std::array<__m256d, kUnrollSize> z_y_wide_arr;
+    std::array<int, kUnrollSize> prev_mask_arr;
+
+    for (; px < data_width; px += kVecSize * kUnrollSize)
     {
-      const __m256d px_wide = _mm256_set_pd(((double)px + 3), ((double)px + 2), ((double)px + 1), ((double)px + 0));
-      const __m256d c_x_wide = lerp(min_x_wide, max_x_wide, _mm256_mul_pd(px_wide, inv_data_width_wide));
-
-      __m256d z_x_wide = _mm256_setzero_pd();
-      __m256d z_y_wide = _mm256_setzero_pd();
-
-      int prev_mask = 0xF;
-
-      auto iter_cnt = 0;
-      for (; iter_cnt < kMaxIterations; ++iter_cnt)
+      for (size_t u = 0; u < kUnrollSize; ++u)
       {
-        const __m256d z_xx_wide = _mm256_mul_pd(z_x_wide, z_x_wide);
-        const __m256d z_yy_wide = _mm256_mul_pd(z_y_wide, z_y_wide);
-        const __m256d lte_mask_wide = _mm256_cmp_pd(_mm256_add_pd(z_xx_wide, z_yy_wide), kSquareBound_wide, _CMP_LE_OQ);
-        const int lte_mask = _mm256_movemask_pd(lte_mask_wide);
+        const __m256d px_wide = _mm256_set_pd(((double)px + u * kVecSize + 3), ((double)px + u * kVecSize + 2), ((double)px + u * kVecSize + 1), ((double)px + u * kVecSize + 0));
+        c_x_wide_arr[u] = lerp(min_x_wide, max_x_wide, _mm256_mul_pd(px_wide, inv_data_width_wide));
 
-        const int mask_change = lte_mask ^ prev_mask;
-        if (mask_change != 0)
+        z_x_wide_arr[u] = _mm256_setzero_pd();
+        z_y_wide_arr[u] = _mm256_setzero_pd();
+
+        prev_mask_arr[u] = 0xF;
+      }
+
+      // Use to count if any vector is still alive (doing useful work)
+      auto alive = kUnrollSize;
+      auto iter_cnt = 0;
+      for (; iter_cnt < kMaxIterations && alive > 0; ++iter_cnt)
+      {
+        for (size_t u = 0; u < kUnrollSize; ++u)
         {
-          for (auto i = 0; i < kVecSize; i++)
+          if (prev_mask_arr[u] == 0)
           {
-            if ((mask_change >> i) & 1)
+            // Skip dead vectors
+            continue;
+          }
+
+          const __m256d z_xx_wide = _mm256_mul_pd(z_x_wide_arr[u], z_x_wide_arr[u]);
+          const __m256d z_yy_wide = _mm256_mul_pd(z_y_wide_arr[u], z_y_wide_arr[u]);
+          const __m256d lte_mask_wide = _mm256_cmp_pd(_mm256_add_pd(z_xx_wide, z_yy_wide), kSquareBound_wide, _CMP_LE_OQ);
+          const int lte_mask = _mm256_movemask_pd(lte_mask_wide);
+
+          const int mask_change = lte_mask ^ prev_mask_arr[u];
+          if (mask_change != 0)
+          {
+            for (auto i = 0; i < kVecSize; i++)
             {
-              result[result_idx + i] = iter_cnt;
+              if ((mask_change >> i) & 1)
+              {
+                result[result_idx + u * kVecSize + i] = iter_cnt;
+              }
+            }
+
+            // No one passed
+            if (lte_mask == 0)
+            {
+              // Mark as dead the vector
+              --alive;
             }
           }
-        }
-        prev_mask = lte_mask;
+          prev_mask_arr[u] = lte_mask;
 
-        // No one passed
-        if (lte_mask == 0)
-        {
-          break;
+          const __m256d z_xy_wide = _mm256_mul_pd(z_x_wide_arr[u], z_y_wide_arr[u]);
+          z_x_wide_arr[u] = _mm256_add_pd(_mm256_sub_pd(z_xx_wide, z_yy_wide), c_x_wide_arr[u]);
+          z_y_wide_arr[u] = _mm256_add_pd(_mm256_add_pd(z_xy_wide, z_xy_wide), c_y_wide);
         }
-
-        const __m256d z_xy_wide = _mm256_mul_pd(z_x_wide, z_y_wide);
-        z_x_wide = _mm256_add_pd(_mm256_sub_pd(z_xx_wide, z_yy_wide), c_x_wide);
-        z_y_wide = _mm256_add_pd(_mm256_add_pd(z_xy_wide, z_xy_wide), c_y_wide);
       }
 
       // Survivors
-      for (auto i = 0; i < kVecSize; i++)
+      for (size_t u = 0; u < kUnrollSize; ++u)
       {
-        if ((prev_mask >> i) & 1)
+        for (auto i = 0; i < kVecSize; i++)
         {
-          result[result_idx + i] = iter_cnt;
+          if ((prev_mask_arr[u] >> i) & 1)
+          {
+            result[result_idx + u * kVecSize + i] = iter_cnt;
+          }
         }
       }
 
-      result_idx += kVecSize;
+      result_idx += kVecSize * kUnrollSize;
     }
   }
   return result;
