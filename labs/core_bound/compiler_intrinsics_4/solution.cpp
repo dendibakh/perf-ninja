@@ -1,6 +1,5 @@
 #include "const.h"
 #include "solution.h"
-#include <cmath>
 
 #if defined(__x86_64__) || defined(_M_X64)
 #include <emmintrin.h>
@@ -12,7 +11,6 @@
 
 #include <array>
 #include <bit>
-#include <cmath>
 #include <cstdint>
 
 namespace {
@@ -96,27 +94,140 @@ namespace {
   };
   #endif  // __x86_64__
   constexpr auto kVecSize = sizeof(Vec) / sizeof(double);
-  constexpr int kUnrollSz = 2;
+  constexpr int kUnrollSz = 4;
 }  // namespace
 
-// Note: 
+// Note:
 //
-// Solutions provided by Oleg Makovski (@0legmak).
+// There are two solutions presented here: SOLUTION and SOLUTION_ALT.
 //
-// SOLUTION_NO_UNROLL is easier to understand, so we recomment to study it first.
-// This implementation, let's say for ARM, processes two adjacent pixels simultaneously
-// (because only two double-precision FP values fit in 128 bit NEON vector).
+// SOLUTION is straightforward and simply processes pixels in small batches.
+//
+// SOLUTION_ALT tries to minimize the number of times the inner loop is executed,
+// at the expense of slightly more complicated code within that loop.
+// This implementation, for example on ARM, processes two adjacent pixels simultaneously
+// (because only two double-precision FP values fit in a 128-bit NEON vector).
 // When one pixel in a vector runs for 100 iterations, while the adjacent pixel in
 // the same vector runs for 200 iterations, it will replace the data for the first pixel
-// once it finishes its execution (because otherwise we will let the algorithm crunch 
-// dummy data which will lose performance).
+// once it finishes its execution (otherwise, the algorithm would crunch 
+// dummy data, as SOLUTION does).
 //
-// SOLUTION is an improved version. SOLUTION_NO_UNROLL process only one vector at a time 
-// while SOLUTION processes multiple vectors simultaneosuly.
+// In practice, however, SOLUTION is both simpler and faster than SOLUTION_ALT.
+// Still, SOLUTION_ALT is provided here for educational purposes.
+//
+// Both solutions use a software pipelining technique (see kUnrollSz) to increase
+// instruction-level parallelism, which provides a significant performance boost for this task.
 
 #define SOLUTION
-//#define SOLUTION_NO_UNROLL
+// #define SOLUTION_ALT
+
 #ifdef SOLUTION
+
+// Solution provided by Christian Oliveros (@maniatic0) and adapted by Oleg Makovski (@0legmak).
+
+std::vector<short> mandelbrot(int image_width, int image_height) {
+  // Calculate the dimensions of the data array, adding a border for anti-aliasing
+  const auto data_width = image_width + 2;
+  const auto data_height = image_height + 2;
+  // Compute the vertical diameter based on the aspect ratio
+  const auto diameter_y = kDiameterX / image_width * image_height;
+  // Set the bounds of the Mandelbrot set in the complex plane
+  const auto min_x = kCenterX - kDiameterX / 2;
+  const auto max_x = kCenterX + kDiameterX / 2;
+  const auto min_y = kCenterY - diameter_y / 2;
+  const auto max_y = kCenterY + diameter_y / 2;
+  // Batch size for vectorized processing
+  const auto kBatchSize = kVecSize * kUnrollSz;
+  // Total number of pixels to process
+  const size_t data_size = data_width * data_height;
+  // Allocate output array, rounded up to batch size for vectorization
+  std::vector<short> data((data_size + kBatchSize - 1) / kBatchSize * kBatchSize);
+  // Pixel coordinates
+  auto px = 0;
+  auto py = 0;
+  // Precompute squared escape bound for Mandelbrot iterations
+  const auto squared_bound = vec_set1(kSquareBound);
+
+  // Process the image in batches for vectorization and software pipelining
+  for (auto data_idx = 0; data_idx < data_size; data_idx += kBatchSize) {
+    // Arrays for vectorized coordinates and results
+    alignas(sizeof(Vec)) std::array<Vec, kUnrollSz> c_x, c_y, z_x, z_y;
+    std::array<std::array<int, kVecSize>, kUnrollSz> res;
+    std::array<uint32_t, kUnrollSz> active_mask;
+
+    // Initialize coordinates and masks for each unrolled vector
+    for (auto u = 0; u < kUnrollSz; ++u) {
+      std::array<double, kVecSize> c_x_src;
+      std::array<double, kVecSize> c_y_src;
+      for (auto i = 0; i < kVecSize; ++i) {
+        // Map pixel coordinates to the complex plane
+        c_x_src[i] = min_x + (max_x - min_x) * px / data_width;
+        c_y_src[i] = min_y + (max_y - min_y) * py / data_height;
+        // Move to next pixel, wrap to next row if needed
+        if (++px == data_width) {
+          px = 0;
+          ++py;
+        }
+      }
+      // Load coordinates into vector registers
+      c_x[u] = vec_load(c_x_src.data());
+      c_y[u] = vec_load(c_y_src.data());
+      // Initialize z values to zero (start of Mandelbrot iteration)
+      z_x[u] = vec_setzero();
+      z_y[u] = vec_setzero();
+      // Fill result array with max iterations (default value)
+      res[u].fill(kMaxIterations);
+      // Set mask to all bits set (all pixels active)
+      active_mask[u] = (1 << kVecSize) - 1;
+    }
+
+    // Track number of active vectors in the batch
+    auto active_vec_cnt = kUnrollSz;
+    // Iterate up to max iterations or until all pixels in batch are completed
+    for (auto iter_cnt = 0; iter_cnt < kMaxIterations && active_vec_cnt != 0; ++iter_cnt) {
+      for (auto u = 0; u < kUnrollSz; ++u) {
+        // Skip vector if all pixels are completed
+        if (active_mask[u] == 0) {
+          continue;
+        }
+        // Compute z_x^2 and z_y^2 for Mandelbrot formula
+        const auto z_xx = vec_mul(z_x[u], z_x[u]);
+        const auto z_yy = vec_mul(z_y[u], z_y[u]);
+        // Check which pixels have escaped (z_x^2 + z_y^2 > bound)
+        // Ignore previously completed pixels by ANDing active_mask
+        for (
+          uint32_t mask = vec_movemask(vec_cmpgt(vec_add(z_xx, z_yy), squared_bound)) & active_mask[u];
+          mask;
+          mask &= mask - 1
+        ) {
+          // Find index of first set bit (pixel that escaped)
+          const auto res_idx = std::countr_zero(mask);
+          // Mark pixel as completed by clearing the bit in active_mask
+          active_mask[u] &= ~((uint32_t)1 << res_idx);
+          // Store iteration count for escaped pixel
+          res[u][res_idx] = iter_cnt;
+          // Decrement active vector count if all pixels in vector are completed
+          active_vec_cnt -= active_mask[u] == 0;
+        }
+        // Mandelbrot iteration: z = z^2 + c
+        const auto z_xy = vec_mul(z_x[u], z_y[u]);
+        z_x[u] = vec_add(vec_sub(z_xx, z_yy), c_x[u]);
+        z_y[u] = vec_add(vec_add(z_xy, z_xy), c_y[u]);
+      }
+    }
+    // Copy results for this batch into output array
+    for (auto u = 0; u < kUnrollSz; ++u) {
+      std::copy(res[u].begin(), res[u].end(), data.begin() + data_idx + u * kVecSize);
+    }
+  }
+  // Resize output to actual image size (remove padding)
+  data.resize(data_size);
+  return data;
+}
+
+#elif defined(SOLUTION_ALT)
+
+// Solution provided by Oleg Makovski (@0legmak).
 
 std::vector<short> mandelbrot(int image_width, int image_height) {
   // Add two extra pixels to the data array dimensions to simplify anti-aliasing code
@@ -150,8 +261,8 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
   auto next_data_point = [&](int idx, int u) {
     if (data_idx[u] < data_size) {
       // Map pixel coordinates to the complex plane
-      c_x_arr[u][idx] = std::lerp(min_x, max_x, 1.0 * px[u] / data_width);
-      c_y_arr[u][idx] = std::lerp(min_y, max_y, 1.0 * py[u] / data_height);
+      c_x_arr[u][idx] = min_x + (max_x - min_x) * px[u] / data_width;
+      c_y_arr[u][idx] = min_y + (max_y - min_y) * py[u] / data_height;
       // Move to the next pixel
       // Pixels are distributed between unrolled loop iterations in a round-robin fashion
       px[u] += kUnrollSz;
@@ -191,8 +302,6 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
     z_y[u] = vec_setzero();
     iter_cnt[u] = vec_set1_int(0);
   }
-  // Arrays to store intermediate results for z_x^2 and z_y^2
-  alignas(sizeof(Vec)) std::array<Vec, kUnrollSz> z_xx, z_yy;
   alignas(sizeof(Vec)) std::array<uint64_t, kVecSize> iter_cnt_arr;
   // Main loop to compute the Mandelbrot set
   while (true) {
@@ -202,10 +311,10 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
       // Check if the maximum iteration count is reached
       const auto max_iter_mask = vec_cmpeq_int(iter_cnt[u], max_iter);
       // Compute z_x^2 and z_y^2
-      z_xx[u] = vec_mul(z_x[u], z_x[u]);
-      z_yy[u] = vec_mul(z_y[u], z_y[u]);
+      auto z_xx = vec_mul(z_x[u], z_x[u]);
+      auto z_yy = vec_mul(z_y[u], z_y[u]);
       // Check if the escape condition is met (z_x^2 + z_y^2 > squared_bound)
-      const auto squared_bound_mask = vec_cmpgt(vec_add(z_xx[u], z_yy[u]), squared_bound);
+      const auto squared_bound_mask = vec_cmpgt(vec_add(z_xx, z_yy), squared_bound);
       // Compute the logical OR for maximum iterations and escape conditions
       const auto cond_mask = vec_or_mask(max_iter_mask, squared_bound_mask);
       // Process points that meet the condition above
@@ -227,100 +336,19 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
         // Reset values for points that met the condition
         z_x[u] = vec_blend(z_x[u], vec_setzero(), cond_mask);
         z_y[u] = vec_blend(z_y[u], vec_setzero(), cond_mask);
-        z_xx[u] = vec_blend(z_xx[u], vec_setzero(), cond_mask);
-        z_yy[u] = vec_blend(z_yy[u], vec_setzero(), cond_mask);
+        z_xx = vec_blend(z_xx, vec_setzero(), cond_mask);
+        z_yy = vec_blend(z_yy, vec_setzero(), cond_mask);
         c_x[u] = vec_blend(c_x[u], vec_load(c_x_arr[u].data()), cond_mask);
         c_y[u] = vec_blend(c_y[u], vec_load(c_y_arr[u].data()), cond_mask);
         iter_cnt[u] = vec_blend_int(iter_cnt[u], vec_set1_int(0), cond_mask);
       }
       // Update z_x and z_y for the next iteration
       const auto z_xy = vec_mul(z_x[u], z_y[u]);
-      z_x[u] = vec_add(vec_sub(z_xx[u], z_yy[u]), c_x[u]);
+      z_x[u] = vec_add(vec_sub(z_xx, z_yy), c_x[u]);
       z_y[u] = vec_add(vec_add(z_xy, z_xy), c_y[u]);
       // Increment the iteration count
       iter_cnt[u] = vec_add_int(iter_cnt[u], iter_inc);
     }
-  }
-}
-
-#elif defined(SOLUTION_NO_UNROLL)
-
-std::vector<short> mandelbrot(int image_width, int image_height) {
-  const auto data_width = image_width + 2;
-  const auto data_height = image_height + 2;
-  const auto diameter_y = kDiameterX / image_width * image_height;
-  const auto min_x = kCenterX - kDiameterX / 2;
-  const auto max_x = kCenterX + kDiameterX / 2;
-  const auto min_y = kCenterY - diameter_y / 2;
-  const auto max_y = kCenterY + diameter_y / 2;  
-  const size_t data_size = data_width * data_height;
-  std::vector<short> data(data_size);
-  const auto squared_bound = vec_set1(kSquareBound);
-  const auto max_iter = vec_set1_int(kMaxIterations);
-  const auto iter_inc = vec_set1_int(1);
-  auto px = 0;
-  auto py = 0;
-  alignas(sizeof(Vec)) std::array<double, kVecSize> c_x_arr;
-  alignas(sizeof(Vec)) std::array<double, kVecSize> c_y_arr;
-  std::array<size_t, kVecSize> res_idx;
-  size_t data_idx = 0;
-  size_t res_used = 0;
-  auto next_data_item = [&](int idx) {
-    if (data_idx < data_size) {
-      c_x_arr[idx] = std::lerp(min_x, max_x, 1.0 * px / data_width);
-      c_y_arr[idx] = std::lerp(min_y, max_y, 1.0 * py / data_height);
-      if (++px == data_width) {
-        px = 0;
-        ++py;
-      }
-      res_idx[idx] = data_idx;
-      ++data_idx;
-      ++res_used;
-    } else {
-      c_x_arr[idx] = 0.0;
-      c_y_arr[idx] = 0.0;
-      res_idx[idx] = -1;
-    }
-  };
-  for (int i = 0; i < kVecSize; ++i) {
-    next_data_item(i);
-  }
-  auto c_x = vec_load(c_x_arr.data());
-  auto c_y = vec_load(c_y_arr.data());
-  auto z_x = vec_setzero();
-  auto z_y = vec_setzero();
-  auto iter_cnt = vec_set1_int(0);
-  while (true) {
-    const auto max_iter_mask = vec_cmpeq_int(iter_cnt, max_iter);
-    auto z_xx = vec_mul(z_x, z_x);
-    auto z_yy = vec_mul(z_y, z_y);
-    const auto squared_bound_mask = vec_cmpgt(vec_add(z_xx, z_yy), squared_bound);
-    const auto cond_mask = vec_or_mask(max_iter_mask, squared_bound_mask);
-    if (uint8_t mask = vec_movemask(cond_mask); mask) {
-      alignas(sizeof(Vec)) std::array<uint64_t, kVecSize> iter_cnt_arr;
-      vec_store_int(iter_cnt_arr.data(), iter_cnt);
-      for (; mask; mask &= mask - 1) {
-        const auto ridx = std::countr_zero(mask);
-        if (res_idx[ridx] != -1) {
-          data[res_idx[ridx]] = static_cast<short>(iter_cnt_arr[ridx]);
-          if (--res_used == 0) {
-            return data;
-          }
-        }
-        next_data_item(ridx);
-      }
-      z_x = vec_blend(z_x, vec_setzero(), cond_mask);
-      z_y = vec_blend(z_y, vec_setzero(), cond_mask);
-      z_xx = vec_blend(z_xx, vec_setzero(), cond_mask);
-      z_yy = vec_blend(z_yy, vec_setzero(), cond_mask);
-      c_x = vec_blend(c_x, vec_load(c_x_arr.data()), cond_mask);
-      c_y = vec_blend(c_y, vec_load(c_y_arr.data()), cond_mask);
-      iter_cnt = vec_blend_int(iter_cnt, vec_set1_int(0), cond_mask);
-    }
-    const auto z_xy = vec_mul(z_x, z_y);
-    z_x = vec_add(vec_sub(z_xx, z_yy), c_x);
-    z_y = vec_add(vec_add(z_xy, z_xy), c_y);
-    iter_cnt = vec_add_int(iter_cnt, iter_inc);
   }
 }
 
@@ -338,8 +366,8 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
   auto result_idx = 0;
   for (auto py = 0; py < data_height; ++py) {
     for (auto px = 0; px < data_width; ++px) {
-      const auto c_x = std::lerp(min_x, max_x, 1.0 * px / data_width);
-      const auto c_y = std::lerp(min_y, max_y, 1.0 * py / data_height);
+      const auto c_x = min_x + (max_x - min_x) * px / data_width;
+      const auto c_y = min_y + (max_y - min_y) * py / data_height;
       auto z_x = 0.0;
       auto z_y = 0.0;
       auto iter_cnt = 0;
