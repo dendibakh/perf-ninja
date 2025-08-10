@@ -1,6 +1,5 @@
 #include "const.h"
 #include "solution.h"
-#include <cmath>
 
 std::vector<short> mandelbrot(int image_width, int image_height) {
   const auto data_width = image_width + 2;
@@ -14,8 +13,8 @@ std::vector<short> mandelbrot(int image_width, int image_height) {
   auto result_idx = 0;
   for (auto py = 0; py < data_height; ++py) {
     for (auto px = 0; px < data_width; ++px) {
-      const auto c_x = std::lerp(min_x, max_x, 1.0 * px / data_width);
-      const auto c_y = std::lerp(min_y, max_y, 1.0 * py / data_height);
+      const auto c_x = min_x + (max_x - min_x) * px / data_width;
+      const auto c_y = min_y + (max_y - min_y) * py / data_height;
       auto z_x = 0.0;
       auto z_y = 0.0;
       auto iter_cnt = 0;
