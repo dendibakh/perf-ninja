@@ -3,6 +3,7 @@
 #include <cassert>
 #include <type_traits>
 
+#include <cstring>
 #include <immintrin.h>
 
 inline constexpr size_t vw = 32;
@@ -56,9 +57,24 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
       for (unsigned i=0; i<5; ++i)
         a = _mm512_max_epi16(_mm512_permutexvar_epi16(perm[i], a), a);
     };
+    auto rotate_right1_epi16 = [](__m512i v) {
+      // index vector: [31, 0, 1, 2, ..., 30]
+      alignas(64) static const uint16_t idx[32] = {
+          31, 0, 1, 2, 3, 4, 5, 6,
+          7, 8, 9,10,11,12,13,14,
+          15,16,17,18,19,20,21,22,
+          23,24,25,26,27,28,29,30
+      };
+      __m512i index = _mm512_load_si512(idx);
+      return _mm512_permutexvar_epi16(index, v);
+    };
 
     sequence_t const &sequence1 = sequences1[sequence_idx];
     sequence_t const &sequence2 = sequences2[sequence_idx];
+
+    alignas(32) uint8_t seq1[vss*vw];
+    memset(seq1, 5, sizeof(seq1));
+    memcpy(seq1+1, sequence1.data(), sequence_size_v);
 
     /*
      * Initialise score values.
@@ -74,6 +90,11 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     vs_t vert_gap_2;
     for (unsigned i=0; i<vw; ++i)
       set2(vert_gap_2, i, (i-vw)*gap_extension);
+
+    vs_t v_gap_open = _mm512_set1_epi16(gap_open);
+    vs_t v_gap_extension = _mm512_set1_epi16(gap_extension);
+    vs_t v_match = _mm512_set1_epi16(match);
+    vs_t v_mismatch = _mm512_set1_epi16(mismatch);
     
     /*
      * Setup the matrix.
@@ -101,21 +122,17 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      * Compute the main recursion to fill the matrix.
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
-      score_t last_diagonal_score =
-          get(score_column, 0); // Cache last diagonal score to compute this cell.
-      set(score_column, 0, get(horizontal_gap_column, 0));
-
-      for (unsigned row = 1; row <= sequence1.size(); ++row) {
-        // Compute next score from diagonal direction with match/mismatch.
-        score_t best_cell_score =
-            last_diagonal_score +
-            (sequence1[row - 1] == sequence2[col - 1] ? match : mismatch);
-        // Determine best score from diagonal, vertical, or horizontal
-        // direction.
-        best_cell_score = std::max(best_cell_score, get(horizontal_gap_column, row));
-        // Cache next diagonal value and store optimum in score_column.
-        last_diagonal_score = get(score_column, row);
-        set(score_column, row, best_cell_score);
+      score_t last_diagonal_score = get(horizontal_gap_column, 0);
+      for (unsigned row = 0; row < vss; ++row) {
+        vs_t a = score_column[row];
+        set2(a, 31, last_diagonal_score);
+        a = rotate_right1_epi16(a);
+        __m256i vsrc = _mm256_load_si256((const __m256i *)(seq1+row*vw));
+        __m256i vx   = _mm256_set1_epi8(sequence2[col-1]);
+        __mmask32 k  = _mm256_cmpeq_epi8_mask(vsrc, vx);
+        a = _mm512_add_epi16(_mm512_mask_blend_epi16(k, v_mismatch, v_match), a);
+        last_diagonal_score = get(score_column, row*vw+vw-1);
+        score_column[row] = _mm512_max_epi16(horizontal_gap_column[row], a);
       }
       last_vertical_gap = get(horizontal_gap_column, 0) + gap_open;
       for (unsigned row = 0; row < vss; ++row) {
@@ -127,8 +144,8 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         score_column[row] = _mm512_max_epi16(score_column[row], a);
       }
       for (unsigned row = 0; row < vss; ++row) {
-        horizontal_gap_column[row] = _mm512_add_epi16(horizontal_gap_column[row], _mm512_set1_epi16(gap_extension));
-        horizontal_gap_column[row] = _mm512_max_epi16(horizontal_gap_column[row], _mm512_add_epi16(score_column[row], _mm512_set1_epi16(gap_open)));
+        horizontal_gap_column[row] = _mm512_add_epi16(horizontal_gap_column[row], v_gap_extension);
+        horizontal_gap_column[row] = _mm512_max_epi16(horizontal_gap_column[row], _mm512_add_epi16(score_column[row], v_gap_open));
       }
     }
 
