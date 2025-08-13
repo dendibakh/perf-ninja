@@ -3,6 +3,11 @@
 #include <cassert>
 #include <type_traits>
 
+#include <immintrin.h>
+
+inline constexpr size_t vw = 32;
+inline constexpr size_t vss = sequence_size_v / vw + 1;
+
 // The alignment algorithm which computes the alignment of the given sequence
 // pairs.
 result_t compute_alignment(std::vector<sequence_t> const &sequences1,
@@ -12,7 +17,31 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
   for (size_t sequence_idx = 0; sequence_idx < sequences1.size();
        ++sequence_idx) {
     using score_t = int16_t;
-    using column_t = std::array<score_t, sequence_size_v + 1>;
+    using vs_t = __m512i;
+    using column_t = std::array<vs_t, vss>;
+
+    auto get = [](column_t &a, size_t i) {
+      __m128i quarter;
+      switch (i%vw/8) {
+        case 0: quarter = _mm512_extracti32x4_epi32(a[i/vw], 0); break;
+        case 1: quarter = _mm512_extracti32x4_epi32(a[i/vw], 1); break;
+        case 2: quarter = _mm512_extracti32x4_epi32(a[i/vw], 2); break;
+        default: quarter = _mm512_extracti32x4_epi32(a[i/vw], 3); break;
+      }
+      switch (i%8) {
+        case 0: return (score_t)_mm_extract_epi16(quarter, 0);
+        case 1: return (score_t)_mm_extract_epi16(quarter, 1);
+        case 2: return (score_t)_mm_extract_epi16(quarter, 2);
+        case 3: return (score_t)_mm_extract_epi16(quarter, 3);
+        case 4: return (score_t)_mm_extract_epi16(quarter, 4);
+        case 5: return (score_t)_mm_extract_epi16(quarter, 5);
+        case 6: return (score_t)_mm_extract_epi16(quarter, 6);
+        default: return (score_t)_mm_extract_epi16(quarter, 7);
+      }
+    };
+    auto set = [](column_t &a, size_t i, score_t x) {
+      a[i/vw] = _mm512_mask_set1_epi16(a[i/vw], 1u<<i%vw, x);
+    };
 
     sequence_t const &sequence1 = sequences1[sequence_idx];
     sequence_t const &sequence2 = sequences2[sequence_idx];
@@ -38,12 +67,12 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
     /*
      * Initialise the first column of the matrix.
      */
-    horizontal_gap_column[0] = gap_open;
+    set(horizontal_gap_column, 0, gap_open);
     last_vertical_gap = gap_open;
 
-    for (size_t i = 1; i < score_column.size(); ++i) {
-      score_column[i] = last_vertical_gap;
-      horizontal_gap_column[i] = last_vertical_gap + gap_open;
+    for (size_t i = 1; i <= sequence_size_v; ++i) {
+      set(score_column, i, last_vertical_gap);
+      set(horizontal_gap_column, i, last_vertical_gap + gap_open);
       last_vertical_gap += gap_extension;
     }
 
@@ -52,10 +81,9 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
      */
     for (unsigned col = 1; col <= sequence2.size(); ++col) {
       score_t last_diagonal_score =
-          score_column[0]; // Cache last diagonal score to compute this cell.
-      score_column[0] = horizontal_gap_column[0];
-      last_vertical_gap = horizontal_gap_column[0] + gap_open;
-      horizontal_gap_column[0] += gap_extension;
+          get(score_column, 0); // Cache last diagonal score to compute this cell.
+      set(score_column, 0, get(horizontal_gap_column, 0));
+      last_vertical_gap = get(horizontal_gap_column, 0) + gap_open;
 
       for (unsigned row = 1; row <= sequence1.size(); ++row) {
         // Compute next score from diagonal direction with match/mismatch.
@@ -65,23 +93,24 @@ result_t compute_alignment(std::vector<sequence_t> const &sequences1,
         // Determine best score from diagonal, vertical, or horizontal
         // direction.
         best_cell_score = std::max(best_cell_score, last_vertical_gap);
-        best_cell_score = std::max(best_cell_score, horizontal_gap_column[row]);
+        best_cell_score = std::max(best_cell_score, get(horizontal_gap_column, row));
         // Cache next diagonal value and store optimum in score_column.
-        last_diagonal_score = score_column[row];
-        score_column[row] = best_cell_score;
+        last_diagonal_score = get(score_column, row);
+        set(score_column, row, best_cell_score);
         // Compute the next values for vertical and horizontal gap.
         best_cell_score += gap_open;
         last_vertical_gap += gap_extension;
-        horizontal_gap_column[row] += gap_extension;
         // Store optimum between gap open and gap extension.
         last_vertical_gap = std::max(last_vertical_gap, best_cell_score);
-        horizontal_gap_column[row] =
-            std::max(horizontal_gap_column[row], best_cell_score);
+      }
+      for (unsigned row = 0; row < vss; ++row) {
+        horizontal_gap_column[row] = _mm512_add_epi16(horizontal_gap_column[row], _mm512_set1_epi16(gap_extension));
+        horizontal_gap_column[row] = _mm512_max_epi16(horizontal_gap_column[row], _mm512_add_epi16(score_column[row], _mm512_set1_epi16(gap_open)));
       }
     }
 
     // Report the best score.
-    result[sequence_idx] = score_column.back();
+    result[sequence_idx] = get(score_column, sequence_size_v);
   }
 
   return result;
