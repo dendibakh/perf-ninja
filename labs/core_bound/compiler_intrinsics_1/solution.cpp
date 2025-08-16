@@ -28,16 +28,14 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
 #if 1 || (defined(__AVX2__) && defined(__SSE4_1__))
   // Process 16 outputs per iteration using AVX2
-  auto prefix_scan8_epi32 = [](__m256i v) -> __m256i {
-    // Prefix scan for 8x 32-bit ints `v`
-    __m256i t = _mm256_slli_si256(v, 4);
-    v = _mm256_add_epi32(v, t);
-    t = _mm256_slli_si256(v, 8);
-    v = _mm256_add_epi32(v, t);
-    __m128i lo128 = _mm256_castsi256_si128(v);
-    __m128i lo_last = _mm_shuffle_epi32(lo128, _MM_SHUFFLE(3, 3, 3, 3));
-    __m256i carry = _mm256_inserti128_si256(_mm256_setzero_si256(), lo_last, 1);
-    return _mm256_add_epi32(v, carry);
+  auto prefix_scan8_epi16 = [](__m128i v) -> __m128i {
+    // Prefix scan for 8x 16-bit ints `v`
+    __m128i t = _mm_slli_si128(v, 2);
+    v = _mm_add_epi16(v, t);
+    t = _mm_slli_si128(v, 4);
+    v = _mm_add_epi16(v, t);
+    t = _mm_slli_si128(v, 8);
+    return _mm_add_epi16(v, t);
   };
 
   for (; pos + 16 <= limit; pos += 16) {
@@ -52,33 +50,24 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
     __m128i nhi = _mm_cvtepu8_epi16(_mm_srli_si128(n, 8));
     __m128i ohi = _mm_cvtepu8_epi16(_mm_srli_si128(o, 8));
 
-    __m128i dlo = _mm_sub_epi16(nlo, olo); // 8 int16 deltas
-    __m128i dhi = _mm_sub_epi16(nhi, ohi); // next 8 int16 deltas
+    __m128i d0 = _mm_sub_epi16(nlo, olo); // 8 int16 deltas
+    __m128i d1 = _mm_sub_epi16(nhi, ohi); // next 8 int16 deltas
 
-    __m256i d0 = _mm256_cvtepi16_epi32(dlo);
-    __m256i s0 = prefix_scan8_epi32(d0);
-    __m256i base0 = _mm256_set1_epi32(currentSum);
-    __m256i out0_32 = _mm256_add_epi32(s0, base0); // 8 int32 outputs
+    __m128i s0 = prefix_scan8_epi16(d0);
+    __m128i base0 = _mm_set1_epi16(currentSum);
+    __m128i out0_16 = _mm_add_epi16(s0, base0); // 8 int16 outputs
 
-    int base1_scalar = currentSum + _mm256_extract_epi32(s0, 7);
+    int base1_scalar = currentSum + _mm_extract_epi16(s0, 7);
 
-    __m256i d1 = _mm256_cvtepi16_epi32(dhi);
-    __m256i s1 = prefix_scan8_epi32(d1);
-    __m256i base1 = _mm256_set1_epi32(base1_scalar);
-    __m256i out1_32 = _mm256_add_epi32(s1, base1); // next 8 int32 outputs
+    __m128i s1 = prefix_scan8_epi16(d1);
+    __m128i base1 = _mm_set1_epi16(base1_scalar);
+    __m128i out1_16 = _mm_add_epi16(s1, base1); // next 8 int16 outputs
 
-    // Pack 2x8 int32 -> 16x uint16 and store in order
-    __m128i out0_lo = _mm256_castsi256_si128(out0_32);
-    __m128i out0_hi = _mm256_extracti128_si256(out0_32, 1);
-    __m128i packed0 = _mm_packus_epi32(out0_lo, out0_hi);
-    _mm_storeu_si128(reinterpret_cast<__m128i *>(outPtr + pos), packed0);
+    // Store in order
+    _mm_storeu_si128(reinterpret_cast<__m128i *>(outPtr + pos), out0_16);
+    _mm_storeu_si128(reinterpret_cast<__m128i *>(outPtr + pos + 8), out1_16);
 
-    __m128i out1_lo = _mm256_castsi256_si128(out1_32);
-    __m128i out1_hi = _mm256_extracti128_si256(out1_32, 1);
-    __m128i packed1 = _mm_packus_epi32(out1_lo, out1_hi);
-    _mm_storeu_si128(reinterpret_cast<__m128i *>(outPtr + pos + 8), packed1);
-
-    currentSum = base1_scalar + _mm256_extract_epi32(s1, 7);
+    currentSum = base1_scalar + _mm_extract_epi16(s1, 7);
   }
 #endif
 
