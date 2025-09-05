@@ -25,23 +25,29 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
-  for (; pos + 7 < limit; pos += 8) {
-    __m128i currentSumVector = _mm_set1_epi16(currentSum);
-    __m128i subU8 = _mm_loadu_si64(&input[pos - radius - 1]);
-    __m128i sub = _mm_cvtepu8_epi16(subU8);
+  for (; pos + 15 < limit; pos += 16) {
+    __m256i currentSumVector = _mm256_set1_epi16(currentSum);
 
-    __m128i addU8 = _mm_loadu_si64(&input[pos + radius]);
-    __m128i add = _mm_cvtepu8_epi16(addU8);
+    __m128i sub_u8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&input[pos - radius - 1]));
+    __m256i sub = _mm256_cvtepu8_epi16(sub_u8);
 
-    __m128i diff = _mm_sub_epi16(add, sub);
+    __m128i add_u8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&input[pos + radius]));
+    __m256i add = _mm256_cvtepu8_epi16(add_u8);
 
-    __m128i sum = _mm_add_epi16(diff, _mm_slli_si128(diff, 2));
-    sum = _mm_add_epi16(sum, _mm_slli_si128(sum, 4));
-    sum = _mm_add_epi16(sum, _mm_slli_si128(sum, 8));
+    __m256i diff = _mm256_sub_epi16(add, sub);
 
-    __m128i result = _mm_add_epi16(sum, currentSumVector);
-    _mm_storeu_si128(reinterpret_cast<__m128i_u *>(&output[pos]), result);
-    currentSum = _mm_extract_epi16(result, 7);
+    __m256i sum = _mm256_add_epi16(diff, _mm256_slli_si256(diff, 2));
+    sum = _mm256_add_epi16(sum, _mm256_slli_si256(sum, 4));
+    sum = _mm256_add_epi16(sum, _mm256_slli_si256(sum, 8));
+
+    int16_t low_lane_total = _mm256_extract_epi16(sum, 7);
+    __m256i bcast_total = _mm256_set1_epi16(low_lane_total);
+    __m256i high_lane_add = _mm256_permute2f128_si256(_mm256_setzero_si256(), bcast_total, 0x21);
+    sum = _mm256_add_epi16(sum, high_lane_add);
+
+    __m256i result = _mm256_add_epi16(sum, currentSumVector);
+    _mm256_storeu_si256(reinterpret_cast<__m256i*>(&output[pos]), result);
+    currentSum = output[pos + 15];
   }
 
   // Remainder
