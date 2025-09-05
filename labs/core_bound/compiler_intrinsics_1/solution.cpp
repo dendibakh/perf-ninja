@@ -70,7 +70,7 @@ for (; pos + 31 < limit; pos += 32) {
     _mm256_storeu_si256(reinterpret_cast<__m256i*>(&output[pos]), result_A);
 
     // --- Dependency Resolved: We now have the starting sum for Block B ---
-    int nextCurrentSum = output[pos + 15];
+    int nextCurrentSum = _mm256_extract_epi16(result_A, 15);
     __m256i currentSumVec_B = _mm256_set1_epi16(static_cast<int16_t>(nextCurrentSum));
 
     // --- Finish Block B: Uses the result from Block A ---
