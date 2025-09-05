@@ -8,6 +8,11 @@ class hash_map_t {
     static constexpr int UNUSED = std::numeric_limits<int>::max();
     std::vector<int> m_vector;
     std::size_t N_Buckets;
+private:
+    int getBucket(int val) const {
+        return val % N_Buckets;
+    }
+
 public:
     hash_map_t(std::size_t size) : m_vector(size, UNUSED), N_Buckets(size) {}
 
@@ -21,8 +26,13 @@ public:
     }
 
     bool find(int val) const {
-        int bucket = val % N_Buckets;
+        int bucket = getBucket(val);
         return m_vector[bucket] != UNUSED;
+    }
+
+    void prefetch(int val) const {
+        int bucket = getBucket(val);
+        __builtin_prefetch(&m_vector[bucket]);
     }
 };
 
