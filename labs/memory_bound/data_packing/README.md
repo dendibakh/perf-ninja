@@ -1,7 +1,3 @@
-**NOTE: this lab is currently broken.**
-**After migrating to a new compiler version the speedup is no longer measurable consistently.**
-**You can still try to solve it to learn the concept, but the result is not guaranteed.**
-
 # Data packing
 
 This is a lab about data packing.
@@ -14,5 +10,9 @@ Some of the ways to do that include:
 * Eliminate compiler-added padding.
 * Use types that require less memory or less precision e.g. (int -> short, double -> float).
 * Use bitfields to pack the data even further.
+
+**Note 1:** Data Packing Summary video mentions branch mispredictions as a primary bottleneck for this lab. This is no longer true since the main source of branch mispredictions (std::sort) was replaced by counting sort.
+
+**Note 2:** Bit Fields are implementation-specific. If you run the solution presented in the video on Windows, you may notice that the size of the structure is larger than you'd expect. The reason for this is a Microsoft-specific undocumented behavior that refuses to pack bit fields of varying types. Consider this if you want to pass performance tests on the Zen platform.
 
 [<img src="../../../img/DataPacking1Summary.png">](https://www.youtube.com/watch?v=ta096PQ6gTg&list=PLRWO2AL1QAV6bJAU2kgB4xfodGID43Y5d)

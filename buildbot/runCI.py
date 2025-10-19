@@ -58,7 +58,7 @@ Labs["data_driven"] = dict()
 Labs["misc"] = dict()
 
 if runner == "LinuxIntelAlderlake":
-  Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
+  Labs["memory_bound"]["data_packing"] = LabParams(threshold=40.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=70.0)
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
@@ -74,6 +74,8 @@ if runner == "LinuxIntelAlderlake":
   Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
   Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
+  Labs["core_bound"]["compiler_intrinsics_3"] = LabParams(threshold=30.0)
+  Labs["core_bound"]["compiler_intrinsics_4"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=10.0)
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=80.0)
@@ -83,7 +85,7 @@ if runner == "LinuxIntelAlderlake":
   Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=60.0)
 elif runner == "LinuxIntelCoffeelake":
-  Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
+  Labs["memory_bound"]["data_packing"] = LabParams(threshold=40.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=70.0)
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
@@ -99,6 +101,8 @@ elif runner == "LinuxIntelCoffeelake":
   Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
   Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
+  Labs["core_bound"]["compiler_intrinsics_3"] = LabParams(threshold=30.0)
+  Labs["core_bound"]["compiler_intrinsics_4"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
   # (It seems it doesn't help Coffelake) Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=10.0)
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=75.0)
@@ -108,7 +112,7 @@ elif runner == "LinuxIntelCoffeelake":
   Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)  
 elif runner == "WinZen3":
-  Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
+  Labs["memory_bound"]["data_packing"] = LabParams(threshold=40.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=60.0)
   Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=50.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
@@ -124,6 +128,8 @@ elif runner == "WinZen3":
   Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
   Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=60.0)
+  Labs["core_bound"]["compiler_intrinsics_3"] = LabParams(threshold=40.0)
+  Labs["core_bound"]["compiler_intrinsics_4"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)  
   Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=10.0)
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=70.0)
@@ -133,7 +139,7 @@ elif runner == "WinZen3":
   Labs["bad_speculation"]["lookup_tables_1"] = LabParams(threshold=80.0)
   Labs["bad_speculation"]["virtual_call_mispredict"] = LabParams(threshold=40.0)
 elif runner == "MacosM1":
-  Labs["memory_bound"]["data_packing"] = LabParams(threshold=13.0)
+  Labs["memory_bound"]["data_packing"] = LabParams(threshold=40.0)
   Labs["memory_bound"]["false_sharing_1"] = LabParams(threshold=70.0)
   # FIXME: Labs["memory_bound"]["huge_pages_1"] = LabParams(threshold=10.0)
   Labs["memory_bound"]["loop_interchange_1"] = LabParams(threshold=85.0)
@@ -149,6 +155,8 @@ elif runner == "MacosM1":
   Labs["core_bound"]["function_inlining_1"] = LabParams(threshold=25.0)
   Labs["core_bound"]["compiler_intrinsics_1"] = LabParams(threshold=60.0)
   # FIXME: Labs["core_bound"]["compiler_intrinsics_2"] = LabParams(threshold=65.0)
+  Labs["core_bound"]["compiler_intrinsics_3"] = LabParams(threshold=15.0)
+  Labs["core_bound"]["compiler_intrinsics_4"] = LabParams(threshold=40.0)
   Labs["core_bound"]["dep_chains_1"] = LabParams(threshold=60.0)
   Labs["core_bound"]["dep_chains_2"] = LabParams(threshold=40.0)
   Labs["core_bound"]["vectorization_1"] = LabParams(threshold=80.0)
@@ -290,8 +298,16 @@ def benchmarkLab(labPath):
   benchmarkSolutionOrBaseline(solutionDir, "solution")
   benchmarkSolutionOrBaseline(baselineDir, "baseline")
 
-  outJsonSolution = gbench.util.load_benchmark_results(os.path.join(solutionDir, "result.json"))
-  outJsonBaseline = gbench.util.load_benchmark_results(os.path.join(baselineDir, "result.json"))
+  try:
+    outJsonSolution = gbench.util.load_benchmark_results(os.path.join(solutionDir, "result.json"))
+  except JSONDecodeError:
+    print (bcolors.FAIL + "Error while loading solution's result.json file. Submission for the lab " + getLabNameStr(labPath) + " failed." + bcolors.ENDC)
+    return False 
+  try:
+    outJsonBaseline = gbench.util.load_benchmark_results(os.path.join(baselineDir, "result.json"))
+  except JSONDecodeError:
+    print (bcolors.FAIL + "Error while loading baseline's result.json file. Submission for the lab " + getLabNameStr(labPath) + " failed." + bcolors.ENDC)
+    return False 
 
   # Parse two report files and compare them
   diff_report = gbench.report.get_difference_report(
