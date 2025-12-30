@@ -298,7 +298,7 @@ def print_difference_report(
         'Benchmark', 12 + first_col_width)
     output_strs = [first_line, '-' * len(first_line)]
 
-    fmt_str = "{}{:<{}s}{endc}{}{:+16.4f}{endc}{}{:+16.4f}{endc}{:14.0f}{:14.0f}{endc}{:14.0f}{:14.0f}"
+    fmt_str = "{}{:<{}s}{endc}{}{:+16.4f}{endc}{}{:+16.4f}{endc}{:14.2f}{:14.2f}{endc}{:14.2f}{:14.2f}"
     for benchmark in json_diff_report:
         # *If* we were asked to only include aggregates,
         # and if it is non-aggregate, then skip it.
