@@ -3,6 +3,8 @@
 #include "benchmark/benchmark.h"
 #include "solution.hpp"
 
+#include <algorithm>
+
 static void bench1(benchmark::State &state) {
   try {
     // Mesh

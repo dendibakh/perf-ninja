@@ -10,11 +10,42 @@
 #define ON_WINDOWS
 #endif
 
+static size_t calculateAlignedSize(size_t size, size_t pageSize) {
+  size_t remainedPage = (size % pageSize > 0U) ? 1U : 0U;
+  return pageSize * (size / pageSize + remainedPage);
+}
+
 #if defined(ON_LINUX)
+
+#include <fstream>
 
 // HINT: allocate huge pages using mmap/munmap
 // NOTE: See HugePagesSetupTips.md for how to enable huge pages in the OS
 #include <sys/mman.h>
+
+static size_t readHugePageSize() {
+  std::ifstream hpage_pmd_size("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size");
+  size_t hugePageSize = 0U;
+  hpage_pmd_size >> hugePageSize;
+  return hugePageSize;
+}
+
+// Allocate an array of doubles of size `size`, return it as a
+// std::unique_ptr<double[], D>, where `D` is a custom deleter type
+inline auto allocateDoublesArray(size_t size) {
+  static const size_t hugePageSize = readHugePageSize();
+
+  size = calculateAlignedSize(size * sizeof(double), hugePageSize);
+  auto *alloc = static_cast<double *>(mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+  if (alloc == MAP_FAILED) {
+    throw std::bad_alloc{};
+  }
+
+  madvise(alloc, size, MADV_HUGEPAGE);
+  auto deleter = [size](double *ptr) { munmap(ptr, size); };
+  return std::unique_ptr<double[], decltype(deleter)>(alloc,
+                                                      std::move(deleter));
+}
 
 #elif defined(ON_WINDOWS)
 
@@ -147,7 +178,24 @@ inline bool setRequiredPrivileges() {
   }
 }
 
-#endif
+// Allocate an array of doubles of size `size`, return it as a
+// std::unique_ptr<double[], D>, where `D` is a custom deleter type
+inline auto allocateDoublesArray(size_t size) {
+  [[maybe_unused]] static const bool setPriv = setRequiredPrivileges();
+  static const size_t hugePageSize = GetLargePageMinimum();
+
+  size = calculateAlignedSize(size * sizeof(double), hugePageSize);
+  auto *alloc = static_cast<double *>(VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE));
+  if (alloc == NULL) {
+    throw std::bad_alloc{};
+  }
+
+  auto deleter = [](double *ptr) { VirtualFree(ptr, 0, MEM_RELEASE); };
+  return std::unique_ptr<double[], decltype(deleter)>(alloc,
+                                                      std::move(deleter));
+}
+
+#else
 
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
@@ -168,3 +216,5 @@ inline auto allocateDoublesArray(size_t size) {
   // The more verbose version is meant to demonstrate the use of a custom
   // (potentially stateful) deleter
 }
+
+#endif // defined(ON_LINUX)
