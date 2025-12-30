@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "Platform.hpp"
+
 //////////////////////////////////////////////////////////////
 //                       ATTENTION                          //
 // You are not meant to modify this file. Please focus on   //
@@ -90,6 +92,29 @@ void solution(const std::vector<std::array<unsigned, 2>> &topo,
               unsigned n_nodes, const double *x, const double *y,
               const double *lhs, double *rhs) {
   std::fill(rhs, rhs + n_nodes * 2, 0.);
-  for (const auto [n1, n2] : topo)
+  for (size_t i = 0U; i < topo.size(); ++i) {
+    auto [n1, n2] = topo[i];
+
+#ifdef PREFETCH_ENABLED
+    // add sw prefetches to reduce dram-bound loads
+    constexpr size_t PREFETCH_STEP = 10U;
+    size_t prefetch_i = i + PREFETCH_STEP;
+    if (prefetch_i < topo.size()) {
+      auto [n1p, n2p] = topo[prefetch_i];
+      // x, y
+      PREFETCH(&x[n1p]);
+      PREFETCH(&x[n2p]);
+      PREFETCH(&y[n1p]);
+      PREFETCH(&y[n2p]);
+      // lhs, rhs
+      const auto dofs = computeDofs(n1p, n2p);
+      for (unsigned k = 0U; k < dofs.size(); ++k) {
+        PREFETCH(&lhs[dofs[k]]);
+        PREFETCHW(&rhs[dofs[k]]);
+      }
+    }
+#endif
+
     processsElement(n1, n2, x, y, lhs, rhs);
+  }
 }

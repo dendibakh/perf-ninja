@@ -1,14 +1,7 @@
 #include <iostream>
 #include <memory>
 
-#if defined(__linux__) || defined(__linux) || defined(linux) ||                \
-    defined(__gnu_linux__)
-#define ON_LINUX
-#elif defined(__APPLE__) && defined(__MACH__)
-#define ON_MACOS
-#elif defined(_WIN32) || defined(_WIN64)
-#define ON_WINDOWS
-#endif
+#include "Platform.hpp"
 
 static size_t calculateAlignedSize(size_t size, size_t pageSize) {
   size_t remainedPage = (size % pageSize > 0U) ? 1U : 0U;
