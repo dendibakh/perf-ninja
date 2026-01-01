@@ -1,5 +1,7 @@
 #include "solution.hpp"
 
+#include <cstddef>
+
 static int getSumOfDigits(int n) {
   int sum = 0;
   while (n != 0) {
@@ -12,9 +14,22 @@ static int getSumOfDigits(int n) {
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
-  for (int val : lookups) {
-    if (hash_map->find(val))
+  constexpr size_t PREFETCH_STEP = 15U;
+  size_t i = 0U;
+  for (size_t p = PREFETCH_STEP; p < lookups.size(); ++i, ++p) {
+    hash_map->prefetch(lookups[p]);
+
+    int val = lookups[i];
+    if (hash_map->find(val)) {
       result += getSumOfDigits(val);
+    }
+  }
+
+  for ( ; i < lookups.size(); ++i) {
+    int val = lookups[i];
+    if (hash_map->find(val)) {
+      result += getSumOfDigits(val);
+    }
   }
 
   return result;
