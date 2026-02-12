@@ -23,5 +23,7 @@ bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
       out[i][j] = in[j][i];
     }
   }
+
+
   return out[0][size - 1];
 }
