@@ -21,6 +21,13 @@
 #include <unistd.h>
 #endif
 
+#ifdef ON_MACOS
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
 #ifdef ON_WINDOWS
 #include <windows.h>
 
@@ -65,6 +72,49 @@ private:
 #ifdef ON_LINUX
 MappedFile::MappedFile(const std::string &path) {
   const int fd = open(path.c_str(), O_RDONLY | O_LARGEFILE);
+  if (fd == -1)
+    throw std::runtime_error{"Could not open the specified file"};
+  struct stat sb {};
+  if (fstat(fd, &sb))
+    throw std::runtime_error{"Could not obtain file info"};
+  m_size = static_cast<std::size_t>(sb.st_size);
+
+  void *const mapped_addr = mmap(NULL, m_size, PROT_READ, MAP_PRIVATE, fd,
+                                 0u); // NOLINT it's a C API...
+  if (mapped_addr == MAP_FAILED)
+    throw std::runtime_error{"Could not mmap file"};
+
+  m_content = static_cast<char *>(mapped_addr);
+
+  if (close(fd))
+    throw std::runtime_error{"Could not close file after mmap"};
+}
+
+MappedFile::MappedFile(MappedFile &&other) noexcept
+    : m_content{other.m_content}, m_size{other.m_size} {
+  other.m_content = nullptr;
+}
+
+MappedFile &MappedFile::operator=(MappedFile &&other) noexcept {
+  if (this != &other) {
+    dtorImpl();
+    m_content = other.m_content;
+    m_size = other.m_size;
+    other.m_content = nullptr;
+  }
+  return *this;
+}
+
+void MappedFile::dtorImpl() noexcept {
+  if (m_content)
+    munmap(m_content, m_size); // Ignore error - dtor shouldn't throw  we can't
+                               // meaningfully handle this error anyway
+}
+#endif
+
+#ifdef ON_MACOS
+MappedFile::MappedFile(const std::string &path) {
+  const int fd = open(path.c_str(), O_RDONLY);
   if (fd == -1)
     throw std::runtime_error{"Could not open the specified file"};
   struct stat sb {};
