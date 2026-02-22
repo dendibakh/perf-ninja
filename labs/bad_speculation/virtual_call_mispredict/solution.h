@@ -6,27 +6,25 @@
 constexpr std::size_t N = 64 * 1024;
 
 struct BaseClass {
+    BaseClass(size_t offset = 0) : offset_(offset) {}
     virtual ~BaseClass() = default;
 
-    virtual void handle(std::size_t& data) const = 0;
+    void handle(std::size_t& data) const {
+      data += offset_;
+    }
+    size_t offset_;
 };
 
 struct ClassA : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 1;
-    }
+  ClassA() : BaseClass(1) {}
 };
 
 struct ClassB : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 2;
-    }
+  ClassB() : BaseClass(2) {}
 };
 
 struct ClassC : public BaseClass {
-    void handle(std::size_t& data) const override {
-        data += 3;
-    }
+  ClassC() : BaseClass(3) {}
 };
 
 using InstanceArray = std::vector<std::unique_ptr<BaseClass>>;
