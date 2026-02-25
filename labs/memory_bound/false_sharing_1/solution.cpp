@@ -4,11 +4,20 @@
 #include <omp.h>
 #include <vector>
 
+#define SOLUTION
+
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
+#ifdef SOLUTION
+  //align as
+  //目标是让每个累加器占据一个缓存行
+  #define CACHELINE_ALIGN alignas(64)
+  struct CACHELINE_ALIGN Accumulator {
+#else
   struct Accumulator {
+#endif
     std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
