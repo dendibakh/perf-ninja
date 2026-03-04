@@ -25,7 +25,7 @@ public:
         return m_vector[bucket] != UNUSED;
     }
 
-    bool pre_fetch_find(int val) const {
+    void pre_fetch_find(int val) const {
         int bucket = val % N_Buckets;
         __builtin_prefetch(&m_vector[bucket]);
     }
