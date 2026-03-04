@@ -33,6 +33,8 @@ static void bench1(benchmark::State &state) {
 
 // Register the function as a benchmark
 BENCHMARK(bench1);
+BENCHMARK(filterHorizontally);
+BENCHMARK(filterVertically);
 
 // Run the benchmark
 int main(int argc, char **argv) {
