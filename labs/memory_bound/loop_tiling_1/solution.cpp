@@ -3,7 +3,7 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  static constexpr int TILE_SIZE = sizeof(size_t * 8);
+  static constexpr int TILE_SIZE = sizeof(size_t) * 8;
   for (int i = 0; i < size; i += TILE_SIZE) {
     for (int j = 0; j < size; j += TILE_SIZE) {
       for (int ii = i; ii < std::min(i + TILE_SIZE, size); ii++) {
