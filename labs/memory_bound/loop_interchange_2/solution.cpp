@@ -1,14 +1,14 @@
-
 #include "solution.h"
 #include <algorithm>
 #include <fstream>
 #include <ios>
 
 static void transpose_u8(uint8_t* out, const uint8_t* in, int width, int height) {
-  for (int y = 0; y < height; ++y) {
-    const uint8_t* row = in + y * width;
-    for (int x = 0; x < width; ++x) {
-      out[x * height + y] = row[x];
+  for (int r = 0; r < height; ++r) {
+    for (int c = 0; c < width; ++c) {
+      const int in_idx  = r * width  + c;
+      const int out_idx = c * height + r;
+      out[out_idx] = in[in_idx];
     }
   }
 }
