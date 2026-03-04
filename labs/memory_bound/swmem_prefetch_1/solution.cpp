@@ -17,7 +17,7 @@ int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
     if (hash_map->find(val)) {
       if (i + 1 < lookups.size()) [[likely]]
       {
-        __builtin_prefetch(&lookups[i + 1], 0, 1);
+        hash_map->pre_fetch_find(lookups[i + 1]);
       }
       result += getSumOfDigits(val);
     }
