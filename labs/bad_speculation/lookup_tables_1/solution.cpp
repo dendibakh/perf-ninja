@@ -14,7 +14,7 @@ int buckets[100] = {
 static size_t mapToBucket(size_t v) {
   if (v < (sizeof (buckets) / sizeof (int)))
     return buckets[v];
-  return -1; // let it crash
+  return DEFAULT_BUCKET;
 }
 
 std::array<size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
