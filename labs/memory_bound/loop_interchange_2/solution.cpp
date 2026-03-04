@@ -4,61 +4,43 @@
 #include <fstream>
 #include <ios>
 
-// Applies Gaussian blur in independent vertical lines
+static void transpose_u8(uint8_t* out, const uint8_t* in, int width, int height) {
+  for (int y = 0; y < height; ++y) {
+    const uint8_t* row = in + y * width;
+    for (int x = 0; x < width; ++x) {
+      out[x * height + y] = row[x];
+    }
+  }
+}
+
+static void filterHorizontally(uint8_t *output, const uint8_t *input,
+                               const int width, const int height,
+                               const int *kernel, const int radius,
+                               const int shift);
+
 static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int width, const int height,
                              const int *kernel, const int radius,
                              const int shift) {
-  const int rounding = 1 << (shift - 1);
+  const int tW = height;
+  const int tH = width;
+  const size_t n = (size_t)width * (size_t)height;
 
-  for (int c = 0; c < width; c++) {
-    // Top part of line, partial kernel
-    for (int r = 0; r < std::min(radius, height); r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = &kernel[radius - r];
-      for (int y = 0; y <= std::min(r + radius, height - 1); y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
+  uint8_t* tin  = (uint8_t*)std::malloc(n);
+  uint8_t* tout = (uint8_t*)std::malloc(n);
 
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
-    }
-
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
-      // Accumulation
-      int dot = 0;
-      for (int i = 0; i < radius + 1 + radius; i++) {
-        dot += input[(r - radius + i) * width + c] * kernel[i];
-      }
-
-      // Fast shift instead of division
-      int value = (dot + rounding) >> shift;
-      output[r * width + c] = static_cast<uint8_t>(value);
-    }
-
-    // Bottom part of line, partial kernel
-    for (int r = std::max(radius, height - radius); r < height; r++) {
-      // Accumulation
-      int dot = 0;
-      int sum = 0;
-      auto p = kernel;
-      for (int y = r - radius; y < height; y++) {
-        int weight = *p++;
-        dot += input[y * width + c] * weight;
-        sum += weight;
-      }
-
-      // Normalization
-      int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
-      output[r * width + c] = static_cast<uint8_t>(value);
-    }
+  if (!tin || !tout) {
+    std::free(tin);
+    std::free(tout);
+    return;
   }
+
+  transpose_u8(tin, input, width, height);
+  filterHorizontally(tout, tin, tW, tH, kernel, radius, shift);
+  transpose_u8(output, tout, tW, tH);
+
+  std::free(tin);
+  std::free(tout);
 }
 
 // Applies Gaussian blur in independent horizontal lines
