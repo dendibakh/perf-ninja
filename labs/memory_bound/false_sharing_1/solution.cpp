@@ -8,9 +8,8 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
-  struct Accumulator {
+  struct alignas(64) Accumulator {
     std::atomic<uint32_t> value = 0;
-    char padding[64 - sizeof(std::atomic<uint32_t>)];
   };
   std::vector<Accumulator> accumulators(thread_count);
 
