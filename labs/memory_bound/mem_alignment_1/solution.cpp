@@ -8,7 +8,11 @@
 // This function allows you to change the number of columns in a matrix. 
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
-int n_columns(int N) {  
+int n_columns(int N) {
+  if (N * sizeof(float) % CACHELINE_SIZE == 0) {
+    return N;
+  }
+  char* dummy = new char (CACHELINE_SIZE - (N * sizeof(float) % CACHELINE_SIZE));
   return N;
 }
 // ******************************************
