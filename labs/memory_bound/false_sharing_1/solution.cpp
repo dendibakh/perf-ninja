@@ -20,7 +20,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
     auto &target = accumulators[target_index];
 
 #pragma omp for
-    int sum = 0;
+    uint32_t sum = 0;
     for (int i = 0; i < data.size(); i++) {
       // Perform computation on each input
       auto item = data[i];
@@ -31,7 +31,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
       // Write result to accumulator
       sum += item % 13;
     }
-    target.value = sum;
+    target.value += sum;
   }
 
   std::size_t result = 0;
