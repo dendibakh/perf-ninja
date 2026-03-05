@@ -10,6 +10,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // to `target` stays inside the loop.
   struct Accumulator {
     std::atomic<uint32_t> value = 0;
+    char padding[64 - sizeof(std::atomic<uint32_t>)];
   };
   std::vector<Accumulator> accumulators(thread_count);
 
@@ -20,7 +21,6 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
     auto &target = accumulators[target_index];
 
 #pragma omp for
-    uint32_t sum = 0;
     for (int i = 0; i < data.size(); i++) {
       // Perform computation on each input
       auto item = data[i];
@@ -29,9 +29,8 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
       item |= (item >> 24);
 
       // Write result to accumulator
-      sum += item % 13;
+      target.value += item % 13;
     }
-    target.value += sum;
   }
 
   std::size_t result = 0;
