@@ -12,7 +12,7 @@ int n_columns(int N) {
   if (N * sizeof(float) % CACHELINE_SIZE == 0) {
     return N;
   }
-  char* dummy = new char (CACHELINE_SIZE - (N * sizeof(float) % CACHELINE_SIZE));
+  std::vector<char> dummy(CACHELINE_SIZE - (N * sizeof(float) % CACHELINE_SIZE));
   return N;
 }
 // ******************************************
