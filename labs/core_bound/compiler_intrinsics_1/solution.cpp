@@ -1,6 +1,8 @@
 
 #include "solution.h"
 #include <memory>
+#include <immintrin.h>
+
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -22,8 +24,23 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
-  for (; pos < limit; ++pos) {
-    output[pos] = output[pos - 1] - input[pos - radius - 1] + input[pos + radius];
+  for (; pos + 16 < limit; pos += 16) {
+    // Load 16x uint8 from input (two offsets)
+    __m128i a8 = _mm_loadu_si128((__m128i*)&input[pos - radius - 1]);
+    __m128i b8 = _mm_loadu_si128((__m128i*)&input[pos + radius]);
+
+    // Widen uint8 → uint16
+    __m256i a16 = _mm256_cvtepu8_epi16(a8);
+    __m256i b16 = _mm256_cvtepu8_epi16(b8);
+
+    // Load existing output (uint16)
+    __m256i out = _mm256_loadu_si256((__m256i*)&output[pos]);
+
+    // out = out - a + b
+    out = _mm256_sub_epi16(out, a16);
+    out = _mm256_add_epi16(out, b16);
+
+    _mm256_storeu_si256((__m256i*)&output[pos], out);
   }
 
   // 3. special case, executed only if size <= 2*radius + 1
