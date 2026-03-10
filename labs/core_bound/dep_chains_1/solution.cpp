@@ -21,7 +21,7 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 unsigned solution(List* l1, List* l2) {
-  constexpr int M = 8;
+  constexpr int M = 16;
   unsigned retVal = 0;
 
   List* head2 = l2;
