@@ -23,6 +23,6 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+        export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
         python3 buildbot/runCI.py -workdir ${{github.workspace}}/labs -runner MacosM1
 
