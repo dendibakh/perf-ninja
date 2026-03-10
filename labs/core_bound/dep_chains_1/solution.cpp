@@ -20,33 +20,42 @@ unsigned getSumOfDigits(unsigned n) {
 // Hint: Traversing a linked list is a long data dependency chain:
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
-unsigned solution(List *l1, List *l2) {
-  unsigned sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
+unsigned solution(List* l1, List* l2) {
+  constexpr int M = 8;
+  unsigned retVal = 0;
 
-  List *head2 = l2;
-  unsigned lane = 0;
+  List* head2 = l2;
 
   while (l1) {
-    unsigned v = l1->value;
-    l2 = head2;
+    std::array<unsigned, M> vals{};
+    std::array<bool, M> active{};
+    int count = 0;
 
-    while (l2) {
-      if (l2->value == v) {
-        unsigned s = getSumOfDigits(v);
-        switch (lane & 3) {
-          case 0: sum0 += s; break;
-          case 1: sum1 += s; break;
-          case 2: sum2 += s; break;
-          case 3: sum3 += s; break;
-        }
-        ++lane;
-        break;
-      }
-      l2 = l2->next;
+    // Load up to 8 values from l1
+    for (; count < M && l1; ++count) {
+      vals[count] = l1->value;
+      active[count] = true;
+      l1 = l1->next;
     }
 
-    l1 = l1->next;
+    // Scan l2 once for the whole batch
+    l2 = head2;
+    int found = 0;
+
+    while (l2 && found < count) {
+      unsigned v2 = l2->value;
+
+      for (int j = 0; j < count; ++j) {
+        if (active[j] && v2 == vals[j]) {
+          retVal += getSumOfDigits(vals[j]);
+          active[j] = false;  // count each l1 element at most once
+          ++found;
+        }
+      }
+
+      l2 = l2->next;
+    }
   }
 
-  return sum0 + sum1 + sum2 + sum3;
+  return retVal;
 }
