@@ -21,22 +21,32 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 unsigned solution(List *l1, List *l2) {
-  unsigned retVal = 0;
+  unsigned sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
 
   List *head2 = l2;
-  // O(N^2) algorithm:
+  unsigned lane = 0;
+
   while (l1) {
     unsigned v = l1->value;
     l2 = head2;
+
     while (l2) {
       if (l2->value == v) {
-        retVal += getSumOfDigits(v);
+        unsigned s = getSumOfDigits(v);
+        switch (lane & 3) {
+          case 0: sum0 += s; break;
+          case 1: sum1 += s; break;
+          case 2: sum2 += s; break;
+          case 3: sum3 += s; break;
+        }
+        ++lane;
         break;
       }
       l2 = l2->next;
     }
+
     l1 = l1->next;
   }
 
-  return retVal;
+  return sum0 + sum1 + sum2 + sum3;
 }
