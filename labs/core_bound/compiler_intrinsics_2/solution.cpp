@@ -26,8 +26,10 @@ unsigned solution(const std::string& inputContents) {
     const __m128i nl = _mm_set1_epi8('\n');
 
     for (; index + 16 <= n; index += 16) {
+        const char* ptr = inputContents.data() + index;
+
         __m128i chunk = _mm_loadu_si128(
-            reinterpret_cast<const __m128i*>(inputContents.data() + index));
+            reinterpret_cast<const __m128i*>(ptr));
 
         __m128i cmp = _mm_cmpeq_epi8(chunk, nl);
         unsigned mask = static_cast<unsigned>(_mm_movemask_epi8(cmp));
@@ -37,25 +39,23 @@ unsigned solution(const std::string& inputContents) {
             continue;
         }
 
+        int prev = 0;
+
         while (mask != 0) {
             unsigned pos = __builtin_ctz(mask);
-            longestLine = std::max(longestLine, curLineLength + pos);
-            curLineLength = 15 - pos; // רגע, זה לא נכון אם יש יותר מ־newline אחד
+
+            curLineLength += (pos - prev);
+            longestLine = std::max(longestLine, curLineLength);
+            curLineLength = 0;
+
+            prev = pos + 1;
             mask &= (mask - 1);
         }
 
-        // לכן בפועל, כשיש match, יותר פשוט לעבור על 16 הבתים
-        const char* p = inputContents.data() + index;
-        for (int i = 0; i < 16; ++i) {
-            if (p[i] == '\n') {
-                longestLine = std::max(longestLine, curLineLength);
-                curLineLength = 0;
-            } else {
-                ++curLineLength;
-            }
-        }
+        curLineLength += (16 - prev);
     }
 
+    // tail
     for (; index < n; ++index) {
         if (inputContents[index] == '\n') {
             longestLine = std::max(longestLine, curLineLength);
