@@ -15,6 +15,10 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install Python Dependencies
+      shell: bash
+      run: python3 -m pip install scipy numpy pandas --break-system-packages
+
     - name: Benchmark
       shell: bash
       working-directory: ${{github.workspace}}
