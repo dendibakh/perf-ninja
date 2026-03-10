@@ -1,0 +1,11 @@
+[env]
+# Prepend Homebrew's LLVM to the path for this directory
+_.path = ["/opt/homebrew/opt/llvm@17/bin"]
+
+# Explicitly tell CMake to use the LLVM 17 compilers
+CC = "/opt/homebrew/opt/llvm@17/bin/clang"
+CXX = "/opt/homebrew/opt/llvm@17/bin/clang++"
+
+# Linker and Preprocessor flags so it can find its own libraries
+LDFLAGS = "-L/opt/homebrew/opt/llvm@17/lib"
+CPPFLAGS = "-I/opt/homebrew/opt/llvm@17/include"
