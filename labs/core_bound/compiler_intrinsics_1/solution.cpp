@@ -24,22 +24,24 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
-  for (; pos <= limit - 8; pos += 8) {
-    auto sum8 = _mm_setzero_si128();
-    for(int j = -radius; j <= radius; j++) {
-      auto loadIndex = pos + j;
-      const auto *ptr = input.data() + loadIndex;
-      auto raw_val = _mm_loadu_si64(ptr);
-      auto val = _mm_cvtepu8_epi16(raw_val);
-      sum8 = _mm_add_epi16(sum8, val);
-    }
-    auto *outPtr = reinterpret_cast<__m128i *>(output.data() + pos);
-    _mm_storeu_si128(outPtr, sum8);
-  }
 
-  currentSum = 0;
-  for (int i = pos - 1 - radius; i <= pos - 1 + radius; ++i) {
-      currentSum += input[i];
+  for (; pos <= limit - 8; pos += 8)
+  {
+    const auto *sub_ptr = input.data() + pos - radius - 1;
+    auto sub_vec = _mm_loadu_si64(sub_ptr);
+    auto sub = _mm_cvtepu8_epi16(sub_vec);
+    const auto *add_ptr = input.data() + pos + radius;
+    auto add_vec = _mm_loadu_si64(add_ptr);
+    auto add = _mm_cvtepu8_epi16(add_vec);
+
+    auto diff = _mm_sub_epi16(add, sub);
+    auto sum = _mm_add_epi16(diff, _mm_slli_si128(diff, 2));
+    sum = _mm_add_epi16(sum, _mm_slli_si128(sum, 4));
+    sum = _mm_add_epi16(sum, _mm_slli_si128(sum, 8));
+    auto result = _mm_add_epi16(_mm_set1_epi16(currentSum), sum);
+    auto *outPtr = reinterpret_cast<__m128i *>(output.data() + pos);
+    _mm_storeu_si128(outPtr, result);
+    currentSum = _mm_extract_epi16(result, 7);
   }
 
   for (; pos < limit; ++pos) {
