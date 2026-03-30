@@ -3,9 +3,16 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  for (int i = 0; i < size; i++) {
-    for (int j = 0; j < size; j++) {
-      out[i][j] = in[j][i];
+  constexpr int TILE_SIZE = 32;
+  for (int i = 0; i < size; i+=TILE_SIZE) {
+    for (int j = 0; j < size; j+=TILE_SIZE) {
+      int bi = std::min(i + TILE_SIZE, size);
+      int bj = std::min(j + TILE_SIZE, size);
+      for (int ii = i; ii < bi; ii++){
+        for (int jj = j; jj < bj; jj++){
+          out[ii][jj] = in[jj][ii];
+        }
+      }
     }
   }
   return out[0][size - 1];
