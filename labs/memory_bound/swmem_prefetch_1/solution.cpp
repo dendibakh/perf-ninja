@@ -11,8 +11,18 @@ static int getSumOfDigits(int n) {
 
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
+  int EARLY_PREFETCH_DISTANCE = 16;
+  int i = 0;
+  int size = lookups.size();
+  for (; i < size - EARLY_PREFETCH_DISTANCE; i++) {
+    hash_map->prefetch(lookups[i + EARLY_PREFETCH_DISTANCE]);
+    int val = lookups[i];
+    if (hash_map->find(val))
+      result += getSumOfDigits(val);
+  }
 
-  for (int val : lookups) {
+  for (; i < size; i++) {
+    int val = lookups[i];
     if (hash_map->find(val))
       result += getSumOfDigits(val);
   }
