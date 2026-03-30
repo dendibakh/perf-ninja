@@ -1,6 +1,8 @@
 
 #include "solution.h"
 #include <memory>
+#include "immintrin.h"
+#include "emmintrin.h"
 
 void imageSmoothing(const InputVector &input, uint8_t radius,
                     OutputVector &output) {
@@ -22,6 +24,24 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
 
   // 2. main loop.
   limit = size - radius;
+  for (; pos <= limit - 8; pos += 8) {
+    auto sum8 = _mm_setzero_si128();
+    for(int j = -radius; j <= radius; j++) {
+      auto loadIndex = pos + j;
+      const auto *ptr = input.data() + loadIndex;
+      auto raw_val = _mm_loadu_si64(ptr);
+      auto val = _mm_cvtepu8_epi16(raw_val);
+      sum8 = _mm_add_epi16(sum8, val);
+    }
+    auto *outPtr = reinterpret_cast<__m128i *>(output.data() + pos);
+    _mm_storeu_si128(outPtr, sum8);
+  }
+
+  currentSum = 0;
+  for (int i = pos - 1 - radius; i <= pos - 1 + radius; ++i) {
+      currentSum += input[i];
+  }
+
   for (; pos < limit; ++pos) {
     currentSum -= input[pos - radius - 1];
     currentSum += input[pos + radius];
