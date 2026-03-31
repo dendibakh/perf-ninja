@@ -12,7 +12,6 @@
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   constexpr int LOOP_UNROLL = 4;
   std::array<std::array<uint32_t, 256>, LOOP_UNROLL> hists{};
-  std::array<uint32_t, 256> hist{};
   const auto pixel_count = image.width * image.height;
   const auto* data = image.data.get();
   int i = 0;
@@ -24,14 +23,14 @@ std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
   }
 
   for (; i < pixel_count; ++i)
-    hist[data[i]]++;
+    hists[0][data[i]]++;
 
   for (int c = 0; c < 256; c++) {
-    for (int j = 0; j < LOOP_UNROLL; j++) {
-      hist[c] += hists[j][c];
+    for (int j = 1; j < LOOP_UNROLL; j++) {
+      hists[0][c] += hists[j][c];
     }
   }
-  return hist;
+  return hists[0];
 }
 // ******************************************
 
