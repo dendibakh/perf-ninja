@@ -10,27 +10,27 @@
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
 std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
-  constexpr int LOOP_UNROLL = 4;
-  std::array<std::array<uint32_t, 256>, LOOP_UNROLL> hists{};
+  std::array<uint32_t, 256> hist1{};
+  std::array<uint32_t, 256> hist2{};
+  std::array<uint32_t, 256> hist3{};
+  std::array<uint32_t, 256> hist4{};
   const auto pixel_count = image.width * image.height;
   const auto* data = image.data.get();
   int i = 0;
-  for (; i <= pixel_count - LOOP_UNROLL; i += LOOP_UNROLL) {
-    hists[0][data[i + 0]]++;
-    hists[1][data[i + 1]]++;
-    hists[2][data[i + 2]]++;
-    hists[3][data[i + 3]]++;
+  for (; i <= pixel_count - 4; i += 4) {
+    hist1[data[i + 0]]++;
+    hist2[data[i + 1]]++;
+    hist3[data[i + 2]]++;
+    hist4[data[i + 3]]++;
   }
 
   for (; i < pixel_count; ++i)
-    hists[0][data[i]]++;
+    hist1[data[i]]++;
 
   for (int c = 0; c < 256; c++) {
-    for (int j = 1; j < LOOP_UNROLL; j++) {
-      hists[0][c] += hists[j][c];
-    }
+      hist1[c] += hist2[c] + hist3[c] + hist4[c];
   }
-  return hists[0];
+  return hist1;
 }
 // ******************************************
 
