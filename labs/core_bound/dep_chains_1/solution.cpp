@@ -21,88 +21,48 @@ unsigned getSumOfDigits(unsigned n) {
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
 
-static unsigned getValue(List *&l1, List *l2, List *&q)
-{
-  if (l1 == nullptr)
-  {
-    q = nullptr;
-    return 0;
-  }
-  auto val = l1->value;
-  q = l2;
-  l1 = l1->next;
-  return val;
-}
-
 unsigned solution(List *l1, List *l2)
 {
   unsigned retVal = 0;
 
   // O(N^2) algorithm:
-  List *q0 = nullptr, *q1 = nullptr, *q2 = nullptr, *q3 = nullptr;
-  auto v0 = getValue(l1, l2, q0);
-  auto v1 = getValue(l1, l2, q1);
-  auto v2 = getValue(l1, l2, q2);
-  auto v3 = getValue(l1, l2, q3);
-  while (q0 || q1 || q2 || q3)
+  constexpr int chains = 4;
+  std::array<List *, chains> q{};
+  std::array<unsigned, chains> v{};
+  for (auto i = 0; i < chains; ++i)
   {
-    if (q0)
+    if (l1)
     {
-      if (q0->value == v0)
-      {
-        retVal += getSumOfDigits(v0);
-        v0 = getValue(l1, l2, q0);
-      }
-      else
-      {
-        q0 = q0->next;
-        if (q0 == nullptr)
-          v0 = getValue(l1, l2, q0);
-      }
+      v[i] = l1->value;
+      l1 = l1->next;
+      q[i] = l2;
     }
-
-    if (q1)
+  }
+  bool any_active = true;
+  while (any_active)
+  {
+    any_active = false;
+    for (auto i = 0; i < chains; ++i)
     {
-      if (q1->value == v1)
+      if (q[i])
       {
-        retVal += getSumOfDigits(v1);
-        v1 = getValue(l1, l2, q1);
+        any_active = true;
+        if (q[i]->value == v[i])
+        {
+          retVal += getSumOfDigits(v[i]);
+          q[i] = nullptr;
+        }
+        else
+        {
+          q[i] = q[i]->next;
+        }
       }
-      else
-      {
-        q1 = q1->next;
-        if (q1 == nullptr)
-          v1 = getValue(l1, l2, q1);
-      }
-    }
 
-    if (q2)
-    {
-      if (q2->value == v2)
+      if (!q[i] && l1)
       {
-        retVal += getSumOfDigits(v2);
-        v2 = getValue(l1, l2, q2);
-      }
-      else
-      {
-        q2 = q2->next;
-        if (q2 == nullptr)
-          v2 = getValue(l1, l2, q2);
-      }
-    }
-
-    if (q3)
-    {
-      if (q3->value == v3)
-      {
-        retVal += getSumOfDigits(v3);
-        v3 = getValue(l1, l2, q3);
-      }
-      else
-      {
-        q3 = q3->next;
-        if (q3 == nullptr)
-          v3 = getValue(l1, l2, q3);
+        v[i] = l1->value;
+        l1 = l1->next;
+        q[i] = l2;
       }
     }
   }
