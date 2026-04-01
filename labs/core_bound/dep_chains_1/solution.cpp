@@ -47,7 +47,7 @@ unsigned solution(List *l1, List *l2)
       if (q[i])
       {
         any_active = true;
-        if (q[i]->value == v[i])
+        if (q[i]->value == v[i]) [[unlikely]]
         {
           retVal += getSumOfDigits(v[i]);
           q[i] = nullptr;
@@ -58,7 +58,7 @@ unsigned solution(List *l1, List *l2)
         }
       }
 
-      if (!q[i] && l1)
+      if (!q[i] && l1) [[unlikely]]
       {
         v[i] = l1->value;
         l1 = l1->next;
