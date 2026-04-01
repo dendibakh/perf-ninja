@@ -76,13 +76,5 @@ void randomParticleMotion(std::vector<Particle> &particles, uint32_t seed) {
       p3.x += cosine(angle_rad3) * p3.velocity;
       p3.y += sine(angle_rad3) * p3.velocity;
     }
-
-    for (; j < sz ; j++) {
-      auto &p = particles[j];
-      uint32_t angle = rng0.gen();
-      float angle_rad = angle * DEGREE_TO_RADIAN;
-      p.x += cosine(angle_rad) * p.velocity;
-      p.y += sine(angle_rad) * p.velocity;
-    }
   }
 }
