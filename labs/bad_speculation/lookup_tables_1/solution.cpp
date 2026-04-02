@@ -1,21 +1,26 @@
 #include "solution.hpp"
 
-static std::size_t mapToBucket(std::size_t v) {
-                              //   size of a bucket
-  if      (v < 13)  return 0; //   13
-  else if (v < 29)  return 1; //   16
-  else if (v < 41)  return 2; //   12
-  else if (v < 53)  return 3; //   12
-  else if (v < 71)  return 4; //   18
-  else if (v < 83)  return 5; //   12
-  else if (v < 100) return 6; //   17
-  return DEFAULT_BUCKET;
+static constexpr auto buildLUT() {
+  constexpr int hi = 150;
+  std::array<std::size_t, hi + 1> LUT{};
+  for(int i = 0; i <= hi; i++) {
+    if      (i < 13)  LUT[i] = 0;
+    else if (i < 29)  LUT[i] = 1;
+    else if (i < 41)  LUT[i] = 2;
+    else if (i < 53)  LUT[i] = 3;
+    else if (i < 71)  LUT[i] = 4;
+    else if (i < 83)  LUT[i] = 5;
+    else if (i < 100) LUT[i] = 6;
+    else              LUT[i] = DEFAULT_BUCKET;
+  }
+  return LUT;
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
+  static constexpr auto LUT = buildLUT();
   std::array<std::size_t, NUM_BUCKETS> retBuckets{0};
   for (auto v : values) {
-    retBuckets[mapToBucket(v)]++;
+    retBuckets[LUT[v]]++;
   }
   return retBuckets;
 }
