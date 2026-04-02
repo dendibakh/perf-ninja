@@ -6,93 +6,79 @@ constexpr int GridXDimension = 1024;
 constexpr int GridYDimension = 1024;
 constexpr int NumberOfSims = 10;
 
-class Life {
+class Life
+{
 
 public:
     using Grid = std::vector<std::vector<int>>;
-private:    
+
+private:
     Grid current;
     Grid future;
+    int M, N;
 
 public:
-
-    void reset(const Grid& grid) {
-        current = future = grid;
+    void reset(const Grid &grid)
+    {
+        M = grid.size();
+        N = grid[0].size();
+        current.assign(M + 2, std::vector<int>(N + 2, 0));
+        future.assign(M + 2, std::vector<int>(N + 2, 0));
+        for (int i = 0; i < M; i++)
+            for (int j = 0; j < N; j++)
+                current[i + 1][j + 1] = grid[i][j];
     }
 
-    int getPopulationCount() {
+    int getPopulationCount()
+    {
         int populationCount = 0;
-        for (auto& row: current)
-            for (auto& item: row)
-                populationCount += item;
+        for (int i = 1; i <= M; i++)
+            for (int j = 1; j <= N; j++)
+                populationCount += current[i][j];
         return populationCount;
     }
 
-    void printCurrentGrid() {
-        for (auto& row: current) {
-            for (auto& item: row)
-                item ? std::cout << "x " : std::cout << ". ";
+    void printCurrentGrid()
+    {
+        for (int i = 1; i <= M; i++)
+        {
+            for (int j = 1; j <= N; j++)
+                current[i][j] ? std::cout << "x " : std::cout << ". ";
             std::cout << "\n";
         }
         std::cout << "\n";
-    }    
+    }
 
-    // Simulate the next generation of life
-    void simulateNext() {
-        //printCurrentGrid();
-        int M = current.size();
-        int N = current[0].size();
-        
-        // Loop through every cell
-        for(int i = 0; i < M; i++) {
-            for(int j = 0; j < N; j++) {
-                int aliveNeighbours = 0;      
-                // finding the number of neighbours that are alive                  
-                for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
-                    for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-                        if((i + p < 0) ||                   // if row offset less than UPPER boundary
-                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                           (j + q < 0) ||                   // if column offset less than LEFT boundary
-                           (j + q > N - 1))                 // if column offset more than RIGHT boundary
-                            continue;
+    void simulateNext()
+    {
+
+        static constexpr int LUT[2][9] = {
+            // 0  1  2  3  4  5  6  7  8  (Neighbors)
+            {0, 0, 0, 1, 0, 0, 0, 0, 0}, // Dead cells only come alive at exactly 3
+            {0, 0, 1, 1, 0, 0, 0, 0, 0}  // Alive cells survive at 2 or 3
+        };
+
+        for (int i = 1; i <= M; i++)
+        {
+            for (int j = 1; j <= N; j++)
+            {
+                int aliveNeighbours = 0;
+                for (int p = -1; p <= 1; p++)
+                {
+                    for (int q = -1; q <= 1; q++)
+                    {
                         aliveNeighbours += current[i + p][j + q];
                     }
                 }
-                // The cell needs to be subtracted from
-                // its neighbours as it was counted before
-                aliveNeighbours -= current[i][j];
+                auto self = current[i][j];
+                aliveNeighbours -= self;
 
-                // Implementing the Rules of Life:
-                // Replacing switch statement
-                future[i][j] = __builtin_unpredictable(aliveNeighbours == 2) ? current[i][j] 
-                : (__builtin_unpredictable(aliveNeighbours == 3) ? 1 : 0);
-
-                // switch(aliveNeighbours) {
-                //     // 1. Cell is lonely and dies
-                //     case 0:
-                //     case 1:
-                //         future[i][j] = 0;
-                //         break;                
-                //     // 2. Remains the same
-                //     case 2:
-                //         future[i][j] = current[i][j];
-                //         break;
-                //     // 3. A new cell is born
-                //     case 3:
-                //         future[i][j] = 1;
-                //         break;
-                //     // 4. Cell dies due to over population
-                //     default:
-                //         future[i][j] = 0;
-                // }
+                future[i][j] = LUT[self][aliveNeighbours];
             }
         }
         std::swap(current, future);
     }
 };
 
-// Init random starting grid of the game
 Life::Grid initRandom();
-// Simulates N steps of the game for each starting grid 
-// and return population count
-std::vector<int> solution(const std::vector<Life::Grid>& grids);
+std::vector<int> solution(const std::vector<Life::Grid> &grids);
