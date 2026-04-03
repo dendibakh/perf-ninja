@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.10)
 
 project(lab)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-use=\"${CMAKE_CURRENT_SOURCE_DIR}/lua.profdata\"")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-use=\"${CMAKE_CURRENT_SOURCE_DIR}/lua.profdata\"")
 
 include_directories(lua)
 file(GLOB EXT_LAB_srcs lua/*.c)
