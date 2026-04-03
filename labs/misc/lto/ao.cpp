@@ -4,7 +4,7 @@ static void saveppm(const char *fname, int w, int h, unsigned char *img)
 {
     FILE *fp;
 
-    fopen_s(&fp, fname, "wb");
+    fp = fopen(fname, "wb");
     assert(fp);
 
     fprintf(fp, "P6\n");
