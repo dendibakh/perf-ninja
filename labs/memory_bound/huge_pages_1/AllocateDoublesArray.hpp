@@ -155,9 +155,13 @@ inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   auto size_in_bytes = size * sizeof(double);
   #if defined(ON_LINUX)
+  // Option 1 : THP via madvise (transparent huge pages must be enabled in the OS)
+  // double* alloc = (double *)mmap(nullptr, size_in_bytes, PROT_READ | PROT_WRITE,
+                        //  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  // madvise(alloc, size_in_bytes, MADV_HUGEPAGE);
+  // Option 2: Explicit huge page allocation (huge pages must be enabled in the OS)
   double* alloc = (double *)mmap(nullptr, size_in_bytes, PROT_READ | PROT_WRITE,
-                         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  madvise(alloc, size_in_bytes, MADV_HUGEPAGE);
+                        MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
   #elif defined(ON_WINDOWS)
   static auto privs = setRequiredPrivileges();
   auto huge_page_min_size = GetLargePageMinimum();
