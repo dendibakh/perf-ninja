@@ -49,11 +49,22 @@ extern Sphere spheres[3];
 extern Plane  plane;
 
 // ao_helpers.c
-double vdot(vec v0, vec v1);
-void vcross(vec *c, vec v0, vec v1);
-void vnormalize(vec *c);
-unsigned char clamp(double f);
-void saveppm(const char *fname, int w, int h, unsigned char *img);
+inline double vdot(vec v0, vec v1)
+{
+    return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+
+inline void vnormalize(vec *c)
+{
+    double length = sqrt(vdot((*c), (*c)));
+
+    if (fabs(length) > 1.0e-17) {
+        c->x /= length;
+        c->y /= length;
+        c->z /= length;
+    }
+}
+
 
 // ao_intersect.c
 void ray_sphere_intersect(Isect *isect, const Ray *ray, const Sphere *sphere);

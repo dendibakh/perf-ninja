@@ -1,5 +1,15 @@
 #include "ao.h"
 
+static unsigned char clamp(double f)
+{
+  int i = (int)(f * 255.5);
+
+  if (i < 0) i = 0;
+  if (i > 255) i = 255;
+
+  return (unsigned char)i;
+}
+
 void
 render(unsigned char *img, int w, int h, int nsubsamples)
 {

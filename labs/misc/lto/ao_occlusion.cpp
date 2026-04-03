@@ -8,7 +8,7 @@
 // this is an implementation of drand48 as defined in 
 // https://man7.org/linux/man-pages/man3/drand48.3.html
 // (linear_congruential_engine)
-double mydrand48() {
+static double mydrand48() {
   static std::minstd_rand generator;
   static std::uniform_real_distribution<double> distribution(0,1);
   return distribution(generator);
