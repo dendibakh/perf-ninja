@@ -1,5 +1,6 @@
 #include "solution.hpp"
 #include <iostream>
+#include <cstdint>
 #include "immintrin.h"
 
 // Find the longest line in a file.
