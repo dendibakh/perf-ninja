@@ -1,6 +1,7 @@
 #include "const.h"
 #include "solution.h"
 #include <array>
+#include <cstdint>
 #include "immintrin.h"
 
 std::vector<short> mandelbrot(int image_width, int image_height)
