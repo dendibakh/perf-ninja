@@ -48,6 +48,7 @@ lines that are too small to fill a 256-bit vector.
 <details>
 
 <summary><b>Worked Solution:</b></summary>
+
 ## Background:
 
 In this lab, the goal is to find the longest line in a file; more specifically, the longest continuous string of text

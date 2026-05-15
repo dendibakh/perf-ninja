@@ -38,7 +38,7 @@ of the row finishes at a cache line boundary?
 <details>
 <summary><b>Hint 3:</b></summary>
 
-Round up the length of the row to meet the next alignment boundary. This will involve adding empty padded columns to
+Round up the length of the row to meet the next alignment boundary. This may involve adding empty padded columns to
 the matrix.
 
 </details>

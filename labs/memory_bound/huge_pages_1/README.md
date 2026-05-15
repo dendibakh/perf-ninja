@@ -78,7 +78,7 @@ and how they work, I'll add a brief explanation of paging and virtual memory.
 
 When a process (such as the program of our algorithm) is run by the operating system (OS),
 the OS provides a virtualisation layer between the process and the machine's physical memory. This virtualisation
-provides _virtual addresses_ to the process that it can use for reads and writes; hidden from the process, these virtual addresses are mapped
+provides _virtual addresses_ to the process that it can use for reads and writes; unbeknownst to the process, these virtual addresses are mapped
 by the OS to real physical memory addresses.
 
 Many OS platforms, such as Linux, implement the mapping between virtual and physical memory through the use
@@ -90,7 +90,7 @@ The idea of the TLB is to provide extremely fast lookups of data that are regula
 
 When mapping a large memory space, such as on the order of hundreds of megabytes or even gigabytes, the sheer number of pages
 required to map the virtual memory to physical memory puts pressure on the TLB. The standard page size in Linux is 4 kB,
-meaning thousands (or even millions )of pages would be needed to map all the memory used by the arrays in an algorithm like this.
+meaning thousands (or even millions) of pages would be needed to map all the memory used by the arrays in an algorithm like this.
 This exceeds the number of entries that can be held in the TLB at a given time (which is usually around 4,000).
 Combined with the observation that this algorithm performs data lookups in a random order,
 a very high number of expensive TLB cache misses is likely to occur.

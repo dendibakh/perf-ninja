@@ -94,7 +94,7 @@ However, the root of the problem really comes from the random organisation of th
 ### Solution:
 
 A common approach to reduce the impact of runtime polymorphism is to use static polymorphism via templates (such as
-through the CRTP idiom, or through concepts in C++ 20+), but this is not available here due to the fact we have our
+through the CRTP idiom, or through concepts in C++ 20+), but this is not easily available here due to the fact we have our
 objects in a container, which limits us to homogeneity.
 
 In any case, we can assist the hardware by grouping the objects of the same derived type together in the container.
@@ -118,7 +118,7 @@ for (std::size_t i = 0; i < N; i++) {
 }
 ```
 
-There are branches here, but these have a smaller impact than the branch misses and extra virtual table lookups.
+There are branches here, but these have a smaller impact than the branch misses with virtual function calls.
 
 We then insert these data into the return array in a grouped fashion. Note that we need to use `std::make_move_iterator`
 to wrap these iterators, as `InstanceArray` is a collection of `std::unique_ptr`, which can only be moved (not copied):

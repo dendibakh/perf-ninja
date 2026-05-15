@@ -13,8 +13,8 @@ Author: @adamf88.
 <details>
 <summary><b>Hint 1:</b></summary>
 
-Can you think how using SIMD instructions here could help us process more elements at once? Have a look at the SSE
-family intrinsics in the [Intel Intrinsics Guide.](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html)
+Can you think how using SIMD instructions here could help us process more elements at once? If you are on x86, have a look at the SSE
+family intrinsics in the [Intel Intrinsics Guide](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html)
 to see which you think would be relevant to our case. Recall the current code manipulates 8-bit integers, one at a time.
 
 The code uses a sliding window to calculate a blur for position `pos` across a range
@@ -28,15 +28,6 @@ sliding window to ensure the width remains no greater than `2 * radius`. Try the
 
 <details>
 <summary><b>Hint 2:</b></summary>
-
-What do we do with any remaining elements that do not fit in a block of eight and thus cannot be read by our SIMD
-instructions?
-</details>
-
-<br>
-
-<details>
-<summary><b>Hint 3:</b></summary>
 
 The scalar problem uses prefix sums. To do this the SIMD way, you'll also need to know the algorithm for vectorised
 prefix sums. For a vector `[1, 2, 3, 4]`, you would have:
@@ -54,6 +45,14 @@ You'll be using `_mm_slli_si128` for these left shifts.
 
 <br>
 
+<details>
+<summary><b>Hint 3:</b></summary>
+
+What do we do with any remaining elements that do not fit in a block of eight and thus cannot be read by our SIMD
+instructions?
+</details>
+
+<br>
 
 <details>
 <summary><b>Worked Solution:</b></summary>
@@ -100,8 +99,8 @@ __m128_i current = _mm_set1_epi16(currentSum); // create vector of eight copies 
 
 We then process eight elements of our data per iteration. Here is how we convert the required values:
 
-- `subtractVal` - we need to use `_mm_loadu_si64` to load the next eight `uint8_t` form out input into the first 64-bits of an 128-bit vector.
-- `addVal` - we need to use the same intrinsic as for `subtractVal`, which is `_mm_loadu_si64`.
+- `subtractVal` - we need to use `_mm_loadu_si64` to load the next eight `uint8_t` from our input into the first 64-bits of an 128-bit vector.
+- `addVal` - we need to use the same intrinsic as for `subtractVal` (`_mm_loadu_si64`).
 
 Once we have loaded them into the vector value, we have an issue as we have eight single-byte integers packed into only the
 first 64 bits of these vectors. We need to use the `_mm_cvtepu8_epi16` intrinsic to extend these single-byte integers into
@@ -138,7 +137,7 @@ v8i diff = _mm_sub_epi16(add_ext_16, sub_ext_16);
 
 We then perform the vector prefix sum algorithm. One thing of importance to note! These intrinsics give us little-endian
 binary numbers, meaning the most significant byte is in the largest memory address. In our algorithm above, we spoke of
-doing right bit-shifts, but that was pertaining to _big-endian_ representations. For example, 32 in big-endian 8-bit
+doing right bit-shifts, but that was pertaining to _big-endian_ representations. For example, `32` in big-endian 8-bit
 representation is `10000000`, but `00000001` in little-endian.
 
 Therefore, in our algorithm, we will need to perform _left_ shifts when we accumulate the prefix sum of all of the

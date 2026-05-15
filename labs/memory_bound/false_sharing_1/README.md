@@ -175,14 +175,14 @@ We note `sizeof(Accumulator) == 4`. On x86 platforms, cache lines are 64 bytes w
 Accumulator objects can live on the same cache line.
 
 On x86, when an address is retrieved from memory, the whole cache line containing it is retrieved (or containing set of
-cache lines for objects \>64 bytes). In the case of atomics, when an attempt is made to write to it, the thread
-performing is granted exclusive access by the hardware not simply to the atomic variable, but to the _entire_ cache line
-in which the atomic resides.
+cache lines for objects \>64 bytes).
 
 When several atomic variables reside on the same cache line, if Thread A is writing to Atomic A, and if different
-threads attempt to write to separate atomics (Atomic B, Atomic C, etc.) simultaneously, these threads will be blocked
-due to the exclusive lock on the cache line. Even though these atomic objects are unrelated, there is now a dependency
-between the threads with their write operations, which is false sharing.
+threads attempt to write to separate atomics (Atomic B, Atomic C, etc.) simultaneously, the system's caching protocol 
+will force the other threads to reload the cache line in order to get the most recent version, which is a costly process
+and degrades performance significantly.
+Even though these atomic objects are unrelated, there is now a dependency between the threads with their write operations,
+which is false sharing.
 
 The resolution is to ensure that each atomic lives on its own cache line. This can be done using `alignas` on the struct
 or on the atomic itself:

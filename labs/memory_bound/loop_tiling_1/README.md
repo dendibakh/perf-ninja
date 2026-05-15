@@ -63,7 +63,7 @@ for (int i = 0; i < size; i++) {
 Matrix `in` is accessed in column-major order (i.e., `(0,0)` -> `(1,0)` -> ... -> `(2000,0)` -> `(0,1)` -> ...). Due to this
 access pattern and the size of the array, the code does not benefit from the way memory is loaded into the cache.
 
-When the code loads the element at (0,0), the next few elements in the 0th row (such as `(0,1)`, `(0,2)` etc.) will also
+When the code loads the element at `(0,0)`, the next few elements in the 0th row (such as `(0,1)`, `(0,2)` etc.) will also
 be loaded as part of the cache line in which they all reside in memory. However, as we traverse in column-major order,
 we never look at these next elements. By the time we get back to the 0th row (after 2000 iterations), and try to access
 `(0,1)`, it is almost certain that we will experience a cache miss due to the eviction of the original data from the cache

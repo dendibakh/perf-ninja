@@ -140,10 +140,10 @@ For completeness, we have to account for any remaining elements of `l1` that wer
   }
 ```
 
-What is a sensible size of blocks of nodes to search? That is up to you to try on your machine, but noticing that the
+What is a sensible size of blocks of nodes to search? That is up to you to try on your machine, but notice that the
 linked lists are allocated in memory via an arena allocator, meaning the elements are adjacent to one another in
-contiguous memory. Perhaps we load one cache line at a time, so the load of the first node from memory will also pull a
-number of adjacent nodes at the same time. The struct `Line` has size 16 (a pointer of size 8, and an unsigned int of
+contiguous memory. The CPU loads one cache line at a time, so the load of the first node from memory will also pull a
+number of adjacent nodes at the same time. The struct `List` has size 16 (a pointer of size 8, and an unsigned int of
 size 8):
 
 ```c++
@@ -154,7 +154,7 @@ struct List {
 ```
 
 On x86 systems, a cache line is 64 bytes wide; therefore, a logical place to start would be to work with blocks of 4
-Line pointers at a time, as these point to a region in memory equal to a cache line.
+`List` pointers at a time, as these point to a region in memory equal to a cache line.
 
 Using `N = 4`, the benchmark shows a marked improvement - twice the number of iterations in half the time!
 

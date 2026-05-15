@@ -48,7 +48,7 @@ This is a big step in assisting the compiler to produce auto-vectorised assembly
 
 Now that the matrix is transposed, we are no longer trying to deal with scalar score accumulators in our loop
 (such as `score_column`, `horizontal_gap_column`, and `last_vertical_gap`), but rather _vectorised_ values of
-width `sequence_count_v` = 16. These types should be updated to `std::array`s (or an equivalent) of size 16,
+width `sequence_count_v = 16`. These types should be updated to `std::array`s (or an equivalent) of size 16,
 and we should wrap them with a for-loop over each element to update each entry. Written in this way, the compiler should
 find it easier to generate vectorised code for us.
 

@@ -92,11 +92,13 @@ built on top of Linux `perf` to run performance analysis on Intel CPUs.
 
 We can run the `toplev.py` script (provided Python is installed) in `pmu-tools` on this lab as follows:
 
-`toplev.py --core S0-C0 --run-sample -l2 -v --no-desc taskset -c 0 ./lab ARG1 ARG2`
+```
+toplev.py --core S0-C0 --run-sample -l2 -v --no-desc taskset -c 0 ./lab ARG1 ARG2
+```
 
 where `ARG1` and `ARG2` are the paths to the input and output `.pgm` files, respectively.
 
-(To use the examples in the repository, they are `${CMAKE_CURRENT_SOURCE_DIR}/pexels-pixabay-434334.pbm` and `output.pgm`, which will be in the `build` directory
+(To use the examples in the repository, `ARG1` is `${CMAKE_CURRENT_SOURCE_DIR}/pexels-pixabay-434334.pbm` and `ARG2` is `output.pgm`, which will be in the `build` directory
 alongside `lab` after `lab` is run).
 
 Part of the output shows us the following:

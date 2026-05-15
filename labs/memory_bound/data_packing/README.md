@@ -103,7 +103,7 @@ is `99`. Given that integers of width 7 bits can represent numbers 0 to 127, we 
 (8 bits) rather than its usual 32 (4 bytes), and `short s` can also be reduced to 7 bits (instead of 16).
 
 By extension, as these two numbers are multiplied to find the value of `l`, we know `l` will not exceed 10,000.
-`l` can therefore be reduced to a 16-bit width. `double` is also too large a data type for the ramge we are considering
+`l` can therefore be reduced to a 16-bit width. `double` is also too large a data type for the range we are considering
 for division, so we can replace it with a `float`.
 
 The boolean field can simply be one bit.
@@ -122,11 +122,11 @@ struct S {
 };
 ```
 
-This eventually produces an object whose `sizeof(S) = 16` bytes, with only two bytes of padding after `bool b`.
+This eventually produces an object of `sizeof(S) = 16` bytes, with only two bytes of padding after `bool b`.
 
 We can actually do better than this still. All the integral values can fit into an `unsigned`, so replacing `long long`
 with `unsigned` allows us to reduce the size to 14-bits rather than 16 (as `2^14 - 1 = 16383 > 10000`, with 10,000 being
-the largest value of `S.l` that we handle). This gives us further size reductions:
+the largest value of `S::l` that we handle). This gives us further size reductions:
 
 ```c++
 struct S {

@@ -86,7 +86,7 @@ bench1           5475 us         5475 us          123
 
 ### Solution
 
-The way to resolve this is to use a lookup table that uses the value of v to directly index into the lookup table and
+The way to resolve this is to use a lookup table that uses the value of v to index directly into the lookup table and
 return the desired result.
 
 ```c++
