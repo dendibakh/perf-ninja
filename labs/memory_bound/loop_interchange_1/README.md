@@ -117,7 +117,7 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
 
 The memory access pattern for the matrix `b` is suboptimal. The innermost loop iterates over `k`, which ends up jumping
 from row to row in the matrix; in terms of memory, the processor has to jump around in memory to go from `b[k][j]` to
-`b[k+1]j`. We want to rewrite this loop so that we keep the row fixed and iterate over each column in `a` and `b`, as
+`b[k+1][j]`. We want to rewrite this loop so that we keep the row fixed and iterate over each column in `a` and `b`, as
 this will traverse memory contiguously.
 
 To do this, we simply swap the iterators over `j` with those over `k`:

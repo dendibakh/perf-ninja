@@ -94,7 +94,7 @@ We use `_mm_set1_epi16` to create eight copies of our 16-bit `currentSum` in a 1
 _broadcasting_ the input.
 
 ```c++
-__m128_i current = _mm_set1_epi16(currentSum); // create vector of eight copies of currentSum
+__m128i current = _mm_set1_epi16(currentSum); // create vector of eight copies of currentSum
 ```
 
 We then process eight elements of our data per iteration. Here is how we convert the required values:
