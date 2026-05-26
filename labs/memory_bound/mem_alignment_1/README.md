@@ -120,7 +120,7 @@ multiple of the number of elements of `float` that will fit on a cache line.
 To do this, we create a function in `solution.cpp`:
 
 ```c++
-int get_next_multiple_of_elems_in_cache_line(int N) {
+int get_next_multiple(int N) {
   const auto y = ELEMS_PER_CACHE_LINE - 1;
   return N + y & ~y;
 }
@@ -134,7 +134,7 @@ inline constexpr int ELEMS_PER_CACHE_LINE = CACHELINE_SIZE / sizeof(float);
 
 `CACHELINE_SIZE` is a constant provided by the existing code.
 
-`get_next_multiple_of_cache_line` will return the first multiple of `ELEMS_PER_CACHE_LINE` that is greater than or
+`get_next_multiple` will return the first multiple of `ELEMS_PER_CACHE_LINE` that is greater than or
 equal to `N`, where `N` will be the number of columns in our matrix.
 
 Finally, we change the function `n_columns`:

@@ -112,7 +112,7 @@ uint32_t acc = 0;
 
 Next, we want to add as many integers from `blob` as possible in chunks so that we get no more than one 32-bit overflow
 per chunk of additions. This is quite easy to achieve; the largest value we will encounter from blob is 2<sup>16</sup> - 1, so
-if we never process more than 2<sup>15</sup> (`1 << 16`) numbers at a time, we will not cause the 32-bit accumulator
+if we never process more than 2<sup>16</sup> - 1 numbers at a time, we will not cause the 32-bit accumulator
 to overflow more than once.
 
 We therefore introduce a chunk to the loop:
@@ -133,8 +133,8 @@ we know we have seen an unsigned integer overflow, and we increment `acc` by `1`
 
 ```c++
 constexpr size_t two_pow_16 = (1 << 16);
+uint32_t acc = 0, prev = 0;
 for (size_t i = 0; i < N; i += two_pow_16) {
-    uint32_t acc = 0, prev = 0;
     for (size_t j = i; j < i + two_pow_16 && j < N; j++) {
         acc += blob[j];
     }

@@ -73,7 +73,7 @@ as these are not characteristics of a cache-friendly algorithm.
 
 ### Solution (Linux)
 
-The problem can be alleviated slightly through the use of huge tables. Before explaining what these are
+The problem can be alleviated slightly through the use of huge pages. Before explaining what these are
 and how they work, I'll add a brief explanation of paging and virtual memory.
 
 When a process (such as the program of our algorithm) is run by the operating system (OS),
@@ -132,7 +132,7 @@ inline auto allocateDoublesArray(size_t size) {
   auto pages_needed = total_array_size / page_2mb + (total_array_size % page_2mb != 0);
   size_t total_to_alloc = pages_needed * page_2mb;
 
-  void* ptr = mmap(nullptr, total_to_alloc, PROT_READ | PROT_WRITE | PROT_EXEC,
+  void* ptr = mmap(nullptr, total_to_alloc, PROT_READ | PROT_WRITE,
                 MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
   if (ptr == MAP_FAILED) {
     throw std::bad_alloc{};
