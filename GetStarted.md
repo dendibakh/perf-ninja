@@ -75,13 +75,13 @@ You are free to work on whatever platform you have at your disposal. However, we
 * Windows 11 Version 21H2, build 22000.282
 * Clang C++ compiler, version 17.0
 
-**Machine 4 - (Linux + CoffeeLake)**
+**~Machine 4 - (Linux + CoffeeLake)~**
 
-* Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache
-* 16 GB RAM, DDR4 @ 2400 MT/s
-* 256GB NVME INTEL SSDPEKKW256G8
-* Ubuntu 20.04, kernel version 5.13
-* Clang C++ compiler, version 17.0
+* ~Intel(R) Core(TM) i5-8259U CPU @ 2.30GHz (3.80GHz Turbo), 6MB L3-cache~
+* ~16 GB RAM, DDR4 @ 2400 MT/s~
+* ~256GB NVME INTEL SSDPEKKW256G8~
+* ~Ubuntu 20.04, kernel version 5.13~
+* ~Clang C++ compiler, version 17.0~
 
 Keep in mind that sometimes you may see different speedups on different platforms.
 
