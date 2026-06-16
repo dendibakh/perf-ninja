@@ -1,0 +1,33 @@
+
+# These allow `objdump -S` to show us the source code. Doesn't impact performance.
+[profile.release]
+debug = true
+
+[profile.bench]
+debug = true
+
+[workspace]
+resolver = "2"
+members = [
+  "labs/misc/warmup",
+  "labs/misc/io_opt1",
+  "labs/core_bound/compiler_intrinsics_1",
+  "labs/core_bound/compiler_intrinsics_2",
+  "labs/core_bound/dep_chains_1",
+  "labs/core_bound/function_inlining_1",
+  "labs/core_bound/vectorization_1",
+  "labs/core_bound/vectorization_2",
+  "labs/memory_bound/data_packing",
+  "labs/memory_bound/loop_interchange_1",
+  "labs/memory_bound/loop_interchange_2",
+  "labs/memory_bound/loop_tiling_1",
+  "labs/memory_bound/swmem_prefetch_1",
+  "labs/memory_bound/false_sharing_1",
+  "labs/memory_bound/huge_pages_1",
+  "labs/bad_speculation/conditional_store_1",
+  "labs/bad_speculation/lookup_tables_1",
+  "labs/bad_speculation/virtual_call_mispredict",
+]
+
+[workspace.package]
+edition = "2021"

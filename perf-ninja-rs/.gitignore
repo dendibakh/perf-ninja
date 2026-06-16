@@ -1,0 +1,4 @@
+target/
+perf.data*
+data/
+labs/misc/io_opt1/src/data_paths.rs

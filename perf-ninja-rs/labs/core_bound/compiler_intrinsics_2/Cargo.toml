@@ -1,0 +1,13 @@
+[package]
+name = "compiler_intrinsics_2"
+version = "0.1.0"
+edition = "2021"
+
+[[bench]]
+name = "bench_compiler_intrinsics_2"
+harness = false
+
+[dependencies]
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports", "real_blackbox", "cargo_bench_support"] }

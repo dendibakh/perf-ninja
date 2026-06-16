@@ -1,0 +1,14 @@
+[package]
+name = "conditional_store_1"
+version = "0.1.0"
+edition = "2021"
+
+[[bench]]
+name = "lab"
+harness = false
+
+[dependencies]
+rand = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
