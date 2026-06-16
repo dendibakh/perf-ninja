@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <vector>
 
 // Assume those constants never change
@@ -7,11 +8,11 @@ constexpr int maxRandom = 100;
 
 // FIXME: this data structure can be reduced in size
 struct S {
-  int i;
   long long l;
-  short s;
   double d;
+  short s;
   bool b;
+  std::uint8_t i;
 
   bool operator<(const S &s) const { return this->i < s.i; }
 };
