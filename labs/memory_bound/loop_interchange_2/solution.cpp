@@ -28,9 +28,11 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
-    // Middle part of computations with full kernel
-    for (int r = radius; r < height - radius; r++) {
+  // Middle part of computations with full kernel
+  for (int r = radius; r < height - radius; r++) {
+    for (int c = 0; c < width; c++) {
       // Accumulation
       int dot = 0;
       for (int i = 0; i < radius + 1 + radius; i++) {
@@ -41,7 +43,9 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       int value = (dot + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
+  for (int c = 0; c < width; c++) {
     // Bottom part of line, partial kernel
     for (int r = std::max(radius, height - radius); r < height; r++) {
       // Accumulation
