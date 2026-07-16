@@ -30,6 +30,25 @@ cmake --build . --config Release --parallel 8
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
 ```
+
+For repeated local work, bootstrap the pinned, repository-local Google Benchmark
+dependency once and use the shorter `pn` workflow:
+
+```
+mkdir -p "$HOME/.local/bin"
+ln -s "$PWD/pn" "$HOME/.local/bin/pn"
+pn bootstrap
+cd labs/misc/warmup
+pn build
+pn validate
+pn bench
+```
+
+The `pn` command always uses Clang 17, Ninja, Release mode, and the Benchmark
+checkout under `tools/benchmark`. Its build and result files stay under the
+ignored `.pn` directory, so it does not conflict with a lab's existing `build`
+directory.
+
 When you push changes to your private branch, it will automatically trigger a CI benchmarking job. More details about it are at the bottom of the page.
 
 ## Profiling
@@ -87,32 +106,39 @@ Keep in mind that sometimes you may see different speedups on different platform
 
 ## Local experiments:
 
-Here are a few tips that will help you compare the results of your experiments against the baseline. You can run the baseline version and write down the results, which you will later use to compare with your experiments. But there is a better way to automate this process. You can choose between two options:
+The recommended local comparison command is:
 
-1) Use the `compare.py` script, which is a part of the Google benchmark library:
+```
+cd labs/misc/warmup
+pn compare
+```
+
+It validates both variants, builds the committed `main` version as the baseline,
+and compares it with the current working tree five times. Baseline and solution
+runs alternate to reduce thermal and frequency drift. No checkout, stash, or
+`#ifdef SOLUTION` wrapper is required. You can change the defaults when needed:
+
+```
+pn compare --runs 7 --min-time 2s --baseline main
+```
+
+The report shows median time, percentage improvement, speedup, and noise for
+each benchmark. Changes below roughly 2% should be treated cautiously unless
+the reported noise is substantially smaller.
+
+The underlying Google Benchmark JSON comparison remains available for manual
+experiments:
+
+Use the `compare.py` script from Google Benchmark:
 
     ```
     # 1. Benchmark the baseline and save the score into a JSON file
-    ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=baseline.json
+    ./lab --benchmark_min_time=1s --benchmark_out_format=json --benchmark_out=baseline.json
     # 2. Change the code
     # 3. Benchmark your solution and save the score into a JSON file
-    ./lab --benchmark_min_time=1 --benchmark_out_format=json --benchmark_out=solution.json
+    ./lab --benchmark_min_time=1s --benchmark_out_format=json --benchmark_out=solution.json
     # 4. Compare solution.json against baseline.json
     /path/to/benchmark/tools/compare.py benchmarks baseline.json solution.json
-    ```
-
-2) Use the `check_speedup.py` script, which is inside the Performance Ninja repo (uses the `compare.py` script under the hood):
-
-    ```
-    # 1. Put your solution under `#ifdef SOLUTION`:
-      #ifdef SOLUTION
-        // your solution
-      #else
-        // baseline version
-      #endif
-    # 2. Run the script, which will build and run your solution against the baseline N times
-    cd build
-    python3 ~/workspace/perf-ninja/tools/check_speedup.py -lab_path ../ -num_runs 3
     ```
 
 ## Submission guidelines:

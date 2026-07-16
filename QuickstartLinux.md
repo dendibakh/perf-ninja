@@ -1,8 +1,6 @@
 ## Set up environment on Linux
 
-1. Run terminal.
-
-2. Install clang-17 compiler using instructions from [here](https://apt.llvm.org/):
+1. Install Clang 17 using the instructions from [apt.llvm.org](https://apt.llvm.org/):
 
     ```
     wget https://apt.llvm.org/llvm.sh
@@ -10,30 +8,52 @@
     sudo ./llvm.sh 17 all
     ```
 
-3. Build release version of google [benchmark library](https://github.com/google/benchmark#installation). It doesn't matter which compiler you use to build it. Install google benchmark library with:
-    ```
-    cmake --build "build" --config Release --target install
-    ```
+2. Install CMake and Ninja:
 
-4. Enable clang-17 compiler for building labs. If you want to make clang-17 to be the default on a system do the following:
     ```
-    sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 30
-    sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 30
+    sudo apt install cmake ninja-build
     ```
 
-    If you don't want to make it a default, you can pass `-DCMAKE_C_COMPILER=clang-17 -DCMAKE_CXX_COMPILER=clang++-17` to the CMake.
+3. Build the pinned Google Benchmark dependency inside the repository:
 
-5. Go to any lab and check if local lab builds are working. You can find the CMake commands [here](GetStarted.md#how-to-build-lab-assignments). 
+    ```
+    ./pn bootstrap
+    ```
 
-6. Set the frequency scaling governor to `performance`.
+    This does not install Google Benchmark system-wide. The version and commit
+    are recorded in `tools/google-benchmark.lock.json`, and the ignored checkout
+    is stored under `tools/benchmark`.
+
+4. Expose the repository command on your user-local `PATH`, then validate a lab:
+
+    ```
+    mkdir -p "$HOME/.local/bin"
+    ln -s "$PWD/pn" "$HOME/.local/bin/pn"
+    cd labs/misc/warmup
+    pn validate
+    ```
+
+    The command invokes `clang-17` and `clang++-17` directly. It does not modify
+    system compiler alternatives or global CMake configuration.
+
+5. For more stable measurements, set the CPU frequency scaling governor to
+   `performance` before benchmarking:
+
     ```
     sudo cpupower frequency-set --governor performance
     ```
 
-7. (Optional) Install [ninja](https://github.com/ninja-build).
-    
+    The `pn` command reports the active governor but never changes it
+    automatically.
+
+6. Build, validate, benchmark, or compare any lab from its source directory:
+
     ```
-    $ sudo apt install ninja-build
+    pn build
+    pn validate
+    pn bench
+    pn compare
     ```
-    
-    You can use it to build labs by passing `-G Ninja` to the CMake invocation.
+
+    You can also pass a lab path when running from elsewhere, for example
+    `pn compare labs/misc/warmup`.
