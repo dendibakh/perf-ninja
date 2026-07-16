@@ -20,6 +20,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Sequence
 
+import pn_submit
+import pn_ci
+
 
 BENCHMARK_VERSION = "v1.9.5"
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -657,7 +660,8 @@ def command_bootstrap(repo: Path, args: argparse.Namespace) -> None:
 
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="pn", description="Build, validate, and compare Performance Ninja labs."
+        prog="pn",
+        description=("Build, validate, compare, and submit Performance Ninja labs."),
     )
     parser.add_argument(
         "--verbose", action="store_true", help="show every command and benchmark output"
@@ -692,6 +696,8 @@ def make_parser() -> argparse.ArgumentParser:
     compare.add_argument(
         "--baseline", default="main", help="Git ref used as the baseline"
     )
+
+    pn_submit.add_parsers(subparsers, add_common)
     return parser
 
 
@@ -702,11 +708,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "bootstrap":
             command_bootstrap(REPO_ROOT, args)
             return 0
+        if args.command == "ci":
+            pn_ci.command_ci(REPO_ROOT, args)
+            return 0
         if getattr(args, "runs", 1) < 1:
             raise PnError("--runs must be at least 1.")
         require_prerequisites(REPO_ROOT)
         start = (Path.cwd() / args.lab).resolve() if args.lab else Path.cwd()
         layout = LabLayout(REPO_ROOT, find_lab(REPO_ROOT, start))
+        if args.command == "submit":
+            pn_submit.command_submit(
+                layout.repo,
+                layout.relative_lab,
+                args,
+                compare=lambda: command_compare(layout, args),
+            )
+            return 0
         commands = {
             "build": command_build,
             "validate": command_validate,
@@ -718,6 +735,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except PnError as error:
         print(f"pn: {error}", file=sys.stderr)
         return 2
+    except pn_submit.CommandError as error:
+        print(f"pn: {error}", file=sys.stderr)
+        return error.exit_code
 
 
 if __name__ == "__main__":

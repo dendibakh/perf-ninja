@@ -12,6 +12,8 @@ TOOLS_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS_DIR))
 
 import pn  # noqa: E402
+import pn_ci  # noqa: E402
+import pn_submit  # noqa: E402
 
 
 @pytest.fixture
@@ -536,6 +538,101 @@ def test_main_bootstrap_does_not_require_an_existing_benchmark_checkout(
 
     assert pn.main(["bootstrap"]) == 0
     assert bootstrap.call_count == 1
+
+
+def test_parser_exposes_safe_submit_and_ci_options(repo: Path) -> None:
+    parser = pn.make_parser()
+    submit = parser.parse_args(
+        [
+            "submit",
+            str(repo / "labs" / "misc" / "warmup"),
+            "--dry-run",
+            "--no-watch",
+            "--yes",
+            "--message",
+            "perf: optimize warmup",
+        ]
+    )
+    ci = parser.parse_args(
+        [
+            "ci",
+            "--commit",
+            "HEAD",
+            "--branch",
+            "jerefigo",
+            "--watch",
+            "--timeout",
+            "60",
+            "--interval",
+            "2",
+        ]
+    )
+
+    assert submit.command == "submit"
+    assert submit.dry_run is True
+    assert submit.no_watch is True
+    assert submit.yes is True
+    assert submit.message == "perf: optimize warmup"
+    assert ci.command == "ci"
+    assert ci.branch == "jerefigo"
+    assert ci.watch is True
+    assert ci.timeout == 60
+    assert ci.interval == 2
+
+
+def test_main_ci_does_not_require_lab_or_build_prerequisites(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    command_ci = Mock()
+    monkeypatch.setattr(pn, "REPO_ROOT", repo)
+    monkeypatch.setattr(pn_ci, "command_ci", command_ci)
+    monkeypatch.setattr(
+        pn,
+        "require_prerequisites",
+        Mock(side_effect=AssertionError("CI status is read-only")),
+    )
+
+    assert pn.main(["ci", "--branch", "jerefigo"]) == 0
+    command_ci.assert_called_once()
+
+
+def test_main_submit_passes_local_compare_as_preflight(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    submit = Mock()
+    monkeypatch.setattr(pn, "REPO_ROOT", repo)
+    monkeypatch.setattr(pn, "require_prerequisites", Mock())
+    monkeypatch.setattr(pn_submit, "command_submit", submit)
+
+    assert (
+        pn.main(
+            [
+                "submit",
+                str(repo / "labs" / "misc" / "warmup"),
+                "--dry-run",
+            ]
+        )
+        == 0
+    )
+    assert submit.call_count == 1
+    compare = submit.call_args.kwargs["compare"]
+    assert callable(compare)
+
+
+@pytest.mark.parametrize(
+    "error,expected",
+    [(pn_ci.CiFailed("failed"), 1), (pn_ci.CiPending("pending"), 8)],
+)
+def test_main_preserves_ci_exit_status(
+    repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    error: pn_submit.CommandError,
+    expected: int,
+) -> None:
+    monkeypatch.setattr(pn, "REPO_ROOT", repo)
+    monkeypatch.setattr(pn_ci, "command_ci", Mock(side_effect=error))
+
+    assert pn.main(["ci", "--branch", "jerefigo"]) == expected
 
 
 def test_bootstrap_configure_command_disables_all_dependency_tests(
