@@ -11,6 +11,8 @@ CTestTestfile.cmake
 _deps
 __pycache__
 *.pyc
+.coverage
+.pn/
 .idea/
 cmake-build-debug/
 .DS_Store
@@ -24,3 +26,4 @@ build_baseline
 build
 results.json
 /tools/benchmark/
+/benchmark/
