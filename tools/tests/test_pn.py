@@ -40,7 +40,7 @@ def test_find_lab_rejects_paths_outside_labs(repo: Path) -> None:
         pn.find_lab(repo, repo / "tools")
 
 
-def test_solution_configure_command_uses_versioned_clang_ninja_and_solution_define(
+def test_solution_configure_command_uses_versioned_clang_and_ninja(
     repo: Path,
 ) -> None:
     lab = repo / "labs" / "misc" / "warmup"
@@ -49,7 +49,6 @@ def test_solution_configure_command_uses_versioned_clang_ninja_and_solution_defi
         build=repo / ".pn" / "solution",
         benchmark_build=repo / "tools" / "benchmark" / "build",
         min_time="1s",
-        solution=True,
     )
 
     assert command[:6] == [
@@ -67,21 +66,37 @@ def test_solution_configure_command_uses_versioned_clang_ninja_and_solution_defi
         argument.startswith("-DCMAKE_MAKE_PROGRAM=") and argument.endswith("ninja")
         for argument in command
     )
-    assert "-DCMAKE_CXX_FLAGS=-DSOLUTION" in command
+    assert not any("SOLUTION" in argument for argument in command)
     assert f"-Dbenchmark_DIR={repo / 'tools' / 'benchmark' / 'build'}" in command
     assert "-DBENCHMARK_MIN_TIME=1s" in command
 
 
-def test_baseline_configure_command_does_not_define_solution(repo: Path) -> None:
+def test_configure_command_sets_cmake4_compatibility_policy(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(pn, "cmake_major_version", lambda: 4, raising=False)
     command = pn.configure_command(
         source=repo / "labs" / "misc" / "warmup",
         build=repo / ".pn" / "baseline",
         benchmark_build=repo / "tools" / "benchmark" / "build",
         min_time="0.5s",
-        solution=False,
     )
 
-    assert not any("SOLUTION" in argument for argument in command)
+    assert "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" in command
+
+
+def test_configure_command_omits_cmake4_policy_on_cmake3(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(pn, "cmake_major_version", lambda: 3, raising=False)
+    command = pn.configure_command(
+        source=repo / "labs" / "misc" / "warmup",
+        build=repo / ".pn" / "baseline",
+        benchmark_build=repo / "tools" / "benchmark" / "build",
+        min_time="0.5s",
+    )
+
+    assert "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" not in command
 
 
 @pytest.mark.parametrize("value", ["1s", "0.5s", ".1s"])
@@ -139,6 +154,34 @@ def test_load_measurements_normalizes_units(tmp_path: Path) -> None:
     assert "bench_us_mean" not in measurements
 
 
+@pytest.mark.parametrize("field", ["error_occurred", "skipped"])
+def test_load_measurements_rejects_failed_or_skipped_rows(
+    tmp_path: Path, field: str
+) -> None:
+    result = tmp_path / "result.json"
+    result.write_text(
+        json.dumps(
+            {
+                "benchmarks": [
+                    {
+                        "name": "bench1",
+                        "run_type": "iteration",
+                        "real_time": 0,
+                        "cpu_time": 0,
+                        "time_unit": "ns",
+                        field: True,
+                        "error_message": "missing input",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(pn.PnError, match="missing input"):
+        pn.load_measurements(result)
+
+
 def test_summarize_reports_median_speedup_and_noise() -> None:
     baseline = {
         "bench1": [
@@ -181,6 +224,9 @@ def test_extract_baseline_uses_committed_snapshot_only(tmp_path: Path) -> None:
     lab.mkdir(parents=True)
     (repository / "tools" / "labs.cmake").write_text("committed\n", encoding="utf-8")
     (lab / "CMakeLists.txt").write_text("committed\n", encoding="utf-8")
+    sibling = repository / "labs" / "shared" / "input.dat"
+    sibling.parent.mkdir(parents=True)
+    sibling.write_text("cross-lab asset\n", encoding="utf-8")
     subprocess.run(
         ["git", "init", "-b", "main", repository], check=True, capture_output=True
     )
@@ -204,12 +250,13 @@ def test_extract_baseline_uses_committed_snapshot_only(tmp_path: Path) -> None:
     (lab / "CMakeLists.txt").write_text("working tree\n", encoding="utf-8")
     destination = tmp_path / "snapshot"
 
-    pn.extract_baseline(repository, Path("labs/misc/warmup"), "main", destination)
+    pn.extract_baseline(repository, "main", destination)
 
     assert (destination / "labs" / "misc" / "warmup" / "CMakeLists.txt").read_text(
         encoding="utf-8"
     ) == "committed\n"
     assert (destination / "tools" / "labs.cmake").is_file()
+    assert (destination / "labs" / "shared" / "input.dat").is_file()
 
 
 def test_resolve_baseline_ref_returns_commit_without_option_parsing(
@@ -237,7 +284,7 @@ def test_prerequisite_errors_do_not_require_global_compiler_aliases(
         "which",
         lambda command: f"/usr/bin/{command}" if command in available else None,
     )
-    monkeypatch.setattr(pn, "benchmark_version", lambda _: pn.BENCHMARK_VERSION)
+    monkeypatch.setattr(pn, "benchmark_checkout_errors", lambda _: [])
 
     assert pn.prerequisite_errors(repo) == []
 
@@ -250,12 +297,63 @@ def test_prerequisite_errors_explain_missing_local_tools(
         "which",
         lambda command: None if command == "ninja" else f"/usr/bin/{command}",
     )
-    monkeypatch.setattr(pn, "benchmark_version", lambda _: "v0.0.0")
+    monkeypatch.setattr(
+        pn,
+        "benchmark_checkout_errors",
+        lambda _: [f"Google Benchmark {pn.BENCHMARK_VERSION} is not pinned."],
+    )
 
     errors = pn.prerequisite_errors(repo)
 
     assert any("ninja-build" in error for error in errors)
     assert any(pn.BENCHMARK_VERSION in error for error in errors)
+
+
+def test_benchmark_checkout_errors_accepts_matching_lock_and_build_stamp(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    commit = "a" * 40
+    monkeypatch.setattr(
+        pn,
+        "load_benchmark_lock",
+        lambda _: {"url": "https://example.invalid", "tag": "v1", "commit": commit},
+    )
+    monkeypatch.setattr(
+        pn,
+        "git_output",
+        lambda arguments, **_: commit if arguments[0] == "rev-parse" else "",
+    )
+    monkeypatch.setattr(
+        pn.shutil,
+        "which",
+        lambda command: f"/usr/bin/{command}",
+    )
+    stamp = {
+        "commit": commit,
+        "compiler": "/usr/bin/clang++-17",
+        "generator": "Ninja",
+        "ninja": "/usr/bin/ninja",
+    }
+    (repo / "tools" / "benchmark" / "build" / ".pn-build.json").write_text(
+        json.dumps(stamp), encoding="utf-8"
+    )
+
+    assert pn.benchmark_checkout_errors(repo) == []
+
+
+def test_benchmark_checkout_errors_rejects_wrong_commit(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        pn,
+        "load_benchmark_lock",
+        lambda _: {"url": "https://example.invalid", "tag": "v1", "commit": "a" * 40},
+    )
+    monkeypatch.setattr(pn, "git_output", lambda *_args, **_kwargs: "b" * 40)
+
+    errors = pn.benchmark_checkout_errors(repo)
+
+    assert any("locked commit" in error for error in errors)
 
 
 def test_require_prerequisites_combines_actionable_errors(
@@ -353,11 +451,12 @@ def test_command_compare_runs_alternating_pairs_and_keeps_raw_results(
     layout = pn.LabLayout(repo, repo / "labs" / "misc" / "warmup")
     args = SimpleNamespace(min_time="10ms", verbose=False, baseline="main", runs=2)
     run_order = []
+    layout.baseline_build.mkdir(parents=True)
+    stale_object = layout.baseline_build / "stale.o"
+    stale_object.write_text("old baseline", encoding="utf-8")
 
-    def fake_extract(
-        _repo: Path, relative_lab: Path, _ref: str, destination: Path
-    ) -> None:
-        (destination / relative_lab).mkdir(parents=True)
+    def fake_extract(_repo: Path, _ref: str, destination: Path) -> None:
+        (destination / layout.relative_lab).mkdir(parents=True)
 
     def fake_target(build_dir: Path, target: str, **_kwargs: object) -> None:
         if target != "benchmarkLab":
@@ -396,6 +495,7 @@ def test_command_compare_runs_alternating_pairs_and_keeps_raw_results(
     assert run_order == ["baseline", "solution", "solution", "baseline"]
     assert len(list(layout.results.glob("baseline-*.json"))) == 2
     assert len(list(layout.results.glob("solution-*.json"))) == 2
+    assert not stale_object.exists()
     assert not layout.baseline_source.exists()
     output = capsys.readouterr().out
     assert "+50.00%" in output
@@ -448,3 +548,22 @@ def test_bootstrap_configure_command_disables_all_dependency_tests(
     assert "-DBENCHMARK_ENABLE_TESTING=OFF" in command
     assert "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF" in command
     assert any(argument.endswith("clang++-17") for argument in command)
+
+
+def test_command_bootstrap_uses_a_repo_local_exclusive_lock(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bootstrap = Mock()
+    flock = Mock()
+    monkeypatch.setattr(pn, "bootstrap_dependency", bootstrap)
+    monkeypatch.setattr(pn.fcntl, "flock", flock)
+    args = SimpleNamespace(verbose=False)
+
+    pn.command_bootstrap(repo, args)
+
+    assert (repo / ".pn" / "bootstrap.lock").is_file()
+    assert bootstrap.call_count == 1
+    assert [call.args[1] for call in flock.call_args_list] == [
+        pn.fcntl.LOCK_EX,
+        pn.fcntl.LOCK_UN,
+    ]

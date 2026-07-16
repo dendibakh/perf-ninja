@@ -35,9 +35,9 @@ For repeated local work, bootstrap the pinned, repository-local Google Benchmark
 dependency once and use the shorter `pn` workflow:
 
 ```
+./pn bootstrap
 mkdir -p "$HOME/.local/bin"
 ln -s "$PWD/pn" "$HOME/.local/bin/pn"
-pn bootstrap
 cd labs/misc/warmup
 pn build
 pn validate
@@ -47,7 +47,8 @@ pn bench
 The `pn` command always uses Clang 17, Ninja, Release mode, and the Benchmark
 checkout under `tools/benchmark`. Its build and result files stay under the
 ignored `.pn` directory, so it does not conflict with a lab's existing `build`
-directory.
+directory. The user-local symlink is only a shortcut; without it, run `./pn`
+from the repository root and pass a lab path.
 
 When you push changes to your private branch, it will automatically trigger a CI benchmarking job. More details about it are at the bottom of the page.
 

@@ -24,7 +24,8 @@
     are recorded in `tools/google-benchmark.lock.json`, and the ignored checkout
     is stored under `tools/benchmark`.
 
-4. Expose the repository command on your user-local `PATH`, then validate a lab:
+4. Optionally expose the repository command on your user-local `PATH`, then
+   validate a lab:
 
     ```
     mkdir -p "$HOME/.local/bin"
@@ -35,6 +36,12 @@
 
     The command invokes `clang-17` and `clang++-17` directly. It does not modify
     system compiler alternatives or global CMake configuration.
+
+    Without the optional symlink, stay at the repository root and run:
+
+    ```
+    ./pn validate labs/misc/warmup
+    ```
 
 5. For more stable measurements, set the CPU frequency scaling governor to
    `performance` before benchmarking:

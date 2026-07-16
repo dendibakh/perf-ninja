@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import io
 import json
 import os
@@ -15,6 +16,7 @@ import sys
 import tarfile
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -111,13 +113,23 @@ def validate_min_time(value: str) -> str:
     return value
 
 
+@lru_cache(maxsize=1)
+def cmake_major_version() -> int:
+    completed = subprocess.run(
+        ["cmake", "--version"], text=True, capture_output=True, check=True
+    )
+    match = re.search(r"cmake version (\d+)", completed.stdout)
+    if not match:
+        raise PnError("Cannot determine the installed CMake version.")
+    return int(match.group(1))
+
+
 def configure_command(
     *,
     source: Path,
     build: Path,
     benchmark_build: Path,
     min_time: str,
-    solution: bool,
 ) -> list[str]:
     command = [
         "cmake",
@@ -134,8 +146,8 @@ def configure_command(
         f"-Dbenchmark_DIR={benchmark_build}",
         f"-DBENCHMARK_MIN_TIME={validate_min_time(min_time)}",
     ]
-    if solution:
-        command.append("-DCMAKE_CXX_FLAGS=-DSOLUTION")
+    if cmake_major_version() >= 4:
+        command.append("-DCMAKE_POLICY_VERSION_MINIMUM=3.5")
     return command
 
 
@@ -160,14 +172,7 @@ def prerequisite_errors(repo: Path) -> list[str]:
                 errors.append("Ninja is missing; install the ninja-build package.")
             else:
                 errors.append(f"Required command is missing: {command}")
-
-    package = repo / "tools" / "benchmark" / "build" / "benchmarkConfig.cmake"
-    version = benchmark_version(repo)
-    if version != BENCHMARK_VERSION or not package.is_file():
-        errors.append(
-            f"Google Benchmark {BENCHMARK_VERSION} must be built at "
-            f"{repo / 'tools' / 'benchmark'}."
-        )
+    errors.extend(benchmark_checkout_errors(repo))
     return errors
 
 
@@ -205,6 +210,47 @@ def git_output(arguments: Sequence[str], *, cwd: Path) -> str:
         raise PnError(
             f"Git command failed: git {' '.join(arguments)}\n{details}"
         ) from error
+
+
+def expected_benchmark_stamp(lock: dict[str, str]) -> dict[str, str]:
+    return {
+        "commit": lock["commit"],
+        "compiler": shutil.which("clang++-17") or "clang++-17",
+        "generator": "Ninja",
+        "ninja": shutil.which("ninja") or "ninja",
+    }
+
+
+def benchmark_checkout_errors(repo: Path) -> list[str]:
+    benchmark = repo / "tools" / "benchmark"
+    build_dir = benchmark / "build"
+    try:
+        lock = load_benchmark_lock(repo)
+    except PnError as error:
+        return [str(error)]
+    if not (benchmark / ".git").is_dir():
+        return [f"Google Benchmark {BENCHMARK_VERSION} is missing at {benchmark}."]
+    try:
+        head = git_output(["rev-parse", "HEAD"], cwd=benchmark)
+        dirty = git_output(["status", "--porcelain"], cwd=benchmark)
+    except PnError as error:
+        return [str(error)]
+    if head != lock["commit"]:
+        return [
+            f"Google Benchmark checkout is {head}, not locked commit {lock['commit']}."
+        ]
+    if dirty:
+        return [f"Google Benchmark checkout is dirty: {benchmark}."]
+    if not (build_dir / "benchmarkConfig.cmake").is_file():
+        return [f"Google Benchmark is not built at {build_dir}."]
+    stamp_path = build_dir / ".pn-build.json"
+    try:
+        stamp = json.loads(stamp_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return [f"Google Benchmark build stamp is missing or invalid at {stamp_path}."]
+    if stamp != expected_benchmark_stamp(lock):
+        return ["Google Benchmark build does not match its compiler/generator lock."]
+    return []
 
 
 def resolve_baseline_ref(repo: Path, ref: str) -> str:
@@ -260,10 +306,8 @@ def run_command(
         raise PnError(f"Command failed: {' '.join(command)}{suffix}") from error
 
 
-def extract_baseline(
-    repo: Path, relative_lab: Path, ref: str, destination: Path
-) -> None:
-    """Extract committed tools and lab files without touching the working tree."""
+def extract_baseline(repo: Path, ref: str, destination: Path) -> None:
+    """Extract a complete committed snapshot without touching the working tree."""
     try:
         archive = subprocess.run(
             [
@@ -273,8 +317,6 @@ def extract_baseline(
                 "archive",
                 "--format=tar",
                 ref,
-                "tools",
-                str(relative_lab),
             ],
             check=True,
             capture_output=True,
@@ -295,7 +337,6 @@ def configure(
     source: Path,
     build: Path,
     min_time: str,
-    solution: bool,
     verbose: bool,
 ) -> None:
     build.mkdir(parents=True, exist_ok=True)
@@ -305,7 +346,6 @@ def configure(
             build=build,
             benchmark_build=layout.benchmark_build,
             min_time=min_time,
-            solution=solution,
         ),
         cwd=layout.repo,
         verbose=verbose,
@@ -349,6 +389,9 @@ def load_measurements(path: Path) -> dict[str, Measurement]:
     for row in payload.get("benchmarks", []):
         if row.get("run_type", "iteration") != "iteration" or "aggregate_name" in row:
             continue
+        if row.get("error_occurred") or row.get("skipped"):
+            message = row.get("error_message", "benchmark was skipped or failed")
+            raise PnError(f"Benchmark {row.get('name', '<unknown>')} failed: {message}")
         unit = row.get("time_unit")
         if unit not in TIME_SCALES:
             raise PnError(f"Unsupported benchmark time unit {unit!r} in {path}.")
@@ -449,7 +492,6 @@ def prepare_solution(layout: LabLayout, min_time: str, verbose: bool) -> None:
         source=layout.lab,
         build=layout.solution_build,
         min_time=min_time,
-        solution=True,
         verbose=verbose,
     )
     build(layout.solution_build, verbose=verbose)
@@ -483,18 +525,16 @@ def command_compare(layout: LabLayout, args: argparse.Namespace) -> None:
     warn_about_governor()
     baseline_commit = resolve_baseline_ref(layout.repo, args.baseline)
     print(f"Baseline: {args.baseline} ({baseline_commit[:12]})")
-    extract_baseline(
-        layout.repo, layout.relative_lab, baseline_commit, layout.baseline_source
-    )
+    extract_baseline(layout.repo, baseline_commit, layout.baseline_source)
     baseline_lab = layout.baseline_source / layout.relative_lab
     try:
         prepare_solution(layout, args.min_time, args.verbose)
+        shutil.rmtree(layout.baseline_build, ignore_errors=True)
         configure(
             layout,
             source=baseline_lab,
             build=layout.baseline_build,
             min_time=args.min_time,
-            solution=False,
             verbose=args.verbose,
         )
         build(layout.baseline_build, verbose=args.verbose)
@@ -540,7 +580,7 @@ def command_compare(layout: LabLayout, args: argparse.Namespace) -> None:
         shutil.rmtree(layout.baseline_source, ignore_errors=True)
 
 
-def command_bootstrap(repo: Path, args: argparse.Namespace) -> None:
+def bootstrap_dependency(repo: Path, args: argparse.Namespace) -> None:
     missing = [
         command
         for command in ("cmake", "git", "ninja", "clang-17", "clang++-17")
@@ -598,7 +638,21 @@ def command_bootstrap(repo: Path, args: argparse.Namespace) -> None:
         verbose=args.verbose,
     )
     build(build_dir, verbose=args.verbose)
+    (build_dir / ".pn-build.json").write_text(
+        json.dumps(expected_benchmark_stamp(lock), indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Google Benchmark {lock['tag']} is ready at {benchmark}")
+
+
+def command_bootstrap(repo: Path, args: argparse.Namespace) -> None:
+    lock_path = repo / ".pn" / "bootstrap.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("w", encoding="utf-8") as lock_file:
+        fcntl.flock(lock_file, fcntl.LOCK_EX)
+        try:
+            bootstrap_dependency(repo, args)
+        finally:
+            fcntl.flock(lock_file, fcntl.LOCK_UN)
 
 
 def make_parser() -> argparse.ArgumentParser:
