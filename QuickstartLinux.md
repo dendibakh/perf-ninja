@@ -53,14 +53,19 @@
     The `pn` command reports the active governor but never changes it
     automatically.
 
-6. Build, validate, benchmark, or compare any lab from its source directory:
+6. Build, validate, benchmark, compare, or submit any lab from its source
+   directory:
 
     ```
     pn build
     pn validate
     pn bench
     pn compare
+    pn submit --dry-run
+    pn submit
     ```
 
     You can also pass a lab path when running from elsewhere, for example
-    `pn compare labs/misc/warmup`.
+    `pn compare labs/misc/warmup`. Submission stages only the selected lab and
+    watches the official CI after a normal non-force push. Run `pn ci --watch`
+    to reattach to CI for the current commit and branch.

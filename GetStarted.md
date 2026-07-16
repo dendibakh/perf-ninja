@@ -148,6 +148,38 @@ Use the `compare.py` script from Google Benchmark:
 
 Push your submissions into your own branch[es]. CI job will be triggered every time you push changes to your remote Github branch. For now, we use a self-hosted runner, which is configured specifically for benchmarking purposes.
 
+The recommended submission command is:
+
+```
+cd labs/memory_bound/data_packing
+pn submit
+```
+
+`pn submit` verifies repository access, refuses the default branch and staged
+files outside the selected lab, runs the local validation and comparison,
+previews the exact lab changes and outgoing commits, and asks before making any
+Git change. It then stages only that lab, creates one commit, performs a normal
+non-force push, and monitors the three official benchmark workflows for the
+exact commit and branch. Unrelated unstaged or untracked files are left alone.
+
+Preview the complete local preflight without staging, committing, or pushing:
+
+```
+pn submit --dry-run
+```
+
+Use `--no-watch` to return after the push. CI can be checked or reattached later
+with the immutable commit SHA printed by the submission:
+
+```
+pn ci --commit <full-commit-sha> --branch <branch> --watch
+```
+
+`pn ci` exits with status 0 when all three platforms pass, 1 for a completed CI
+failure, 8 while a non-watched run is pending, and 2 for usage, authentication,
+network, or timeout errors. `pn submit --yes` is available for deliberate
+non-interactive use; interactive submission is the safer default.
+
 By default, CI will detect which lab was modified in the last commit and will only benchmark affected assignment. If you make changes to more than one lab, the CI job will benchmark all the labs. You can also force benchmarking all the labs if you add `[CheckAll]` in the commit message.
 
 In case all the labs were benchmarked, a summary will be provided at the end, e.g.:
