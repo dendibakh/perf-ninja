@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>compressed-paths</key>
+	<array>
+		<string>currentRun/core/uniquing</string>
+		<string>currentRun/core/uniquing</string>
+		<string>currentRun/core/uniquing</string>
+		<string>run1/core/stores/indexed-store-0</string>
+		<string>run1/core/stores/indexed-store-1</string>
+		<string>run1/core/stores/indexed-store-2</string>
+		<string>run1/core/stores/indexed-store-3</string>
+		<string>run1/core/stores/indexed-store-4</string>
+		<string>run1/core/stores/indexed-store-5</string>
+		<string>run1/core/stores/indexed-store-6</string>
+		<string>run1/core/stores/indexed-store-7</string>
+		<string>run1/core/stores/indexed-store-8</string>
+		<string>run1/core/table-manager</string>
+		<string>run1/core/core-config</string>
+		<string>run1/core/uniquing</string>
+		<string>run1/core/uniquing</string>
+		<string>run1/core/uniquing</string>
+	</array>
+	<key>paths</key>
+	<array>
+		<string>currentRun/core/uniquing</string>
+		<string>run1/core/stores/indexed-store-0</string>
+		<string>run1/core/stores/indexed-store-1</string>
+		<string>run1/core/stores/indexed-store-2</string>
+		<string>run1/core/stores/indexed-store-3</string>
+		<string>run1/core/stores/indexed-store-4</string>
+		<string>run1/core/stores/indexed-store-5</string>
+		<string>run1/core/stores/indexed-store-6</string>
+		<string>run1/core/stores/indexed-store-7</string>
+		<string>run1/core/stores/indexed-store-8</string>
+		<string>run1/core/table-manager</string>
+		<string>run1/core/core-config</string>
+		<string>run1/core/uniquing</string>
+	</array>
+</dict>
+</plist>

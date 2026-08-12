@@ -11,8 +11,8 @@ constexpr int GridYDimension = 1025;
 constexpr int NumberOfSims = 10;
 
 
-const std::array<int, 8> dx{1,1,1,0,-1,-1,-1,0};
-const std::array<int, 8> dy{-1,0,1,1,1,0,-1,-1};
+const std::array<int, 8> dx{-1, 0, 1, -1, 1,-1, 0, 1};
+const std::array<int, 8> dy{-1, -1, -1, 0, 0, 1, 1, 1};
 
 const std::array<std::array<int, 9>, 2> transition{{
     {0, 0, 0, 1, 0, 0, 0, 0, 0},
@@ -65,11 +65,11 @@ public:
                     const int nx = j + dx[d];
 
 
-                    aliveNeighbours += ((ny >= 0) * (ny < M) * (nx >= 0) * (nx < N)) and  current[ny][nx];
+                    //aliveNeighbours += ((ny >= 0) * (ny < M) * (nx >= 0) * (nx < N)) and  current[ny][nx];
                      //aliveNeighbours += (ny >= 0 and ny < M and nx >= 0 and nx < N and current[ny][nx]);
-                    // if (ny >= 0 and ny < M and nx >= 0 and nx < N) {
-                    //     aliveNeighbours+=current[ny][nx];
-                    // }
+                    if (ny >= 0 and ny < M and nx >= 0 and nx < N) {
+                        aliveNeighbours+=current[ny][nx];
+                    }
                 }
                 future[i][j] = transition[current[i][j]][aliveNeighbours];
             }
