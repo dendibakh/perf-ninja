@@ -6,8 +6,8 @@
 #include <cassert>
 
 constexpr int NumberOfGrids = 16;
-constexpr int GridXDimension = 1024;
-constexpr int GridYDimension = 1024;
+constexpr int GridXDimension = 1025;
+constexpr int GridYDimension = 1025;
 constexpr int NumberOfSims = 10;
 
 
@@ -57,12 +57,12 @@ public:
         int N = current[0].size();
 
         // Loop through every cell
-        for(int i = 0; i < M; i++) {
-            for(int j = 0; j < N; j++) {
+        for(int i = 0; i < M; ++i) {
+            for(int j = 0; j < N; ++j) {
                 int aliveNeighbours = 0;
-                for (int d = 0; d < 8; d++) {
-                    int ny = i + dy[d];
-                    int nx = j + dx[d];
+                for (int d = 0; d < 8; ++d) {
+                    const int ny = i + dy[d];
+                    const int nx = j + dx[d];
 
                      //aliveNeighbours += (ny >= 0 and ny < M and nx >= 0 and nx < N and current[ny][nx]);
                     if (ny >= 0 and ny < M and nx >= 0 and nx < N) {
