@@ -1,15 +1,32 @@
 #include "solution.hpp"
 
+
+constexpr char a[128] = {
+  // 0..12
+  0,0,0,0,0,0,0,0,0,0,0,0,0,
+  // 13..28
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  // 29..40
+  2,2,2,2,2,2,2,2,2,2,2,2,
+  // 41..52
+  3,3,3,3,3,3,3,3,3,3,3,3,
+  // 53..70
+  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+  // 71..82
+  5,5,5,5,5,5,5,5,5,5,5,5,
+  // 83..99
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  // 100..127 — always 7
+  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+ };
+
+
+
 static std::size_t mapToBucket(std::size_t v) {
-                              //   size of a bucket
-  if      (v < 13)  return 0; //   13
-  else if (v < 29)  return 1; //   16
-  else if (v < 41)  return 2; //   12
-  else if (v < 53)  return 3; //   12
-  else if (v < 71)  return 4; //   18
-  else if (v < 83)  return 5; //   12
-  else if (v < 100) return 6; //   17
-  return DEFAULT_BUCKET;
+  if (v>=128) {
+    return DEFAULT_BUCKET;
+  }
+  return a[v];
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
