@@ -65,7 +65,7 @@ public:
                     const int nx = j + dx[d];
 
 
-                    aliveNeighbours += (ny >= 0 * ny < M * nx >= 0 * nx < N) and  current[ny][nx];
+                    aliveNeighbours += ((ny >= 0) * (ny < M) * (nx >= 0) * (nx < N)) and  current[ny][nx];
                      //aliveNeighbours += (ny >= 0 and ny < M and nx >= 0 and nx < N and current[ny][nx]);
                     // if (ny >= 0 and ny < M and nx >= 0 and nx < N) {
                     //     aliveNeighbours+=current[ny][nx];
