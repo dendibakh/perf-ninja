@@ -1,10 +1,22 @@
+#pragma once
+
+
+#include <array>
 #include <vector>
 #include <iostream>
+#include <cassert>
+#include <cstdint>
 
 constexpr int NumberOfGrids = 16;
 constexpr int GridXDimension = 1024;
 constexpr int GridYDimension = 1024;
 constexpr int NumberOfSims = 10;
+
+
+const std::vector<int> dx{-1, 0, 1, -1, 1,-1, 0, 1};
+const std::vector<int> dy{-1, -1, -1, 0, 0, 1, 1, 1};
+
+const std::vector<int> transition{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0};
 
 class Life {
 
@@ -44,31 +56,21 @@ public:
         int N = current[0].size();
 
         // Loop through every cell
-        for(int i = 0; i < M; i++) {
-            for(int j = 0; j < N; j++) {
+        for(int i = 0; i < M; ++i) {
+            for(int j = 0; j < N; ++j) {
                 int aliveNeighbours = 0;
-                // finding the number of neighbours that are alive
-                for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
-                    for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-                        if((i + p < 0) ||                   // if row offset less than UPPER boundary
-                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                           (j + q < 0) ||                   // if column offset less than LEFT boundary
-                           (j + q > N - 1))                 // if column offset more than RIGHT boundary
-                            continue;
-                        aliveNeighbours += current[i + p][j + q];
+                for (int d = 0; d < 8; ++d) {
+                    const int ny = i + dy[d];
+                    const int nx = j + dx[d];
+
+
+                    //aliveNeighbours += ((ny >= 0) * (ny < M) * (nx >= 0) * (nx < N)) and  current[ny][nx];
+                     //aliveNeighbours += (ny >= 0 and ny < M and nx >= 0 and nx < N and current[ny][nx]);
+                    if (ny >= 0 and ny < M and nx >= 0 and nx < N) {
+                        aliveNeighbours+=current[ny][nx];
                     }
                 }
-                // The cell needs to be subtracted from
-                // its neighbours as it was counted before
-                aliveNeighbours -= current[i][j];
-
-                // Implementing the Rules of Life:
-                int cell = current[i][j];
-                if (__builtin_unpredictable(aliveNeighbours != 2))
-                    cell = 0;
-                if (__builtin_unpredictable(aliveNeighbours == 3))
-                    cell = 1;
-                future[i][j] = cell;
+                future[i][j] = transition[(current[i][j]<<3)+aliveNeighbours];
             }
         }
         std::swap(current, future);
