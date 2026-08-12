@@ -8,8 +8,8 @@
 #include <cstdint>
 
 constexpr int NumberOfGrids = 16;
-constexpr int GridXDimension = 1025;
-constexpr int GridYDimension = 1025;
+constexpr int GridXDimension = 1024;
+constexpr int GridYDimension = 1024;
 constexpr int NumberOfSims = 10;
 
 
@@ -73,14 +73,7 @@ public:
                         aliveNeighbours+=current[ny][nx];
                     }
                 }
-
-                int cell_value = 0;
-                if (__builtin_unpredictable(aliveNeighbours == 2)) {
-                    cell_value = current[i][j];
-                } else if (__builtin_unpredictable(aliveNeighbours == 3)) {
-                    cell_value = 1;
-                }
-                future[i][j] = cell_value;
+                future[i][j] = transition[current[i][j]][aliveNeighbours];
             }
         }
         std::swap(current, future);
