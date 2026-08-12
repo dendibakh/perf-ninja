@@ -12,10 +12,10 @@ constexpr int GridYDimension = 1025;
 constexpr int NumberOfSims = 10;
 
 
-const std::vector<int> dx{-1, 0, 1, -1, 1,-1, 0, 1};
-const std::vector<int> dy{-1, -1, -1, 0, 0, 1, 1, 1};
+const std::vector<int8_t> dx{-1, 0, 1, -1, 1,-1, 0, 1};
+const std::vector<int8_t> dy{-1, -1, -1, 0, 0, 1, 1, 1};
 
-const std::vector<std::vector<int>> transition{{
+const std::vector<std::vector<uint8_t>> transition{{
     {0, 0, 0, 1, 0, 0, 0, 0, 0},
     {0, 0, 1, 1, 0, 0, 0, 0, 0}
 }};
