@@ -23,10 +23,7 @@ constexpr char a[128] = {
 
 
 static std::size_t mapToBucket(std::size_t v) {
-  if (v>=128) {
-    return DEFAULT_BUCKET;
-  }
-  return a[v];
+  return a[std::min(v, (size_t)(127))];
 }
 
 std::array<std::size_t, NUM_BUCKETS> histogram(const std::vector<int> &values) {
