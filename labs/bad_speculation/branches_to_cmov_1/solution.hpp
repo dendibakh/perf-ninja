@@ -11,10 +11,10 @@ constexpr int GridYDimension = 1025;
 constexpr int NumberOfSims = 10;
 
 
-constexpr std::array<int, 8> dx{1,1,1,0,-1,-1,-1,0};
-constexpr std::array<int, 8> dy{-1,0,1,1,1,0,-1,-1};
+const std::array<int, 8> dx{1,1,1,0,-1,-1,-1,0};
+const std::array<int, 8> dy{-1,0,1,1,1,0,-1,-1};
 
-constexpr std::array<std::array<int, 9>, 2> transition{{
+const std::array<std::array<int, 9>, 2> transition{{
     {0, 0, 0, 1, 0, 0, 0, 0, 0},
     {0, 0, 1, 1, 0, 0, 0, 0, 0}
 }};
