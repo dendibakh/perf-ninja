@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <cstdint>
 
 constexpr int NumberOfGrids = 16;
 constexpr int GridXDimension = 1025;
@@ -72,7 +73,14 @@ public:
                         aliveNeighbours+=current[ny][nx];
                     }
                 }
-                future[i][j] = transition[current[i][j]][aliveNeighbours];
+
+                int cell_value = 0;
+                if (__builtin_unpredictable(aliveNeighbours == 2)) {
+                    cell_value = current[i][j];
+                } else if (__builtin_unpredictable(aliveNeighbours == 3)) {
+                    cell_value = 1;
+                }
+                future[i][j] = cell_value;
             }
         }
         std::swap(current, future);
