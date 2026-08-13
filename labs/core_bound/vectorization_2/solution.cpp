@@ -5,5 +5,5 @@ uint16_t checksum(const Blob &blob) {
   for (auto value : blob) {
     acc += value;
   }
-  return (acc & ((1 << 16) - 1)) + (acc >> 16) + 1;
+  return (acc & ((1 << 16) - 1)) + (acc >> 16);
 }
