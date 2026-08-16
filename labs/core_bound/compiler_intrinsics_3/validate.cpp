@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
                 << ". Original result = " << original_result
                 << "; Modified version returned = " << result << "\n";
       valid = false;
+      return 1; //
     }
   }
 

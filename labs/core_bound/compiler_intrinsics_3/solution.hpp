@@ -4,10 +4,15 @@
 #include <vector>
 
 template<class T>
-struct Position {
+struct alignas(8 * sizeof(T)) Position {
   T x;
+  char _pad1[sizeof(T)] = {};
   T y;
+  char _pad2[sizeof(T)] = {};
   T z;
+  char _pad3[sizeof(T)] = {};
+
+  Position(T x, T y, T z) : x(x), y(y), z(z) {}
 
   constexpr bool operator==(Position const &other) const {
     return x == other.x and y == other.y and z == other.z;
