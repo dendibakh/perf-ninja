@@ -1,3 +1,4 @@
+#pragma GCC target("avx512f")
 #include "solution.hpp"
 #include <algorithm>
 #include <immintrin.h>
