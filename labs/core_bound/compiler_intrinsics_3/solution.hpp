@@ -6,11 +6,13 @@
 template<class T>
 struct alignas(8 * sizeof(T)) Position {
   T x;
-  char _pad1[sizeof(T)] = {};
+  T _pad1 = 0;
   T y;
-  char _pad2[sizeof(T)] = {};
+  T _pad2 = 0;
   T z;
-  char _pad3[sizeof(T)] = {};
+  T _pad3 = 0;
+  T _pad4 = 0;
+  T _pad5;
 
   Position(T x, T y, T z) : x(x), y(y), z(z) {}
 
@@ -28,5 +30,4 @@ constexpr std::ostream &operator<<(std::ostream &oss, Position<T> position) {
   return oss << '(' << position.x << ", " << position.y << ", " << position.z << ')';
 }
 
-__attribute__((target("avx512f")))
 Position<std::uint32_t> solution(std::vector<Position<std::uint32_t>> const &input);
