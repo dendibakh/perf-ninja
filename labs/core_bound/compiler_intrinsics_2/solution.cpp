@@ -20,20 +20,22 @@ unsigned solution(const std::string &inputContents) {
   int sz = inputContents.size();
   const char* data = inputContents.data();
 
-  __m256i backslash = _mm256_set1_epi8('\n');
+  __m128i backslash = _mm_set1_epi8('\n');
 
   int i = 0;
-  for (i = 0; i + 32 < sz;) {
-    __m256i vec = _mm256_loadu_si256((__m256i*)(char*)&data[i]);
-    int mask = _mm256_cmpeq_epi8_mask(vec, backslash);
+  for (i = 0; i + 16 < sz;) {
+    __m128i vec = _mm_loadu_si128((__m128i*)(char*)&data[i]);
+
+    __m128i cmp_result = _mm_cmpeq_epi8(vec, backslash);
+    int mask = _mm_movemask_epi8(cmp_result);
     if (mask) {
       int x = __builtin_ctz(mask);
       longestLine = std::max(curLineLength + x, longestLine);
       curLineLength = 0;
       i += x + 1;
     } else {
-      i += 32;
-      curLineLength += 32;
+      i += 16;
+      curLineLength += 16;
       longestLine = std::max(curLineLength, longestLine);
     }
   }
