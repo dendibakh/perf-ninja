@@ -2,6 +2,8 @@
 #include <atomic>
 #include <cstring>
 #include <omp.h>
+#include <thread>
+#include <iostream>
 #include <vector>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
@@ -12,29 +14,28 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
     std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
+  std::vector<std::thread> threads;
 
-#pragma omp parallel num_threads(thread_count) default(none)                   \
-    shared(accumulators, data)
-  {
-    int target_index = omp_get_thread_num();
-    auto &target = accumulators[target_index];
+  const int datasz = data.size();
+  const int step = datasz / thread_count + 1;
+  for (int i = 0; i < thread_count; ++i) {
+    threads.emplace_back([i, step, &data, &accumulators, datasz]() {
+      int endd = std::min(datasz, (i + 1) * step);
+      for (int j = i * step; j < endd; ++j) {
+        auto item = data[j];
+        item += 1000;
+        item ^= 0xADEDAE;
+        item |= (item >> 24);
 
-#pragma omp for
-    for (int i = 0; i < data.size(); i++) {
-      // Perform computation on each input
-      auto item = data[i];
-      item += 1000;
-      item ^= 0xADEDAE;
-      item |= (item >> 24);
-
-      // Write result to accumulator
-      target.value += item % 13;
-    }
+        // Write result to accumulator
+        accumulators[i].value += item % 13;
+      }
+    });
   }
-
   std::size_t result = 0;
-  for (const auto &accumulator : accumulators) {
-    result += accumulator.value;
+  for (int i = 0; i < thread_count; ++i) {
+    threads[i].join();
+    result += accumulators[i].value;
   }
   return result;
 }
