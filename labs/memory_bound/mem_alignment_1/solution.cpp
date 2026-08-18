@@ -5,11 +5,11 @@
 // ******************************************
 // Change this function
 // ******************************************
-// This function allows you to change the number of columns in a matrix. 
+// This function allows you to change the number of columns in a matrix.
 // In other words, it defines how many elements are in each row.
 // hint: you need to allocate dummy columns to achieve proper data alignment.
-int n_columns(int N) {  
-  return N;
+int n_columns(int N) {
+  return N / CACHELINE_SIZE * CACHELINE_SIZE + CACHELINE_SIZE * (N % CACHELINE_SIZE != 0);
 }
 // ******************************************
 
@@ -40,7 +40,7 @@ void copyFromMatrix(const Matrix &from, Matrix &to, int N, int K) {
 }
 
 // A simple GEMM. Use only for small matrices (up to 100 x 100)
-void interchanged_matmul(float* RESTRICT A, 
+void interchanged_matmul(float* RESTRICT A,
                          float* RESTRICT B,
                          float* RESTRICT C, int N, int K) {
   for (int i = 0; i < N; ++i)
@@ -50,7 +50,7 @@ void interchanged_matmul(float* RESTRICT A,
 }
 
 // Here is a blocked version for larger matrix sizes (e.g. 512 x 512 and beyond).
-void blocked_matmul(float* RESTRICT A, 
+void blocked_matmul(float* RESTRICT A,
                     float* RESTRICT B,
                     float* RESTRICT C, int N, int K) {
   constexpr int blockSize = 64;
@@ -59,6 +59,6 @@ void blocked_matmul(float* RESTRICT A,
       for (int jj = 0; jj < N; jj += blockSize)
         for (int i = ii; i < std::min(ii + blockSize, N); ++i)
           for (int k = kk; k < std::min(kk + blockSize, N); ++k)
-            for (int j = jj; j < std::min(jj + blockSize, N); ++j)                        
+            for (int j = jj; j < std::min(jj + blockSize, N); ++j)
               C[i * K + j] += A[i * K + k] * B[k * K + j];
 }

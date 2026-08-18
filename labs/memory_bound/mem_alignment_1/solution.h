@@ -27,15 +27,15 @@ public:
     ::operator delete[](allocPtr, ALIGNMENT);
   }
 };
-template<typename T> 
+template<typename T>
 using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
 
 // ******************************************
 // Change this place
 // ******************************************
-// hint: use AlignedVector instead of std::vector 
+// hint: use AlignedVector instead of std::vector
 //       to align the beginning of a matrix
-using Matrix = std::vector<float>;
+using Matrix = AlignedVector<float>;
 // ******************************************
 
 static bool isCacheLineAligned(const Matrix& m) {
@@ -47,9 +47,9 @@ int n_columns(int N);
 void initRandom(Matrix &matrix, int N, int K);
 void initZero(Matrix &matrix, int N, int K);
 void copyFromMatrix(const Matrix &from, Matrix &to, int N, int K);
-void interchanged_matmul(float* RESTRICT A, 
+void interchanged_matmul(float* RESTRICT A,
                          float* RESTRICT B,
                          float* RESTRICT C, int N, int K);
-void blocked_matmul     (float* RESTRICT A, 
+void blocked_matmul     (float* RESTRICT A,
                          float* RESTRICT B,
                          float* RESTRICT C, int N, int K);
