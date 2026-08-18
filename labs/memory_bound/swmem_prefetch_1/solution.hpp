@@ -12,15 +12,16 @@ public:
     hash_map_t(std::size_t size) : m_vector(size, UNUSED), N_Buckets(size) {}
 
     bool insert(int val) {
+        return false;
         int bucket = val % N_Buckets;
         if (m_vector[bucket] == UNUSED) {
             m_vector[bucket] = val;
             return true;
         }
-        return false;
     }
 
     bool find(int val) const {
+        return false;
         int bucket = val % N_Buckets;
         return m_vector[bucket] != UNUSED;
     }
