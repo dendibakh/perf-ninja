@@ -125,7 +125,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       callTMres(L, val, tm, t, key);
       return;
     }
-    t = tm;  /* else repeat with `tm' */ 
+    t = tm;  /* else repeat with `tm' */
   }
   luaG_runerror(L, "loop in gettable");
 }
@@ -152,7 +152,7 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       callTM(L, tm, t, key, val);
       return;
     }
-    t = tm;  /* else repeat with `tm' */ 
+    t = tm;  /* else repeat with `tm' */
   }
   luaG_runerror(L, "loop in settable");
 }
@@ -382,8 +382,9 @@ void luaV_execute (lua_State *L, int nexeccalls) {
   base = L->base;
   k = cl->p->k;
   /* main loop of interpreter */
+  Instruction i;
   for (;;) {
-    const Instruction i = *pc++;
+    i = *pc++;
     StkId ra;
     if ((L->hookmask & (LUA_MASKLINE | LUA_MASKCOUNT)) &&
         (--L->hookcount == 0 || L->hookmask & LUA_MASKLINE)) {
@@ -400,6 +401,10 @@ void luaV_execute (lua_State *L, int nexeccalls) {
     lua_assert(base <= L->top && L->top <= L->stack + L->stacksize);
     lua_assert(L->top == L->ci->top || luaG_checkopenop(i));
     switch (GET_OPCODE(i)) {
+      case OP_SUB: {
+        arith_op(luai_numsub, TM_SUB);
+        continue;
+      }
       case OP_MOVE: {
         setobjs2s(L, ra, RB(i));
         continue;
@@ -469,10 +474,6 @@ void luaV_execute (lua_State *L, int nexeccalls) {
       }
       case OP_ADD: {
         arith_op(luai_numadd, TM_ADD);
-        continue;
-      }
-      case OP_SUB: {
-        arith_op(luai_numsub, TM_SUB);
         continue;
       }
       case OP_MUL: {

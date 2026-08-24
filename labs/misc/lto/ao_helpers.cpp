@@ -1,13 +1,8 @@
 #include "ao.h"
 
-double vdot(vec v0, vec v1)
-{
-    return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
-}
-
 void vcross(vec *c, vec v0, vec v1)
 {
-    
+
     c->x = v0.y * v1.z - v0.z * v1.y;
     c->y = v0.z * v1.x - v0.x * v1.z;
     c->z = v0.x * v1.y - v0.y * v1.x;

@@ -1,5 +1,10 @@
 #include "ao.h"
 
+double vdot(vec v0, vec v1)
+{
+    return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+
 void
 ray_sphere_intersect(Isect *isect, const Ray *ray, const Sphere *sphere)
 {
@@ -15,11 +20,11 @@ ray_sphere_intersect(Isect *isect, const Ray *ray, const Sphere *sphere)
 
     if (D > 0.0) {
         double t = -B - sqrt(D);
-        
+
         if ((t > 0.0) && (t < isect->t)) {
             isect->t = t;
             isect->hit = 1;
-            
+
             isect->p.x = ray->org.x + ray->dir.x * t;
             isect->p.y = ray->org.y + ray->dir.y * t;
             isect->p.z = ray->org.z + ray->dir.z * t;
@@ -46,7 +51,7 @@ ray_plane_intersect(Isect *isect, const Ray *ray, const Plane *plane)
     if ((t > 0.0) && (t < isect->t)) {
         isect->t = t;
         isect->hit = 1;
-        
+
         isect->p.x = ray->org.x + ray->dir.x * t;
         isect->p.y = ray->org.y + ray->dir.y * t;
         isect->p.z = ray->org.z + ray->dir.z * t;
