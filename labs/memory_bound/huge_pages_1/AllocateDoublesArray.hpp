@@ -156,7 +156,7 @@ inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   double *alloc = new double[size];
   size_t segsize = size * sizeof(double);
-  void* ptr = mmap(NULL, segsize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+  void* ptr = mmap(NULL, segsize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (!ptr) {
     exit(31);
   }
