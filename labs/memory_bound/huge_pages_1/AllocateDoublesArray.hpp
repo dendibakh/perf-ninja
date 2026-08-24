@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <cstring>
 
 #if defined(__linux__) || defined(__linux) || defined(linux) ||                \
     defined(__gnu_linux__)
@@ -154,11 +155,24 @@ inline bool setRequiredPrivileges() {
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
   double *alloc = new double[size];
+  size_t segsize = size * sizeof(double);
+  void* ptr = mmap(NULL, segsize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+  if (!ptr) {
+    exit(31);
+  }
+  if (const auto err = madvise(ptr, segsize, MADV_HUGEPAGE)) {
+    std::cerr << "HAHA " << errno << ' ' << ptr << ' ' << segsize << std::endl;
+    exit(errno);
+  }
+  std::memcpy(ptr, (const void*)alloc, segsize);
+  delete[] alloc;
+  alloc = (double*)ptr;
+
   // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  auto deleter = [segsize](double *ptr) { munmap(ptr, segsize); };
 
   return std::unique_ptr<double[], decltype(deleter)>(alloc,
                                                       std::move(deleter));
