@@ -10,14 +10,20 @@ class Life {
 
 public:
     using Grid = std::vector<std::vector<int>>;
-private:    
+private:
     Grid current;
     Grid future;
 
 public:
 
     void reset(const Grid& grid) {
-        current = future = grid;
+        current = Grid(grid.size() + 2, std::vector<int>(grid[0].size() + 2, 0));
+        for (size_t i = 0; i < grid.size(); ++i) {
+            for (size_t j = 0; j < grid[0].size(); ++j) {
+                current[i + 1][j + 1] = grid[i][j];
+            }
+        }
+        future = current;
     }
 
     int getPopulationCount() {
@@ -29,32 +35,28 @@ public:
     }
 
     void printCurrentGrid() {
-        for (auto& row: current) {
-            for (auto& item: row)
-                item ? std::cout << "x " : std::cout << ". ";
+        for (size_t i = 1; i <= current.size() - 2; ++i) {
+            for (size_t j = 1; j <= current[i].size() - 2; ++j) {
+                current[i][j] ? std::cout << "x " : std::cout << ". ";
+            }
             std::cout << "\n";
         }
         std::cout << "\n";
-    }    
+    }
 
     // Simulate the next generation of life
     void simulateNext() {
         //printCurrentGrid();
         int M = current.size();
         int N = current[0].size();
-        
+
         // Loop through every cell
-        for(int i = 0; i < M; i++) {
-            for(int j = 0; j < N; j++) {
-                int aliveNeighbours = 0;      
-                // finding the number of neighbours that are alive                  
-                for(int p = -1; p <= 1; p++) {              // row-offet (-1,0,1)
-                    for(int q = -1; q <= 1; q++) {          // col-offset (-1,0,1)
-                        if((i + p < 0) ||                   // if row offset less than UPPER boundary
-                           (i + p > M - 1) ||               // if row offset more than LOWER boundary
-                           (j + q < 0) ||                   // if column offset less than LEFT boundary
-                           (j + q > N - 1))                 // if column offset more than RIGHT boundary
-                            continue;
+        for(int i = 1; i <= M - 2; i++) {
+            for(int j = 1; j <= N - 2; j++) {
+                int aliveNeighbours = 0;
+                // finding the number of neighbours that are alive
+                for(int p = -1; p <= 1; p++) {
+                    for(int q = -1; q <= 1; q++) {
                         aliveNeighbours += current[i + p][j + q];
                     }
                 }
@@ -68,7 +70,7 @@ public:
                     case 0:
                     case 1:
                         future[i][j] = 0;
-                        break;                   
+                        break;
                     // 2. Remains the same
                     case 2:
                         future[i][j] = current[i][j];
@@ -89,6 +91,6 @@ public:
 
 // Init random starting grid of the game
 Life::Grid initRandom();
-// Simulates N steps of the game for each starting grid 
+// Simulates N steps of the game for each starting grid
 // and return population count
 std::vector<int> solution(const std::vector<Life::Grid>& grids);
