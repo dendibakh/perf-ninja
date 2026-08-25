@@ -1,23 +1,39 @@
 #include "solution.hpp"
 
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 
-uint32_t solution(const char *file_name) {
-  std::fstream file_stream{file_name};
-  if (!file_stream.is_open())
-    throw std::runtime_error{"The file could not be opened"};
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+uint32_t solution(const char *file_name) {
   // Initial value has all bits set to 1
   uint32_t crc = 0xff'ff'ff'ff;
 
-  // Update the CRC32 value character by character
-  char c;
-  while (true) {
-    file_stream.read(&c, 1);
-    if (file_stream.eof())
-      break;
-    update_crc32(crc, static_cast<uint8_t>(c));
+  int fd = open(file_name, O_RDONLY);
+  if (fd == -1) {
+    std::cerr << "ZHOPA" << std::endl;
+    exit(1);
+  }
+  struct stat st;
+  if (fstat(fd, &st) == -1) {
+    std::cerr << "ZHOPA2" << std::endl;
+    exit(1);
+  }
+
+  int fsz = st.st_size;
+  char* addr = (char*)mmap(NULL, fsz, PROT_READ, MAP_PRIVATE, fd, 0);
+  if (addr == MAP_FAILED) {
+    std::cerr << "ZHOPA3" << std::endl;
+    exit(1);
+  }
+  for (int i = 0; i < fsz; ++i) {
+    update_crc32(crc, static_cast<uint8_t>(addr[i]));
   }
 
   // Invert the bits
