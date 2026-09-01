@@ -36,19 +36,19 @@ void imageSmoothing(const InputVector &input, uint8_t radius,
   // 2. main loop.
   limit = size - radius;
   for (; pos + 8 <= limit; pos += 8) {
-    __m128i sub = _mm_cvtepu8_epi16(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(&input[pos - radius - 1])));
-    __m128i add = _mm_cvtepu8_epi16(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(&input[pos + radius])));
+    __m128i sub = _mm_cvtepu8_epi16(_mm_loadu_si64(&input[pos - radius - 1]));
+    __m128i add = _mm_cvtepu8_epi16(_mm_loadu_si64(&input[pos + radius]));
 
-    __m128i sumVec = _mm_sub_epi16(add, sub);
-    sumVec = _mm_add_epi16(sumVec, _mm_setr_epi16(currentSum, 0, 0, 0, 0, 0, 0, 0));
+    __m128i diff = _mm_sub_epi16(add, sub);
 
     static constexpr int bytesPerLane = 2;
-    sumVec = _mm_add_epi16(sumVec, _mm_bslli_si128(sumVec, bytesPerLane));
-    sumVec = _mm_add_epi16(sumVec, _mm_bslli_si128(sumVec, bytesPerLane * 2));
-    sumVec = _mm_add_epi16(sumVec, _mm_bslli_si128(sumVec, bytesPerLane * 4));
+    __m128i diffPrefixSum = _mm_add_epi16(diff, _mm_bslli_si128(diff, bytesPerLane));
+    diffPrefixSum = _mm_add_epi16(diffPrefixSum, _mm_bslli_si128(diffPrefixSum, bytesPerLane * 2));
+    diffPrefixSum = _mm_add_epi16(diffPrefixSum, _mm_bslli_si128(diffPrefixSum, bytesPerLane * 4));
 
-    _mm_storeu_si128(reinterpret_cast<__m128i*>(&output[pos]), sumVec);
-    currentSum = _mm_extract_epi16(sumVec, 7);
+    __m128i result = _mm_add_epi16(diffPrefixSum, _mm_set1_epi16(currentSum));
+    _mm_storeu_si128(reinterpret_cast<__m128i*>(&output[pos]), result);
+    currentSum = _mm_extract_epi16(result, 7);
   }
   for (; pos < limit; ++pos) {
     currentSum -= input[pos - radius - 1];
