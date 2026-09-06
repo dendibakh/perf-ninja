@@ -1,5 +1,6 @@
-#include <vector>
 #include <limits>
+#include <utility>
+#include <vector>
 
 static constexpr std::size_t HASH_MAP_SIZE = 32 * 1024 * 1024 - 5;
 static constexpr std::size_t NUMBER_OF_LOOKUPS = 1024 * 1024;
@@ -12,18 +13,31 @@ public:
     hash_map_t(std::size_t size) : m_vector(size, UNUSED), N_Buckets(size) {}
 
     bool insert(int val) {
-        int bucket = val % N_Buckets;
-        if (m_vector[bucket] == UNUSED) {
-            m_vector[bucket] = val;
+        int& slot = get(val);
+        if (slot == UNUSED) {
+            slot = val;
             return true;
         }
         return false;
     }
 
     bool find(int val) const {
-        int bucket = val % N_Buckets;
-        return m_vector[bucket] != UNUSED;
+        return get(val) != UNUSED;
     }
+
+  void prefetch(int val) const {
+      __builtin_prefetch(&get(val));
+    }
+
+private:
+  const int& get(int val) const {
+    int bucket = val % N_Buckets;
+    return m_vector[bucket];
+  }
+
+  int& get(int val) {
+    return const_cast<int&>(std::as_const(*this).get(val));
+  }
 };
 
 void init(hash_map_t* hash_map, std::vector<int>& lookups);
