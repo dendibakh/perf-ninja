@@ -5,10 +5,12 @@
 #include <vector>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
+  static constexpr size_t CACHE_LINE_SIZE = 64;
+
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
-  struct Accumulator {
+  struct alignas(CACHE_LINE_SIZE) Accumulator {
     std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
