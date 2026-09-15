@@ -23,19 +23,20 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
-  List *head2 = l2;
-  // O(N^2) algorithm:
+  std::vector<unsigned> l1Values;
+
   while (l1) {
-    unsigned v = l1->value;
-    l2 = head2;
-    while (l2) {
-      if (l2->value == v) {
-        retVal += getSumOfDigits(v);
-        break;
-      }
-      l2 = l2->next;
-    }
+    l1Values.push_back(l1->value);
     l1 = l1->next;
+  }
+
+  while (l2) {
+    for (unsigned value : l1Values) {
+      if (l2->value == value) {
+        retVal += getSumOfDigits(value);
+      }
+    }
+    l2 = l2->next;
   }
 
   return retVal;
