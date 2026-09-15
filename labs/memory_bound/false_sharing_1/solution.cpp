@@ -2,6 +2,7 @@
 #include <atomic>
 #include <cstring>
 #include <omp.h>
+#include <new>
 #include <vector>
 
 std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
@@ -9,7 +10,7 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
   struct Accumulator {
-    std::atomic<uint32_t> value = 0;
+    alignas(std::hardware_destructive_interference_size) std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
 
