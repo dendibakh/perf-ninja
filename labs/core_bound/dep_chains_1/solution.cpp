@@ -23,20 +23,21 @@ unsigned getSumOfDigits(unsigned n) {
 unsigned solution(List *l1, List *l2) {
   unsigned retVal = 0;
 
-  std::vector<unsigned> l1Values;
-
-  while (l1) {
-    l1Values.push_back(l1->value);
-    l1 = l1->next;
-  }
+  std::vector<unsigned> l2Values;
 
   while (l2) {
-    for (unsigned value : l1Values) {
-      if (l2->value == value) {
+    l2Values.push_back(l2->value);
+    l2 = l2->next;
+  }
+
+  while (l1) {
+    for (unsigned value : l2Values) {
+      if (l1->value == value) {
         retVal += getSumOfDigits(value);
+        break;
       }
     }
-    l2 = l2->next;
+    l1 = l1->next;
   }
 
   return retVal;
