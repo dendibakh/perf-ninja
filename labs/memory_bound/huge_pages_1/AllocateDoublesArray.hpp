@@ -20,9 +20,10 @@ void* allocateRegion(size_t size)
 {
   void *ptr = mmap(NULL, size + HUGE_PAGE_SIZE, 
     PROT_READ | PROT_WRITE, 
-    MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, 
+    MAP_PRIVATE | MAP_ANONYMOUS, 
     -1, 0);
   if (ptr == MAP_FAILED) { perror("mmap"); std::abort(); } 
+  madvise(ptr, size + HUGE_PAGE_SIZE, MADV_HUGEPAGE);
 
   return ptr;
 }
