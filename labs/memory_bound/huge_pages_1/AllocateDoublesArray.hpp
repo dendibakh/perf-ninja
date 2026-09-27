@@ -15,6 +15,17 @@
 // HINT: allocate huge pages using mmap/munmap
 // NOTE: See HugePagesSetupTips.md for how to enable huge pages in the OS
 #include <sys/mman.h>
+#define HUGE_PAGE_SIZE (2 * 1024 * 1024)
+void* allocateRegion(size_t size)
+{
+  void *ptr = mmap(NULL, size + HUGE_PAGE_SIZE, 
+    PROT_READ | PROT_WRITE, 
+    MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, 
+    -1, 0);
+  if (ptr == MAP_FAILED) { perror("mmap"); std::abort(); } 
+
+  return ptr;
+}
 
 #elif defined(ON_WINDOWS)
 
@@ -37,6 +48,11 @@
 #include <Sddl.h>
 #include <ntsecapi.h>
 #include <ntstatus.h>
+
+void* allocateRegion(size_t size)
+{
+  return nullptr;
+}
 
 // Based on
 // https://stackoverflow.com/questions/42354504/enable-large-pages-in-windows-programmatically
@@ -153,12 +169,12 @@ inline bool setRequiredPrivileges() {
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
   // Allocate memory
-  double *alloc = new double[size];
+  double *alloc = (double*)allocateRegion(sizeof(double)*size);
   // remember to cast the pointer to double* if your allocator returns void*
 
   // Deleters can be conveniently defined as lambdas, but you can explicitly
   // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  auto deleter = [size](double *ptr) { munmap(ptr,sizeof(double)*size + HUGE_PAGE_SIZE); };
 
   return std::unique_ptr<double[], decltype(deleter)>(alloc,
                                                       std::move(deleter));
