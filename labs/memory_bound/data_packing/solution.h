@@ -9,8 +9,8 @@ constexpr int maxRandom = 100;
 struct S {
   int i;
   long long l;
-  short s;
   double d;
+  short s;
   bool b;
 
   bool operator<(const S &s) const { return this->i < s.i; }
