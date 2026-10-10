@@ -1,6 +1,10 @@
 #include <iostream>
 #include <memory>
 
+// HINT: allocate huge pages using mmap/munmap
+// NOTE: See HugePagesSetupTips.md for how to enable huge pages in the OS
+#include <sys/mman.h>
+
 #if defined(__linux__) || defined(__linux) || defined(linux) ||                \
     defined(__gnu_linux__)
 #define ON_LINUX
@@ -149,6 +153,34 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+#ifdef ON_LINUX
+// Allocate an array of doubles of size `size`, return it as a
+// std::unique_ptr<double[], D>, where `D` is a custom deleter type
+inline auto allocateDoublesArray(size_t size) {
+  size *= sizeof(double);
+
+  // Allocate full pages
+  constexpr size_t page_size = 1ul << 21; // 2MB
+  const auto pages_to_alloc = size / page_size + (size % page_size != 0);
+  size = pages_to_alloc * page_size;
+
+  const auto alloc = mmap(nullptr, size, PROT_READ | PROT_WRITE,
+                          MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (alloc == MAP_FAILED)
+    throw std::bad_alloc{};
+
+  // Request transparent huge pages without requiring a reserved huge-page pool.
+  // This is a best-effort hint; the mapping is usable even if it is rejected.
+  madvise(alloc, size, MADV_HUGEPAGE);
+
+  auto deleter = [s = size](double *addr) { munmap(addr, s); };
+
+  return std::unique_ptr<double[], decltype(deleter)>(
+      static_cast<double *>(alloc), deleter);
+}
+
+#else
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
 inline auto allocateDoublesArray(size_t size) {
@@ -168,3 +200,5 @@ inline auto allocateDoublesArray(size_t size) {
   // The more verbose version is meant to demonstrate the use of a custom
   // (potentially stateful) deleter
 }
+
+#endif
