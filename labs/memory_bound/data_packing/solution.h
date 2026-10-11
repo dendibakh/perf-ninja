@@ -5,7 +5,7 @@ constexpr int N = 1000000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
-// FIXME: this data structure can be reduced in size
+// FIXME: this data structure can be reduced in size -> DONE
 struct S {
   long long l;
   double d;
