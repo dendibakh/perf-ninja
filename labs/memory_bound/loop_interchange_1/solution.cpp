@@ -5,8 +5,9 @@
 
 // Make zero matrix
 void zero(Matrix &result) {
-  for (int j = 0; j < N; j++) {
   for (int i = 0; i < N; i++) {
+  for (int j = 0; j < N; j++) {
+  
       result[i][j] = 0;
     }
   }
@@ -14,11 +15,11 @@ void zero(Matrix &result) {
 
 // Make identity matrix
 void identity(Matrix &result) {
-  for (int j = 0; j < N; j++) {
   for (int i = 0; i < N; i++) {
+  for (int j = 0; j < N; j++) {
       result[i][j] = 0;
     }
-    result[j][j] = 1;
+    result[i][i] = 1;
   }
 }
 
@@ -26,9 +27,9 @@ void identity(Matrix &result) {
 void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   zero(result);
 
-  for (int j = 0; j < N; j++) {
+  for (int i = 0; i < N; i++) {
     for (int k = 0; k < N; k++) {
-      for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
         result[i][j] += a[i][k] * b[k][j];
       }
     }
