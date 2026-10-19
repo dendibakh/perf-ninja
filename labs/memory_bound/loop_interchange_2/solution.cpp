@@ -3,6 +3,41 @@
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <chrono>
+#include <cmath>
+#include <iostream>
+
+// Accumulates per-loop durations (Welford) and prints avg/std in us at exit
+struct LoopTimer {
+  const char *name;
+  long long count = 0;
+  double mean = 0.0;
+  double m2 = 0.0;
+
+  explicit LoopTimer(const char *n) : name(n) {}
+
+  void add(double us) {
+    count++;
+    double delta = us - mean;
+    mean += delta / count;
+    m2 += delta * (us - mean);
+  }
+
+  ~LoopTimer() {
+    double stddev = count > 1 ? std::sqrt(m2 / (count - 1)) : 0.0;
+    std::cout << name << ": n=" << count << " avg=" << mean
+              << " us std=" << stddev << " us" << std::endl;
+  }
+};
+
+static LoopTimer verticalTimer("filterVertically middle");
+static LoopTimer horizontalTimer("filterHorizontally middle");
+
+static inline double elapsedUs(std::chrono::steady_clock::time_point start) {
+  return std::chrono::duration<double, std::micro>(
+             std::chrono::steady_clock::now() - start)
+      .count();
+}
 
 // Applies Gaussian blur in independent vertical lines
 static void filterVertically(uint8_t *output, const uint8_t *input,
@@ -11,9 +46,9 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
                              const int shift) {
   const int rounding = 1 << (shift - 1);
 
-  for (int c = 0; c < width; c++) {
     // Top part of line, partial kernel
     for (int r = 0; r < std::min(radius, height); r++) {
+      for (int c = 0; c < width; c++) {
       // Accumulation
       int dot = 0;
       int sum = 0;
@@ -28,9 +63,11 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       int value = static_cast<int>(dot / static_cast<float>(sum) + 0.5f);
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+  }
 
     // Middle part of computations with full kernel
     for (int r = radius; r < height - radius; r++) {
+    for (int c = 0; c < width; c++) {
       // Accumulation
       int dot = 0;
       for (int i = 0; i < radius + 1 + radius; i++) {
@@ -41,8 +78,11 @@ static void filterVertically(uint8_t *output, const uint8_t *input,
       int value = (dot + rounding) >> shift;
       output[r * width + c] = static_cast<uint8_t>(value);
     }
+    }
+  
 
     // Bottom part of line, partial kernel
+    for (int c = 0; c < width; c++) {
     for (int r = std::max(radius, height - radius); r < height; r++) {
       // Accumulation
       int dot = 0;
