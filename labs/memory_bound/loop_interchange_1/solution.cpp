@@ -52,7 +52,7 @@ void multiply(Matrix &result, const Matrix &a, const Matrix &b) {
   //   }
   // }
 
-  //Local Variable x3 faster
+  // Local Variable x3 faster
   // --------------------------------------------------------------
   // Benchmark                    Time             CPU   Iterations
   // --------------------------------------------------------------
