@@ -4,7 +4,7 @@
 
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
-  int n = 5;
+  int n = 48;
   for (int ii = 0; ii < size; ii += n)
   {
     for (int jj = 0; jj < size; jj += n)
