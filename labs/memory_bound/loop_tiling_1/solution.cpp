@@ -5,12 +5,12 @@
 bool solution(MatrixOfDoubles &in, MatrixOfDoubles &out) {
   int size = in.size();
   int n = 5;
-  for (int ii = 0; ii < size - n; ii += n)
+  for (int ii = 0; ii < size; ii += n)
   {
-    for (int jj = 0; jj < size - n; jj += n)
-      for (int i = ii; i < ii + n; i++)
+    for (int jj = 0; jj < size; jj += n)
+      for (int i = ii; i < std::min(ii + n, size); i++)
       {
-        for (int j = jj; j < jj + n; j++)
+        for (int j = jj; j < std::min(jj + n, size); j++)
         {
           out[i][j] = in[j][i];
         }
