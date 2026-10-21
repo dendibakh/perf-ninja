@@ -38,6 +38,23 @@ sudo sysctl -w kernel.perf_event_paranoid=-1
 cat /proc/sys/kernel/perf_event_paranoid
 ```
 
+### List Counters
+```bash
+perf list | grep -Ei 'L1-dcache|L1-icache|L2|LLC|cache-miss|cache-load'
+
+perf stat -e \
+cycles,instructions,\
+l2_rqsts.demand_data_rd_hit,\
+l2_rqsts.demand_data_rd_miss,\
+mem_load_retired.l1_hit,\
+mem_load_retired.l1_miss,\
+mem_load_retired.l2_hit,\
+mem_load_retired.l2_miss,\
+mem_load_retired.l3_hit,\
+mem_load_retired.l3_miss \
+./lab
+```
+
 ### Top down analisys
 ```bash
 perf stat --topdown -a taskset -c 0 ./lab
