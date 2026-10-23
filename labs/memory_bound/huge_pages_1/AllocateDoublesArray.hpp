@@ -149,22 +149,74 @@ inline bool setRequiredPrivileges() {
 
 #endif
 
+// Baseline 
+// $ sudo perf stat -e dtlb_load_misses.walk_completed -e dtlb_store_misses.walk_complete
+// -------------------------------------------------------------------------------------
+// Benchmark                           Time             CPU   Iterations UserCounters...
+// -------------------------------------------------------------------------------------
+// Apply matrix-free operator       6.41 s          6.41 s             1 bytes_per_second=228.476Mi/s
+
+//  Performance counter stats for './lab':
+
+//        415,902,857      dtlb_load_misses.walk_completed                                       
+//         53,665,767      dtlb_store_misses.walk_completed                                      
+
+//        8.855646327 seconds time elapsed
+
+//        8.524874000 seconds user
+//        0.329995000 seconds sys
+
 // Allocate an array of doubles of size `size`, return it as a
 // std::unique_ptr<double[], D>, where `D` is a custom deleter type
+// inline auto allocateDoublesArray(size_t size) {
+//   // Allocate memory
+//   double *alloc = new double[size];
+//   // remember to cast the pointer to double* if your allocator returns void*
+
+//   // Deleters can be conveniently defined as lambdas, but you can explicitly
+//   // define a class if you're not comfortable with the syntax
+//   auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+
+//   return std::unique_ptr<double[], decltype(deleter)>(alloc,
+//                                                       std::move(deleter));
+
+//   // The above is equivalent to:
+//   // return std::make_unique<double[]>(size);
+//   // The more verbose version is meant to demonstrate the use of a custom
+//   // (potentially stateful) deleter
+// }
+
+// FIX
+// -------------------------------------------------------------------------------------
+// Benchmark                           Time             CPU   Iterations UserCounters...
+// -------------------------------------------------------------------------------------
+// Apply matrix-free operator       5.80 s          5.80 s             1 bytes_per_second=252.272Mi/s
+
+//  Performance counter stats for './lab':
+
+//         50,202,925      dtlb_load_misses.walk_completed                                       
+//          6,465,025      dtlb_store_misses.walk_completed                                      
+
+//        8.115809081 seconds time elapsed
+
+//        7.898769000 seconds user
+//        0.215993000 seconds sys
+
 inline auto allocateDoublesArray(size_t size) {
-  // Allocate memory
-  double *alloc = new double[size];
-  // remember to cast the pointer to double* if your allocator returns void*
+  size_t total_array_size = size * sizeof(double);
+  constexpr size_t page_2mb = 1UL << 21;
+  auto pages_needed = total_array_size / page_2mb + (total_array_size % page_2mb != 0);
+  size_t total_to_alloc = pages_needed * page_2mb;
 
-  // Deleters can be conveniently defined as lambdas, but you can explicitly
-  // define a class if you're not comfortable with the syntax
-  auto deleter = [/* state = ... */](double *ptr) { delete[] ptr; };
+  void* ptr = mmap(nullptr, total_to_alloc, PROT_READ | PROT_WRITE,
+                MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
+  if (ptr == MAP_FAILED) {
+    throw std::bad_alloc{};
+  }
+  madvise(ptr, total_to_alloc, MADV_HUGEPAGE);
 
-  return std::unique_ptr<double[], decltype(deleter)>(alloc,
-                                                      std::move(deleter));
+  auto deleter = [total_to_alloc](double *p) { munmap(p, total_to_alloc); };
 
-  // The above is equivalent to:
-  // return std::make_unique<double[]>(size);
-  // The more verbose version is meant to demonstrate the use of a custom
-  // (potentially stateful) deleter
+  return std::unique_ptr<double[], decltype(deleter)>(static_cast<double*>(ptr), std::move(deleter));
 }
+
