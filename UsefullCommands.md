@@ -23,8 +23,10 @@ python3 -m venv ~/cmake-venv
 ### Build Lab
 ```bash
 ~/cmake-venv/bin/cmake -E make_directory build
+cd ./build
 ~/cmake-venv/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
 ~/cmake-venv/bin/cmake --build . --config Release --parallel 8
+~/cmake-venv/bin/cmake --build . --config Debug --parallel 8 # for intel advisor :D 
 ~/cmake-venv/bin/cmake --build . --target validateLab
 ~/cmake-venv/bin/cmake --build . --target benchmarkLab
 ```
@@ -36,6 +38,23 @@ sudo sysctl -w kernel.perf_event_paranoid=-1
 cat /proc/sys/kernel/perf_event_paranoid
 ```
 
+### List Counters
+```bash
+perf list | grep -Ei 'L1-dcache|L1-icache|L2|LLC|cache-miss|cache-load'
+
+perf stat -e \
+cycles,instructions,\
+l2_rqsts.demand_data_rd_hit,\
+l2_rqsts.demand_data_rd_miss,\
+mem_load_retired.l1_hit,\
+mem_load_retired.l1_miss,\
+mem_load_retired.l2_hit,\
+mem_load_retired.l2_miss,\
+mem_load_retired.l3_hit,\
+mem_load_retired.l3_miss \
+./lab
+```
+
 ### Top down analisys
 ```bash
 perf stat --topdown -a taskset -c 0 ./lab
@@ -44,10 +63,17 @@ perf stat --topdown -a taskset -c 0 ./lab
 ### Finding hot paths
 ```bash
 perf record -g -- taskset -c 0 ./lab
+perf report
+```
+
+## Intel VTune & Advisor
+```bash
+/opt/intel/oneapi/vtune/2026.6/bin64/vtune-backend --allow-remote-access --enable-server-profiling --web-port=8080
+
+/opt/intel/oneapi/advisor/latest/bin64/advisor-gui
 ```
 
 ### Notes
-
 After top down analisys we see that CPU stalls waiting for resources/data.
 
 ```bash
