@@ -37,7 +37,7 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
   * [Compiler Intrinsics 3](labs/core_bound/compiler_intrinsics_3)
   * [Compiler Intrinsics 4](labs/core_bound/compiler_intrinsics_4)
 * Memory Bound:
-  * [Data Packing](labs/memory_bound/data_packing)
+  * ✅ [Data Packing](labs/memory_bound/data_packing)
   * ✅ [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
   * ✅ [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
   * ✅ [Loop Tiling](labs/memory_bound/loop_tiling_1)

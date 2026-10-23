@@ -5,6 +5,28 @@ constexpr int N = 1000000;
 constexpr int minRandom = 0;
 constexpr int maxRandom = 100;
 
+// Baseline
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bench1           48.2 ms         48.2 ms           12
+// -----------------------------------------------------
+// struct S {
+//   int i;
+//   long long l;
+//   short s;
+//   double d;
+//   bool b;
+
+//   bool operator<(const S &s) const { return this->i < s.i; }
+// };
+
+// Fixes
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bench1           8.06 ms         8.06 ms           82
+// -----------------------------------------------------
 struct S {
   unsigned l:14;   // 14 Bits
   unsigned i:7;    // 7 Bits
