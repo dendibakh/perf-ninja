@@ -38,9 +38,9 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
   * [Compiler Intrinsics 4](labs/core_bound/compiler_intrinsics_4)
 * Memory Bound:
   * [Data Packing](labs/memory_bound/data_packing)
-  * [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
-  * [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
-  * [Loop Tiling](labs/memory_bound/loop_tiling_1)
+  * ✅ [Loop Interchange 1](labs/memory_bound/loop_interchange_1)
+  * ✅ [Loop Interchange 2](labs/memory_bound/loop_interchange_2)
+  * ✅ [Loop Tiling](labs/memory_bound/loop_tiling_1)
   * [SW memory prefetching](labs/memory_bound/swmem_prefetch_1)
   * [False Sharing](labs/memory_bound/false_sharing_1)
   * [Huge Pages](labs/memory_bound/huge_pages_1)
@@ -54,7 +54,7 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
 * CPU Frontend Bound:
 * Data-Driven optimizations:
 * Misc:
-  * [Warmup](labs/misc/warmup)
+  * ✅ [Warmup](labs/misc/warmup)
   * [LTO](labs/misc/lto)
   * [PGO](labs/misc/pgo)
   * [Optimize IO](labs/misc/io_opt1)
