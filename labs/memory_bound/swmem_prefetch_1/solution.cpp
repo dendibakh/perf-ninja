@@ -12,7 +12,15 @@ static int getSumOfDigits(int n) {
 int solution(const hash_map_t *hash_map, const std::vector<int> &lookups) {
   int result = 0;
 
-  for (int val : lookups) {
+  for (int i = 0; i < lookups.size(); ++i)
+  {
+    hash_map->prefetch(lookups[i+1]);
+    hash_map->prefetch(lookups[i+2]);
+    hash_map->prefetch(lookups[i+3]);
+    hash_map->prefetch(lookups[i+4]);
+    hash_map->prefetch(lookups[i+5]);
+    hash_map->prefetch(lookups[i+6]);
+    const int& val = lookups[i];
     if (hash_map->find(val))
       result += getSumOfDigits(val);
   }
