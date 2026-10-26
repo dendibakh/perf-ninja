@@ -20,6 +20,8 @@ Prerequisites: basic C++ skills are an absolute must-have for the course. Denis'
 
 Before you start working on lab assignments, make sure you read [Get Started page](GetStarted.md) and watch the [warmup video](https://youtu.be/jFRwAcIoLgQ).
 
+For a chapter-by-chapter lab checklist based on the book, see the [course plan](COURSE_PLAN.md).
+
 Lab assignments in this project are implemented in C++. Also, Performance Ninja was ported to:
 * Rust ([perf-ninja-rs](https://github.com/grahamking/perf-ninja-rs)), thanks to @grahamking.
 * Zig ([perf-ninja-zig](https://github.com/JonathanHallstrom/perf-ninja-zig)), thanks to @JonathanHallstrom.

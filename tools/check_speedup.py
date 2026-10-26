@@ -1,106 +1,157 @@
-# This script helps to check the speedup (and noise) of a benchmark
-# by building and running a solution against the baseline code.
+r"""Build and compare the baseline and SOLUTION variants with stable measurements.
 
-# Requirement: guard the code of the solution with #ifdef SOLUTION
+Guard the optimized implementation with #ifdef SOLUTION and keep the baseline
+under #else. Run from a separate build/results directory, as your normal user:
 
-# Example usage:
-# $ mkdir check_speedup
-# $ cd check_speedup
-# $ python "C:\workspace\perf-ninja\tool\check_noise.py"
-#   -lab_path "C:\workspace\perf-ninja\labs\misc\warmup"
-#   -DSOLUTION -num_runs 3 -v
+  python3 /path/to/perf-ninja/tools/check_speedup.py \
+    -lab_path /path/to/perf-ninja/labs/misc/warmup -num_runs 3 -v
 
-import subprocess
-import os
+Each benchmarkLab target runs through stable_run.py with run_lab.sh's defaults
+and environment overrides. Configuration, compilation and validation run normally.
+"""
+
 import argparse
+import os
 from pathlib import Path
+import re
+import shlex
 import shutil
-import gbench
-from gbench import util, report
-from gbench.util import *
+import subprocess
+import sys
 
-parser = argparse.ArgumentParser(description='test results')
-parser.add_argument("-num_runs", type=int, help="Number of runs", default=5)
-parser.add_argument("-lab_path", type=str, help="Path to the root of the lab.")
-parser.add_argument("-D", type=str, help="Path to the root of the lab.", default="SOLUTION")
-parser.add_argument("-v", help="verbose", action="store_true", default=False)
 
-args = parser.parse_args()
-numRuns = args.num_runs
-labRootPath = args.lab_path
-defines = args.D
-verbose = args.v
+STABLE_RUN = Path(__file__).resolve().parent / "misc/stable_run.py"
 
-saveCWD = os.getcwd()
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
-def callWrapper(cmdLine):
-  if verbose:
-    print(bcolors.OKCYAN + "Running: " + cmdLine + bcolors.ENDC)
-    subprocess.check_call(cmdLine, shell=True)
-  else:
-    subprocess.check_call(cmdLine, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
-  return
 
-def buildAndRunBench(iterNumber, variant, cmakeFlags):
-  os.chdir(saveCWD)
-  buildPath = os.path.join(saveCWD, variant + "Build" + str(iterNumber))
-  buildDirPath = Path(buildPath)
-  if buildDirPath.exists() and buildDirPath.is_dir():
-    shutil.rmtree(buildDirPath)
-  try:
-    callWrapper("cmake -E make_directory " + variant +"Build" + str(iterNumber))
-    os.chdir(buildPath)
-    labAbsPath = labRootPath
-    if not os.path.isabs(labAbsPath):
-      labAbsPath = os.path.join(saveCWD, labRootPath)
-    callWrapper("cmake -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Ninja -DCMAKE_CXX_COMPILER=clang++-17 -DCMAKE_C_COMPILER=clang-17 -DCMAKE_BUILD_TYPE=Release " + cmakeFlags + " -S \"" + labAbsPath + "\"")
-    callWrapper("cmake --build . --config Release --parallel 8")
-    # this will save score in result.json file
-    callWrapper("cmake --build . --config Release --target validateLab")
-    callWrapper("cmake --build . --config Release --target benchmarkLab")
-  except:
-    print(bcolors.FAIL + variant + ": iteration " + str(iterNumber) + " - Failed" + bcolors.ENDC)
-    return False
-  print(bcolors.OKGREEN + variant + ": iteration " + str(iterNumber) + " - Done" + bcolors.ENDC)
-  return True
+def stable_run_options(environment=None):
+    """Match run_lab.sh, including its empty-variable-as-default behavior."""
+    env = os.environ if environment is None else environment
+    defaults = {
+        "CPU": "2", "GOVERNOR": "performance", "TURBO": "on",
+        "PLATFORM_PROFILE": "performance", "CPU_FREQ_KHZ": "3500000",
+        "CPU_FREQ_SCOPE": "all", "ISOLATE": "on", "SMT": "off", "ASLR": "off",
+    }
+    values = {key: env.get(key) or default for key, default in defaults.items()}
+    choices = {
+        "TURBO": ("off", "on", "keep"), "PLATFORM_PROFILE": ("performance", "keep"),
+        "CPU_FREQ_SCOPE": ("selected", "all"), "ISOLATE": ("on", "off"),
+        "SMT": ("off", "keep"), "ASLR": ("off", "keep"),
+    }
+    for key, allowed in choices.items():
+        if values[key] not in allowed:
+            raise ValueError(f"{key} must be one of: {', '.join(allowed)}")
+    if not re.fullmatch(r"[0-9]+", values["CPU"]):
+        raise ValueError("CPU must be a non-negative integer")
+    frequency = values["CPU_FREQ_KHZ"]
+    if frequency != "keep" and not re.fullmatch(r"[1-9][0-9]*", frequency):
+        raise ValueError("CPU_FREQ_KHZ must be a positive integer in kHz, or keep")
+    options = ["--cpu", values["CPU"], "--governor", values["GOVERNOR"],
+               "--turbo", values["TURBO"], "--smt", values["SMT"],
+               "--aslr", values["ASLR"], "--platform-profile", values["PLATFORM_PROFILE"]]
+    if frequency != "keep":
+        options += ["--frequency-khz", frequency, "--frequency-scope", values["CPU_FREQ_SCOPE"]]
+    if values["ISOLATE"] == "on":
+        options.append("--isolate")
+    return options
 
-def compareResults(iterNumber):
-  baselineBuildPath = os.path.join(saveCWD, "baselineBuild" + str(iterNumber))
-  baselineResultPath = os.path.join(baselineBuildPath, "result.json")
-  solutionBuildPath = os.path.join(saveCWD, "solutionBuild" + str(iterNumber))
-  solutionResultPath = os.path.join(solutionBuildPath, "result.json")
 
-  outJsonSolution = gbench.util.load_benchmark_results(solutionResultPath)
-  outJsonBaseline = gbench.util.load_benchmark_results(baselineResultPath)
+def callWrapper(command, verbose=False, *, cwd=None, benchmark=False):
+    if verbose:
+        print(bcolors.OKCYAN + "Running: " + shlex.join(command) + bcolors.ENDC, flush=True)
+    subprocess.check_call(command, cwd=cwd,
+                          stdout=None if verbose else subprocess.DEVNULL,
+                          # Always show helper diagnostics, including failed recovery.
+                          stderr=None if verbose or benchmark else subprocess.DEVNULL)
 
-  # Parse two report files and compare them
-  diff_report = gbench.report.get_difference_report(
-    outJsonBaseline, outJsonSolution, True)
-  output_lines = gbench.report.print_difference_report(
-    diff_report,
-    False, True, 0.05, True)
-  
-  for ln in output_lines:
-    print(ln)
 
-  return True
+def buildAndRunBench(iterNumber, variant, cmakeFlags, labRootPath, saveCWD,
+                     stableOptions, verbose=False):
+    buildPath = Path(saveCWD) / f"{variant}Build{iterNumber}"
+    try:
+        if buildPath.is_dir():
+            shutil.rmtree(buildPath)
+        buildPath.mkdir()
+        callWrapper(["cmake", "-B", ".", "-DCMAKE_POLICY_VERSION_MINIMUM=3.5", "-G", "Ninja",
+                     "-DCMAKE_CXX_COMPILER=clang++", "-DCMAKE_C_COMPILER=clang",
+                     "-DCMAKE_BUILD_TYPE=Release", *cmakeFlags, "-S", str(labRootPath)],
+                    verbose, cwd=buildPath)
+        callWrapper(["cmake", "--build", ".", "--config", "Release", "--parallel", "8"],
+                    verbose, cwd=buildPath)
+        callWrapper(["cmake", "--build", ".", "--config", "Release", "--target", "validateLab"],
+                    verbose, cwd=buildPath)
+        # Preserve the lab's CMake arguments, minimum duration and result.json path.
+        callWrapper([sys.executable, str(STABLE_RUN), *stableOptions, "--",
+                     "cmake", "--build", ".", "--config", "Release", "--target", "benchmarkLab"],
+                    verbose, cwd=buildPath, benchmark=True)
+    except (OSError, subprocess.CalledProcessError) as error:
+        print(bcolors.FAIL + f"{variant}: iteration {iterNumber} - Failed: {error}" + bcolors.ENDC,
+              file=sys.stderr)
+        return False
+    print(bcolors.OKGREEN + f"{variant}: iteration {iterNumber} - Done" + bcolors.ENDC, flush=True)
+    return True
 
-for i in range(0, numRuns):
-  buildAndRunBench(i, "baseline", "")
-  buildAndRunBench(i, "solution", "-DCMAKE_CXX_FLAGS=-D" + defines)
 
-os.chdir(saveCWD)
+def compareResults(iterNumber, saveCWD):
+    from gbench import util, report
 
-for i in range(0, numRuns):
-  compareResults(i)
+    baselineResultPath = Path(saveCWD) / f"baselineBuild{iterNumber}/result.json"
+    solutionResultPath = Path(saveCWD) / f"solutionBuild{iterNumber}/result.json"
+    outJsonSolution = util.load_benchmark_results(solutionResultPath)
+    outJsonBaseline = util.load_benchmark_results(baselineResultPath)
+    diff_report = report.get_difference_report(outJsonBaseline, outJsonSolution, True)
+    for line in report.print_difference_report(diff_report, False, True, 0.05, True):
+        print(line)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-num_runs", type=int, help="Number of baseline/solution build pairs", default=5)
+    parser.add_argument("-lab_path", type=Path, required=True, help="Path to the root of the lab")
+    parser.add_argument("-D", default="SOLUTION", help="Preprocessor macro for the solution variant")
+    parser.add_argument("-v", help="Show build and benchmark output", action="store_true")
+    args = parser.parse_args(argv)
+    if args.num_runs <= 0:
+        parser.error("-num_runs must be positive")
+    if hasattr(os, "geteuid") and os.geteuid() == 0:
+        parser.error("run as your normal user; stable_run.py requests sudo for settings")
+    labRootPath = args.lab_path.resolve()
+    if not (labRootPath / "CMakeLists.txt").is_file():
+        parser.error("-lab_path must point to a lab containing CMakeLists.txt")
+    if not STABLE_RUN.is_file():
+        parser.error(f"stable_run.py not found: {STABLE_RUN}")
+    try:
+        options = stable_run_options()
+    except ValueError as error:
+        parser.error(str(error))
+    # Check the existing comparison dependency before spending time on builds.
+    from gbench import report
+
+    saveCWD = Path.cwd()
+    try:
+        for i in range(args.num_runs):
+            if not buildAndRunBench(i, "baseline", [], labRootPath, saveCWD, options, args.v):
+                return 1
+            if not buildAndRunBench(i, "solution", ["-DCMAKE_CXX_FLAGS=-D" + args.D],
+                                    labRootPath, saveCWD, options, args.v):
+                return 1
+        for i in range(args.num_runs):
+            compareResults(i, saveCWD)
+    except KeyboardInterrupt:
+        print("Interrupted; stable_run.py restores settings or retains its recovery snapshot.", file=sys.stderr)
+        return 130
+    except (OSError, ValueError) as error:
+        print(f"Comparison failed: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

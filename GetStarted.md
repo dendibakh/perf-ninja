@@ -115,6 +115,12 @@ Here are a few tips that will help you compare the results of your experiments a
     python3 ~/workspace/perf-ninja/tools/check_speedup.py -lab_path ../ -num_runs 3
     ```
 
+    `check_speedup.py` runs each measurement through the Linux `stable_run.py` helper
+    with the same defaults and environment overrides as `run_lab.sh`. Run as your
+    normal user: the helper requests `sudo` and restores CPU settings, the platform
+    profile and power limits after each measurement. Compilation and validation
+    run normally. See [tools/misc/README.md](tools/misc/README.md#comparing-baseline-and-solution).
+
 ## Submission guidelines:
 
 **IMPORTANT:** Send a request to be added as a collaborator to this Github repo. Otherwise, you won't be able to push your private branch[es]. Send your github handle to dendibakh@gmail.com with the topic "[PerfNinjaAccessRequest]". Do not fork the repo and submit a pull request with your solution, the CI job won't be triggered.
