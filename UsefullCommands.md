@@ -22,13 +22,13 @@ python3 -m venv ~/cmake-venv
 
 ### Build Lab
 ```bash
-~/cmake-venv/bin/cmake -E make_directory build
+cmake -E make_directory build
 cd ./build
-~/cmake-venv/bin/cmake -DCMAKE_BUILD_TYPE=Release ..
-~/cmake-venv/bin/cmake --build . --config Release --parallel 8
-~/cmake-venv/bin/cmake --build . --config Debug --parallel 8 # for intel advisor :D 
-~/cmake-venv/bin/cmake --build . --target validateLab
-~/cmake-venv/bin/cmake --build . --target benchmarkLab
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --config Release --parallel 8
+cmake --build . --config Debug --parallel 8 # for intel advisor :D 
+cmake --build . --target validateLab
+cmake --build . --target benchmarkLab
 ```
 
 ### Set perf counter access
@@ -42,6 +42,7 @@ cat /proc/sys/kernel/perf_event_paranoid
 ```bash
 perf list | grep -Ei 'L1-dcache|L1-icache|L2|LLC|cache-miss|cache-load'
 
+# Cache counters
 perf stat -e \
 cycles,instructions,\
 l2_rqsts.demand_data_rd_hit,\
@@ -53,6 +54,9 @@ mem_load_retired.l2_miss,\
 mem_load_retired.l3_hit,\
 mem_load_retired.l3_miss \
 ./lab
+
+# TLB Counters
+
 ```
 
 ### Top down analisys
