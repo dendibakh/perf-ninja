@@ -20,7 +20,13 @@ unsigned getSumOfDigits(unsigned n) {
 // Hint: Traversing a linked list is a long data dependency chain:
 //       to get the node N+1 you need to retrieve the node N first.
 //       Think how you can execute multiple dependency chains in parallel.
-unsigned solution(List *l1, List *l2) {
+
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bench1           72.4 ms         72.4 ms            9
+
+unsigned solution_baseline(List *l1, List *l2) {
   unsigned retVal = 0;
 
   List *head2 = l2;
@@ -37,6 +43,6 @@ unsigned solution(List *l1, List *l2) {
     }
     l1 = l1->next;
   }
-
   return retVal;
 }
+

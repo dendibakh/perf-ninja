@@ -31,7 +31,8 @@ int main() {
   auto l2 = getRandomList(arena2);
 
   auto original_result = original_solution(l1, l2);
-  auto result = solution(l1, l2);
+  auto result = solution<16>(l1, l2);
+  // auto result = solution(l1, l2);
 
   if (original_result != result) {
     std::cerr << "Validation Failed. Original result = " << original_result
