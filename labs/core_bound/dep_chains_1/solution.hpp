@@ -24,7 +24,7 @@ unsigned solution_baseline(List *l1, List *l2);
 // bench1<2>        39.1 ms         39.1 ms           17
 // bench1<4>        22.9 ms         22.9 ms           33
 // bench1<8>        14.6 ms         14.6 ms           48
-// bench1<16>       10.7 ms         10.7 ms           63
+// bench1<16>       10.7 ms         10.7 ms           63 <----- WINNER
 // bench1<32>       36.7 ms         36.7 ms           18
 // bench1<64>       30.4 ms         30.4 ms           23
 template <size_t group_size>
