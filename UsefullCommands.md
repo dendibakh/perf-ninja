@@ -17,7 +17,7 @@ cp perf /usr/bin
 sudo apt install python3-venv python3-full
 python3 -m venv ~/cmake-venv
 ~/cmake-venv/bin/pip install --upgrade cmake
-~/cmake-venv/bin/cmake --version
+cmake --version
 ```
 
 ### Build Lab

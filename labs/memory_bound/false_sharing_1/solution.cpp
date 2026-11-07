@@ -8,7 +8,17 @@ std::size_t solution(const std::vector<uint32_t> &data, int thread_count) {
   // Using std::atomic counters to disallow compiler to promote `target`
   // memory location into a register. This way we ensure that the store
   // to `target` stays inside the loop.
-  struct Accumulator {
+  // Baseline - Without alignas
+  // -----------------------------------------------------------
+  // Benchmark                 Time             CPU   Iterations
+  // -----------------------------------------------------------
+  // bench1/real_time        187 ms          174 ms            4
+  
+  // -----------------------------------------------------------
+  // Benchmark                 Time             CPU   Iterations
+  // -----------------------------------------------------------
+  // bench1/real_time       31.2 ms         30.5 ms           21
+  struct alignas(64) Accumulator {
     std::atomic<uint32_t> value = 0;
   };
   std::vector<Accumulator> accumulators(thread_count);
