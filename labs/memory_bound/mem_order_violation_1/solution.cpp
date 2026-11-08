@@ -5,17 +5,185 @@
 #include <stdint.h>
 #include <cmath>
 #include <ios>
+#include <immintrin.h>
 
 // ******************************************
 // ONLY THE FOLLOWING FUNCTION IS BENCHMARKED
 // Compute the histogram of image pixels
-std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bird/0           77.4 us         77.4 us         8937
+// coins/1          35.2 us         35.2 us        19990
+// pepper/2         30.6 us         30.6 us        22418
+// pixabay/3        14.7 ms         14.7 ms           49
+
+std::array<uint32_t, 256> computeHistogram_2(const GrayscaleImage& image) {
   std::array<uint32_t, 256> hist;
   hist.fill(0);
-  for (int i = 0; i < image.width * image.height; ++i)
+
+  for (int i = 0; i < image.width * image.height; ++i){
     hist[image.data[i]]++;
+  }
   return hist;
 }
+
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bird/0           56.2 us         56.2 us        12459
+// coins/1          27.4 us         27.4 us        25535
+// pepper/2         24.8 us         24.8 us        28618
+// pixabay/3        11.5 ms         11.5 ms           61
+
+// .L4:
+//         movdqa  1024(%rsp,%rax), %xmm0
+//         paddd   (%rsp,%rax), %xmm0
+//         paddd   3072(%rsp,%rax), %xmm0
+//         paddd   2048(%rsp,%rax), %xmm0
+//         movups  %xmm0, (%rbx,%rax)
+
+std::array<uint32_t, 256> computeHistogram_simple(const GrayscaleImage& image) {
+  std::array<uint32_t, 256> hist_1;
+  std::array<uint32_t, 256> hist_2;
+  std::array<uint32_t, 256> hist_3;
+  std::array<uint32_t, 256> hist_4;
+
+  hist_1.fill(0);
+  hist_2.fill(0);
+  hist_3.fill(0);
+  hist_4.fill(0);
+
+  int chunks = (image.width * image.height)/4;
+  int main_iter_count = chunks * 4;
+
+  for (int i = 0; i < main_iter_count; i+=4){
+    hist_1[image.data[i]]++;
+    hist_2[image.data[i+1]]++;
+    hist_3[image.data[i+2]]++;
+    hist_4[image.data[i+3]]++;
+  }
+
+  std::array<uint32_t, 256> hist_final;
+  hist_final.fill(0);
+
+  for (int i = 0; i < 256; ++i) {
+    hist_final[i] =
+        hist_1[i] + hist_2[i] +
+        hist_3[i] + hist_4[i];
+  }
+
+  for (int i = main_iter_count; i < image.width * image.height; ++i){
+    hist_final[image.data[i]]++;
+  }
+
+  return hist_final;
+}
+
+std::array<uint32_t, 256> computeHistogram(const GrayscaleImage& image) {
+  std::array<uint32_t, 256> hist_1;
+  std::array<uint32_t, 256> hist_2;
+  std::array<uint32_t, 256> hist_3;
+  std::array<uint32_t, 256> hist_4;
+  std::array<uint32_t, 256> hist_5;
+  std::array<uint32_t, 256> hist_6;
+
+  hist_1.fill(0);
+  hist_2.fill(0);
+  hist_3.fill(0);
+  hist_4.fill(0);
+  hist_5.fill(0);
+  hist_6.fill(0);
+
+  int chunks = (image.width * image.height)/6;
+  int main_iter_count = chunks * 6;
+
+  for (int i = 0; i < main_iter_count; i+=6){
+    hist_1[image.data[i]]++;
+    hist_2[image.data[i+1]]++;
+    hist_3[image.data[i+2]]++;
+    hist_4[image.data[i+3]]++;
+    hist_5[image.data[i+4]]++;
+    hist_6[image.data[i+5]]++;
+  }
+
+  std::array<uint32_t, 256> hist_final;
+  hist_final.fill(0);
+
+  for (int i = 0; i < 256; ++i) {
+    hist_final[i] =
+        hist_1[i] + hist_2[i] +
+        hist_3[i] + hist_4[i] + 
+        hist_5[i] + hist_6[i];
+  }
+
+  for (int i = main_iter_count; i < image.width * image.height; ++i){
+    hist_final[image.data[i]]++;
+  }
+
+  return hist_final;
+}
+
+// -----------------------------------------------------
+// Benchmark           Time             CPU   Iterations
+// -----------------------------------------------------
+// bird/0           56.0 us         56.0 us        12058
+// coins/1          27.3 us         27.3 us        25935
+// pepper/2         24.4 us         24.4 us        29380
+// pixabay/3        11.7 ms         11.7 ms           61
+std::array<uint32_t, 256> computeHistogram_SIMD(const GrayscaleImage& image) {
+  std::array<uint32_t, 256> hist_1;
+  std::array<uint32_t, 256> hist_2;
+  std::array<uint32_t, 256> hist_3;
+  std::array<uint32_t, 256> hist_4;
+
+  hist_1.fill(0);
+  hist_2.fill(0);
+  hist_3.fill(0);
+  hist_4.fill(0);
+
+  int chunks = (image.width * image.height)/4;
+  int main_iter_count = chunks * 4;
+
+  for (int i = 0; i < main_iter_count; i+=4){
+    hist_1[image.data[i]]++;
+    hist_2[image.data[i+1]]++;
+    hist_3[image.data[i+2]]++;
+    hist_4[image.data[i+3]]++;
+  }
+
+  std::array<uint32_t, 256> hist_final;
+  hist_final.fill(0);
+
+  for (int i = 0; i < 256; i += 8) {
+    __m256i h1 = _mm256_loadu_si256(
+        reinterpret_cast<const __m256i*>(&hist_1[i]));
+
+    __m256i h2 = _mm256_loadu_si256(
+        reinterpret_cast<const __m256i*>(&hist_2[i]));
+
+    __m256i h3 = _mm256_loadu_si256(
+        reinterpret_cast<const __m256i*>(&hist_3[i]));
+
+    __m256i h4 = _mm256_loadu_si256(
+        reinterpret_cast<const __m256i*>(&hist_4[i]));
+
+    __m256i sum = _mm256_add_epi32(h1, h2);
+    sum = _mm256_add_epi32(sum, h3);
+    sum = _mm256_add_epi32(sum, h4);
+
+    _mm256_storeu_si256(
+        reinterpret_cast<__m256i*>(&hist_final[i]), sum);
+}
+
+  for (int i = main_iter_count; i < image.width * image.height; ++i){
+    hist_final[image.data[i]]++;
+  }
+
+  return hist_final;
+}
+
 // ******************************************
 
 // Calculate Otsu's Threshold
