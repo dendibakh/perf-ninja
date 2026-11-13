@@ -22,13 +22,24 @@ cmake --version
 
 ### Build Lab
 ```bash
-cmake -E make_directory build
-cd ./build
+cmake -E make_directory build && cd ./build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release --parallel 8
+
 cmake --build . --config Debug --parallel 8 # for intel advisor :D 
+
+cmake -DCMAKE_BUILD_TYPE=Release .. -DCMAKE_CXX_FLAGS_RELEASE="-O3 -march=native -fopt-info-vec-all=vectorization.txt"
+cmake --build . --config Release --parallel 8
+
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
+```
+
+### Checking vectorization
+```bash
+cmake -E make_directory build && cd ./build
+cmake -DCMAKE_BUILD_TYPE=Release .. -DCMAKE_CXX_FLAGS_RELEASE="-O3 -march=native -fopt-info-vec-all=vectorization.txt"
+cmake --build . --config Release --parallel 8
 ```
 
 ### Set perf counter access

@@ -29,7 +29,7 @@ Lab assignments in this project are implemented in C++. Also, Performance Ninja 
 * Core Bound:
   * [Vectorization 1](labs/core_bound/vectorization_1)
   * [Vectorization 2](labs/core_bound/vectorization_2)
-  * [Function Inlining](labs/core_bound/function_inlining_1)
+  * ✅ [Function Inlining](labs/core_bound/function_inlining_1)
   * ✅ [Dependency Chains 1](labs/core_bound/dep_chains_1)
   * ✅ [Dependency Chains 2](labs/core_bound/dep_chains_2)
   * [Compiler Intrinsics 1](labs/core_bound/compiler_intrinsics_1)
