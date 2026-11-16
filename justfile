@@ -7,6 +7,8 @@ cpu := "0"
 defines := if baseline == "1" { "" } else { "-DSOLUTION" } 
 
 flags := "-g -fno-omit-frame-pointer " + defines
+cc := "clang"
+cxx := "clang++"
 
 default:
     @just --list
@@ -18,6 +20,8 @@ configure:
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_FLAGS="{{flags}}" \
         -DCMAKE_CXX_FLAGS="{{flags}}" \
+        -DCMAKE_C_COMPILER={{cc}} \
+        -DCMAKE_CXX_COMPILER={{cxx}} \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Build all lab targets
@@ -51,6 +55,11 @@ profile event="cycles": build
     taskset -c {{cpu}} perf record -e cpu_core/{{event}}/pp -o {{build_dir}}/perf.data ./{{build_dir}}/lab
     perf annotate -i {{build_dir}}/perf.data
 
+# toplev
+[no-cd]
+toplev *args: build
+    taskset -c {{cpu}} toplev {{args}} ./{{build_dir}}/lab
+
 # Build baseline and #ifdef SOLUTION variants N times each and compare them
 [no-cd]
 speedup runs="3" *args:
@@ -61,7 +70,7 @@ speedup runs="3" *args:
 [no-cd]
 remarks pass="loop-vectorize|slp-vectorizer":
     cmake -S . -B {{build_dir}}-remarks -G "{{generator}}" -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_C_COMPILER={{cc}} -DCMAKE_CXX_COMPILER={{cxx}} \
         -DCMAKE_CXX_FLAGS="-g {{defines}} -Rpass='{{pass}}' -Rpass-missed='{{pass}}' -Rpass-analysis='{{pass}}' -fsave-optimization-record" \
         > /dev/null
     cmake --build {{build_dir}}-remarks --clean-first 2>&1 | grep 'remark:' | grep -v '/_deps/\|benchmark/' | sort -u
