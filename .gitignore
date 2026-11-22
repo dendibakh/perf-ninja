@@ -22,5 +22,6 @@ labs/core_bound/compiler_intrinsics_4/data
 build_solution
 build_baseline
 build
+build-clang
 results.json
 /tools/benchmark/

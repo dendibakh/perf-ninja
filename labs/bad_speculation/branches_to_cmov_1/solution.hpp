@@ -117,7 +117,7 @@ public:
 
                 if(aliveNeighbours == 2) {
                     cell_val = current[i][j];
-                } 
+                }
                 
                 if(aliveNeighbours == 3) {
                     cell_val = 1;

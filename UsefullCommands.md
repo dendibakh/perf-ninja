@@ -20,7 +20,7 @@ python3 -m venv ~/cmake-venv
 cmake --version
 ```
 
-### Build Lab
+### Build Lab GCC
 ```bash
 cmake -E make_directory build && cd ./build && cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release --parallel 8
@@ -32,6 +32,13 @@ cmake --build . --config Release --parallel 8
 
 cmake --build . --target validateLab
 cmake --build . --target benchmarkLab
+```
+
+### Build Lab Clang
+```bash
+cmake -E make_directory build-clang && cd build-clang
+cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE="-O3 -march=native"
+cmake --build . --parallel 8
 ```
 
 ### Checking vectorization
