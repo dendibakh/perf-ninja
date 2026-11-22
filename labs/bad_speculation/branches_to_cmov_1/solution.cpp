@@ -25,7 +25,7 @@ std::vector<int> solution(const std::vector<Life::Grid>& grids) {
   for (auto& grid : grids) {
     life.reset(grid);
     for (int i = 0; i < NumberOfSims; i++)
-      life.simulateNext_opt();
+      life.simulateNext();
     popCounts.push_back(life.getPopulationCount());
   }
 

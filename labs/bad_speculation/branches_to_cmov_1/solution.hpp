@@ -40,7 +40,7 @@ public:
     }    
 
     // Simulate the next generation of life
-    void simulateNext() {
+    void simulateNext_base() {
         //printCurrentGrid();
         int M = current.size();
         int N = current[0].size();
@@ -88,7 +88,18 @@ public:
         std::swap(current, future);
     }
 
-    void simulateNext_opt() {
+
+    // -----------------------------------------------------
+    // Benchmark           Time             CPU   Iterations
+    // -----------------------------------------------------
+    // bench1            423 ms          423 ms            2
+
+    // Performance counter stats for './lab':
+
+    //         3166201515      branches:u                                                            
+    //             909816      branch-misses:u                  #    0.03% of all branches     
+
+    void simulateNext() {
         //printCurrentGrid();
         int M = current.size();
         int N = current[0].size();
@@ -117,7 +128,7 @@ public:
 
                 if(aliveNeighbours == 2) {
                     cell_val = current[i][j];
-                }
+                } 
                 
                 if(aliveNeighbours == 3) {
                     cell_val = 1;
