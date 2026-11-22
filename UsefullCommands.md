@@ -22,8 +22,7 @@ cmake --version
 
 ### Build Lab
 ```bash
-cmake -E make_directory build && cd ./build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -E make_directory build && cd ./build && cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release --parallel 8
 
 cmake --build . --config Debug --parallel 8 # for intel advisor :D 
@@ -47,6 +46,17 @@ cmake --build . --config Release --parallel 8
 cat /proc/sys/kernel/perf_event_paranoid
 sudo sysctl -w kernel.perf_event_paranoid=-1
 cat /proc/sys/kernel/perf_event_paranoid
+```
+
+## Branch misses
+```bash
+perf stat -e branches,branch-misses ./lab
+
+# find code lines
+cmake -DCMAKE_BUILD_TYPE=Debug .. -DCMAKE_CXX_FLAGS_RELEASE="-g -O3 -fno-omit-frame-pointer"
+cmake --build . --config Debug --parallel 8
+perf record -e branch-misses:u -g -- ./lab
+perf report
 ```
 
 ### List Counters
